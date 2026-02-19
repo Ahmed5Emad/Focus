@@ -1,15 +1,10 @@
-import { Button } from "./components/ui/button"
-import { HeroSection } from "./sections/hero/HeroSection"
+import Home from "./Pages/Home/Home"
 
 function App() {
 
   return (
     <>
-    <div className="flex flex-col  w-lvw h-lvh items-center justify-center ">
-
-    <HeroSection />
-    </div>
-      
+      <Home />
     </>
   )
 }

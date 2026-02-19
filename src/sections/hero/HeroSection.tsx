@@ -6,7 +6,8 @@ import { ButtonGroup } from "@/components/ui/ButtonGroup";
 
 export function HeroSection() {
   return (
-    <div className="flex mb-4 flex-col justify-center gap-2">
+    <div className='w-full flex flex-row px-32'>
+    <div className="flex mb-4 flex-col w-1/2 justify-center gap-2">
       <h1 className="text-4xl font-bold ">
         Software to <br />
         replace all software
@@ -43,6 +44,10 @@ export function HeroSection() {
       <p className="newfont font-medium text-[14px]">Get 400% more done • Customize your workspace</p>
       <ButtonGroup></ButtonGroup>
 
+    </div>
+    <div className="flex flex-col w-1/2 rounded-2xl justify-center gap-2 border shadow-xl">
+
+    </div>
     </div>
   );
 }

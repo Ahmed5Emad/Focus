@@ -1,4 +1,4 @@
-import { Button } from "./button"
+import { Toggle } from "./toggle"
 
 
 
@@ -9,11 +9,11 @@ var content = [ "Projects" , "Chats" , "Workspaces" , "Calendar"
     ]
  
     return ( 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
         {content.map((item) => (
-          <Button className="" size="xs" variant="outline" key={item}>
+          <Toggle className="" size="sm" variant="hero" key={item}>
             {item}
-          </Button>
+          </Toggle>
         ))}
       </div>
 
