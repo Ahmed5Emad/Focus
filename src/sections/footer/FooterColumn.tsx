@@ -1,4 +1,9 @@
-function FooterColumn({ title, links }) {
+interface FooterColumnProps {
+  title: string;
+  links: string[];
+}
+
+function FooterColumn({ title, links }: FooterColumnProps) {
   return (
     <div>
       <h3 className="font-semibold mb-4">{title}</h3>

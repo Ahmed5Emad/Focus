@@ -1,55 +1,41 @@
 import { Button } from "@/components/ui/button";
-import { CheckIcon } from "lucide-react";
-import './HeroSection.css';
-import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 
 export function HeroSection() {
   const navigate = useNavigate();
   return (
-    <div className='w-full flex flex-row px-32'>
-    <div className="flex mb-4 flex-col w-1/2 justify-center gap-2">
-      <h1 className="text-4xl font-bold ">
-        Software to <br />
-        replace all software
-      </h1>
-      <p>
-        <ul className="flex gap-2 font-semibold">
-          {" "}
-          <CheckIcon className="text-blue-500 " /> Save money.{" "}
-          <p className="font-normal">
-            All Apps, AI, Projects, Chat + 20 more.
-          </p>{" "}
-        </ul>
-        <ul className="flex gap-2 font-semibold">
-          {" "}
-          <CheckIcon className="text-blue-500 " />
-          Save time.{" "}
-          <p className="font-normal">
-            All humans working together with perfect context.
-          </p>
-        </ul>
-        <ul className="flex gap-2 font-semibold">
-          {" "}
-          <CheckIcon className="text-blue-500 " />
-          Create infinite productivity.{" "}
-          <p className="font-normal">AI Agents & Workflows.</p>{" "}
-        </ul>
-      </p>
-      <div className="flex my-6 gap-2">
-        <Button size="lg" className="w-1/2 shadow-2xl font-bold text-1xl" onClick={() => navigate("/signup")}>
-          Get Started
-        </Button> 
-        <p className="font-light text-gray-500 text-sm">free forever<br/> no credit card.</p>
+    <div className="w-full flex my-16 self-stretch flex-col items-center px-32">
+      <div className="flex mb-4 flex-col w-1/2 items-center justify-center gap-2">
+        <h1 className="text-8xl -tracking-wide text-center  font-black  ">
+          Focus on work. <br />
+          <p className="text-gray-400 -tracking-tight">Not on the app.</p>
+        </h1>
+        <p className="text-center mt-8 text-gray-500 " >
+         A brutalist, distraction-free workspace designed for high-performance ,<br />
+teams who value speed over decoration.
+        </p>
+        <div className="flex my-10 gap-2">
+          <Button
+            size="lg"
+            className="shadow-2xl  px-8 font-bold text-1xl"
+            onClick={() => navigate("/signup")}
+          >
+            Get Started Free <ArrowRight />
+          </Button>
+          <Button
+          size="lg"
+          variant="outline"
+          className="shadow-2xl px-8"
+          >
+            View Documentation
+          </Button>
+        </div>
       </div>
-      <p className="newfont font-medium text-[14px]">Get 400% more done • Customize your workspace</p>
-      <ButtonGroup></ButtonGroup>
-
+      <div className="flex flex-col max-w-7xl w-7xl items-center content-start">
+        <div className="flex flex-col self-stretch content-start max-w-7xl rounded-md h-270 gap-2 border shadow-xl"></div>
     </div>
-    <div className="flex flex-col w-1/2 rounded-2xl justify-center gap-2 border shadow-xl">
-
-    </div>
-    </div>
+      </div>
+      
   );
 }

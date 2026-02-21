@@ -19,12 +19,12 @@ export function FeaturesCard({
   return (
     <div 
       className={cn(
-        "flex flex-col w-1/3 gap-4 p-6 rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md", 
+        "flex flex-col w-1/3 gap-4 p-6 border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md", 
         className
       )} 
       {...props}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <div className="flex h-12 w-12 border border-gray-200 items-center shadow-[0_1px_2px_rgba(0,0,0,0.05)] justify-center rounded-lg bg-white text-primary">
         <Icon className="h-6 w-6" />
       </div>
       <div className="space-y-2">
