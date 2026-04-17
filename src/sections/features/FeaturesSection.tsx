@@ -6,27 +6,37 @@ const features = [
   {
     icon: Layers,
     head: "Task Management",
-    description: "Organize your daily goals with a simple, keyboard-driven list. Drag, drop, done."
+    description: "Organize your daily goals with a simple, keyboard-driven list. Drag, drop, done.",
+    iconColorClass: "text-cu-purple",
+    iconBgClass: "bg-cu-purple/10"
   },
   {
     icon: Zap,
     head: "Instant Sync",
-    description: "Changes reflect instantly across all devices. Offline support included."
+    description: "Changes reflect instantly across all devices. Offline support included.",
+    iconColorClass: "text-cu-pink",
+    iconBgClass: "bg-cu-pink/10"
   },
   {
     icon: Rocket,
     head: "Seamless Scaling",
-    description: "Visualize progress without the clutter of traditional dashboards. Real-time updates without the noise."
+    description: "Visualize progress without the clutter of traditional dashboards. Real-time updates without the noise.",
+    iconColorClass: "text-cu-orange",
+    iconBgClass: "bg-cu-orange/10"
   },
   {
-    icon: Rocket,
-    head: "Seamless Scaling",
-    description: "Visualize progress without the clutter of traditional dashboards. Real-time updates without the noise."
+    icon: Layers,
+    head: "Custom Workflows",
+    description: "Adapt the app to your team's unique processes with fully customizable statuses and fields.",
+    iconColorClass: "text-cu-blue",
+    iconBgClass: "bg-cu-blue/10"
   },
   {
-    icon: Rocket,
-    head: "Seamless Scaling",
-    description: "Visualize progress without the clutter of traditional dashboards. Real-time updates without the noise."
+    icon: Zap,
+    head: "Automations",
+    description: "Save time by automating repetitive tasks and streamlining your team's workflow.",
+    iconColorClass: "text-cu-green",
+    iconBgClass: "bg-cu-green/10"
   },
 ];
 
@@ -39,19 +49,21 @@ function FeaturesSection() {
             Designed for Deep Work
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Remove the clutter. Focus provides a stripped-down environment where your
-content is the only thing that matters.
+            Remove the clutter. Focus provides a vibrant environment where your
+content is clearly organized and accessible.
           </p>
         </div>
         
-        <div className="featureGrid  gap-0">
+        <div className="featureGrid gap-[1px] bg-gray-200 border border-gray-200 rounded-xl overflow-hidden shadow-sm w-full max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <FeaturesCard
-              className={`feature${index} w-full`}
+              className={`feature${index} w-full h-full bg-white`}
               key={index}
               icon={feature.icon}
               head={feature.head}
               description={feature.description}
+              iconColorClass={feature.iconColorClass}
+              iconBgClass={feature.iconBgClass}
             />
           )
           )}
