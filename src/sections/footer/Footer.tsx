@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import logo from "../../assets/logo.svg";
 import { Globe, SquareTerminal } from "lucide-react";
 
@@ -34,50 +33,6 @@ function FooterColumn({ title, links }: FooterColumnProps) {
   );
 }
 
-function FinalCTA() {
-  return (
-    <section className="bg-slate-950 text-white" aria-labelledby="cta-heading">
-      <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-        <div className="max-w-xl">
-          <h2 id="cta-heading" className="text-4xl md:text-5xl font-black mb-4">
-            Ready to reclaim your focus?
-          </h2>
-          <p className="text-slate-300 text-lg">
-            Join thousands of high-performing teams who have switched to a
-            more productive, colorful way of working.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            className="
-              bg-cu-purple text-white px-8 py-4 rounded-xl font-bold
-              hover:bg-cu-purple/90 shadow-lg shadow-cu-purple/20
-              focus:outline-none focus:ring-2 focus:ring-cu-purple focus:ring-offset-2 focus:ring-offset-slate-950
-              transition
-            "
-            aria-label="Get started for free"
-          >
-            Get Started Free
-          </button>
-
-          <button
-            className="
-              border-2 border-slate-700 px-8 py-4 rounded-xl font-bold
-              hover:bg-slate-800 text-white
-              focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950
-              transition
-            "
-            aria-label="Talk to sales team"
-          >
-            Talk to Sales
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -86,9 +41,6 @@ function Footer() {
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
-
-      {/* CTA Section */}
-      <FinalCTA />
 
       {/* Main Footer Content */}
       <section className="bg-white">
@@ -132,11 +84,12 @@ function Footer() {
             <p>© {currentYear} Focus Technology Group. All rights reserved.</p>
 
             <div className="flex gap-4 mt-4 md:mt-0">
-              <div className="gap-2 flex flex-row">
+              <div className="gap-6 flex flex-row items-center">
                 {icons.map((Icon, index) => (
-                  <Button key={index} size={"lg"} className="h-10 w-10">
-                    <Icon className="text-2xl" />
-                  </Button>
+                  <a key={index} href="#" className="text-slate-400 hover:text-slate-900 transition-colors">
+                    <Icon className="w-6 h-6" />
+                    <span className="sr-only">Social Link</span>
+                  </a>
                 ))}
               </div>
             </div>
