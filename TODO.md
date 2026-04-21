@@ -1,0 +1,37 @@
+# Plan for **Focus** project 
+--- 
+## Phase 0: Onboarding 
+- [X] Welcome
+- [ ] Deepwork
+- [ ] text
+- [ ] text
+
+
+## Phase 1: Post-Auth Architecture
+- [ ] Create `AppLayout` component (authenticated shell with sidebar/header).
+- [ ] Implement Protected Routes (redirect unauthenticated users to `/login`).
+- [ ] Setup global state management for user session and app data.
+## Phase 2: Core App Interface
+- [ ] Build User Dashboard (overview, quick actions).
+- [ ] Implement Task Management System (CRUD for tasks).
+---
+## Phase 3: "Focus" Productivity Features
+- [ ] Develop the Focus Session Timer (Pomodoro).
+- [ ] Integrate Timer with Task list (track time per task).
+- [ ] Build Distraction Log component.
+## Phase 4: Core Productivity Features (MVP Promises)
+- [ ] **Task Management Engine:** Implement keyboard-driven CRUD (Create, Read, Update, Delete) for tasks (per `FeaturesSection`).
+- [ ] **Goal Tracking:** Build the "Goals" management module.
+- [ ] **Real-time Synchronization:** Implement the promised "Instant Sync" mechanism using a real-time backend (e.g., Supabase/Firebase).
+---
+## Phase 5: Power User Tools
+- [ ] **Command Palette:** Develop the "02_Control" Command Palette (⌘K interface) for navigation and task manipulation, as promised in the `Featured` page.
+- [ ] **Custom Workflow Configuration:** Implement the ability to define custom statuses and fields for tasks.
+- [ ] **Global Graph Visualization:** Build the "04_Graph" engine to visualize the network interconnectivity of projects, tasks, and data points.
+## Phase 6: Collaboration & Integration
+- [ ] **Chat & Document Integration:** Implement basic chat and document handling modules to fulfill the "Tasks, Docs, Chat" promise from the Hero section.
+- [ ] **Automations Framework:** Build the foundation for the promised task automations.
+## Phase 7: Polish & Performance
+- [ ] **Zero-Latency Interaction:** Optimize key bindings and UI transitions to ensure "zero-latency" feel as promised in the "03_Flow" section.
+- [ ] **UI/UX Refinement:** Ensure all new components strictly adhere to the established Tailwind `cu-*` color palette and micro-interaction patterns.
+

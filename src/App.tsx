@@ -5,6 +5,8 @@ import { LoginForm } from "./Pages/LogIn/login-form";
 import Pricing from "./Pages/Pricing/Pricing";
 import About from "./Pages/About/About";
 import Featured from "./Pages/Featured/Featured";
+import OnboardingWelcome from "./Pages/Onboarding/OnboardingWelcome";
+import OnboardingDeepWork from "./Pages/Onboarding/OnboardingDeepWork";
 
 function App() {
 
@@ -17,6 +19,8 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/features" element={<Featured />} />
+        <Route path="/onboarding" element={<OnboardingWelcome />} />
+        <Route path="/onboarding/deep-work" element={<OnboardingDeepWork />} />
       </Routes>
     </BrowserRouter>
   )

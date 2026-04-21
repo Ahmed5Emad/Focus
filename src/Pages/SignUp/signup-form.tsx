@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,10 +15,17 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/onboarding');
+  };
+
   return (
     <div className={cn("min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-white to-cu-orange/5 p-4", className)} {...props}>
       <div className="w-full max-w-md flex flex-col gap-6 bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 sm:p-10 relative overflow-hidden">
-        <form>
+        <form onSubmit={handleSubmit}>
           <FieldGroup>
             <div className="flex flex-col items-center gap-2 text-center mb-4">
               <Link
