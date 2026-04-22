@@ -1,5 +1,5 @@
 import Home from "./Pages/Home/Home"
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { SignupForm } from "./Pages/SignUp/signup-form";
 import { LoginForm } from "./Pages/LogIn/login-form";
 import Pricing from "./Pages/Pricing/Pricing";
@@ -11,11 +11,11 @@ import OnboardingPowerTools from "./Pages/Onboarding/OnboardingPowerTools";
 import OnboardingFinalSetup from "./Pages/Onboarding/OnboardingFinalSetup";
 
 function App() {
-
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/pricing" element={<Pricing />} />
@@ -26,7 +26,7 @@ function App() {
         <Route path="/onboarding/power-tools" element={<OnboardingPowerTools />} />
         <Route path="/onboarding/final-setup" element={<OnboardingFinalSetup />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
