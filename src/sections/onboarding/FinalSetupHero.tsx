@@ -16,10 +16,16 @@ export const FinalSetupHero: React.FC<FinalSetupHeroProps> = ({ className = '' }
       <h1 className="text-5xl font-bold text-slate-950 tracking-tight">{finalSetup.title}</h1>
       <p className="text-lg text-slate-600 max-w-md leading-relaxed">{finalSetup.description}</p>
       
-      {/* Placeholder for workspace image */}
-      <div className="relative rounded-2xl overflow-hidden shadow-xl mt-4">
-        <div className="w-full aspect-video bg-slate-200 flex items-center justify-center text-slate-400">
-            Workspace Preview
+      {/* Placeholder for workspace image - Increased height */}
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl mt-4 border border-slate-200 h-[350px]">
+        <div className="w-full h-full bg-slate-900 flex items-center justify-center text-slate-500">
+            <span className="material-symbols-outlined text-8xl opacity-30">desktop_windows</span>
+        </div>
+        {/* Decorative elements to fill the panel */}
+        <div className="absolute top-4 left-4 flex gap-2">
+            <div className="w-3 h-3 rounded-full bg-cu-red opacity-80"></div>
+            <div className="w-3 h-3 rounded-full bg-cu-yellow opacity-80"></div>
+            <div className="w-3 h-3 rounded-full bg-cu-green opacity-80"></div>
         </div>
       </div>
     </div>

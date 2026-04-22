@@ -6,8 +6,6 @@ import Header from '../../sections/onboarding/Header';
 import { Slider } from '../../components/ui/slider';
 import { Link } from 'react-router-dom';
 
-import { Link } from 'react-router-dom';
-
 const OnboardingWelcome: React.FC = () => {
   console.log("Rendering OnboardingWelcome");
   return (
@@ -32,7 +30,5 @@ const OnboardingWelcome: React.FC = () => {
     </div>
   );
 };
-
-
 
 export default OnboardingWelcome;
