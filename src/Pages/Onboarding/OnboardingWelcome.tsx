@@ -1,9 +1,11 @@
 import React from 'react';
-import Header from '../../sections/onboarding/Header';
 import Hero from '../../sections/onboarding/Hero';
 import Visuals from '../../sections/onboarding/Visuals';
 import Stats from '../../sections/onboarding/Stats';
+import Header from '../../sections/onboarding/Header';
 import { Slider } from '../../components/ui/slider';
+import { Link } from 'react-router-dom';
+
 import { Link } from 'react-router-dom';
 
 const OnboardingWelcome: React.FC = () => {

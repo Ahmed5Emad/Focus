@@ -23,5 +23,29 @@ export const OnboardingData = {
       { title: "Capture every thought", description: "A dedicated distraction log to offload intrusive ideas instantly, keeping your current session uninterrupted.", icon: "edit_note" }
     ],
     primaryButton: "Next"
+  },
+  powerTools: {
+    badge: "Efficiency First",
+    title: "Built for speed.",
+    description: "Navigate your entire workspace without ever touching your mouse. Focus utilizes keyboard-first patterns to keep you in flow state, visualizing connections across your project's knowledge graph.",
+    features: [
+      { title: "Universal Command Palette", description: "Press ⌘K to trigger actions, search files, or switch contexts instantly.", icon: "keyboard_command_key" },
+      { title: "Knowledge Graph", description: "See how tasks, documents, and people are connected in a live visual web.", icon: "hub" }
+    ],
+    primaryButton: "Next"
+  },
+  finalSetup: {
+    badge: "Final Step",
+    title: "Let's set the stage.",
+    description: "Your environment dictates your output. Define your first workspace to start the journey of deep focus.",
+    workspaceLabel: "Workspace Name",
+    goalLabel: "Primary Focus Goal",
+    goals: [
+        { label: "Coding", icon: "code", value: "coding" },
+        { label: "Writing", icon: "edit_note", value: "writing" },
+        { label: "Design", icon: "brush", value: "design" }
+    ],
+    aiToggle: { label: "Enable Focus AI", subLabel: "Automatically optimizes notifications based on your activity." },
+    primaryButton: "Launch Workspace"
   }
 };

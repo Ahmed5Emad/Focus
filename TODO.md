@@ -1,12 +1,12 @@
 # Plan for **Focus** project 
 --- 
 ## Phase 0: Onboarding 
-- [X] Welcome
-- [ ] Deepwork
-- [ ] text
-- [ ] text
-
-
+- [X] Implement 'Onboarding: Welcome' screen
+- [X] Implement 'Onboarding: Deep work' screen
+- [ ] Implement 'Onboarding: Power Tools' screen
+- [ ] Implement 'Onboarding: Final Setup' screen
+- [ ] Ensure navigation flow between Welcome -> Deep Work -> Power Tools -> Final Setup
+--- 
 ## Phase 1: Post-Auth Architecture
 - [ ] Create `AppLayout` component (authenticated shell with sidebar/header).
 - [ ] Implement Protected Routes (redirect unauthenticated users to `/login`).
