@@ -1,3 +1,5 @@
+import { Code, FileEdit, Brush, Timer, Keyboard, Network } from "lucide-react";
+
 export const OnboardingData = {
   welcome: {
     hero: {
@@ -19,8 +21,8 @@ export const OnboardingData = {
     title: "Master your focus.",
     description: "Eliminate distractions and enter the flow state with precision-engineered tools designed for deep concentration.",
     features: [
-      { title: "Pomodoro integration", description: "Customizable focus intervals and intelligent break reminders to keep your cognitive load balanced.", icon: "timer" },
-      { title: "Capture every thought", description: "A dedicated distraction log to offload intrusive ideas instantly, keeping your current session uninterrupted.", icon: "edit_note" }
+      { title: "Pomodoro integration", description: "Customizable focus intervals and intelligent break reminders to keep your cognitive load balanced.", icon: Timer },
+      { title: "Capture every thought", description: "A dedicated distraction log to offload intrusive ideas instantly, keeping your current session uninterrupted.", icon: FileEdit }
     ],
     primaryButton: "Next"
   },
@@ -29,8 +31,8 @@ export const OnboardingData = {
     title: "Built for speed.",
     description: "Navigate your entire workspace without ever touching your mouse. Focus utilizes keyboard-first patterns to keep you in flow state, visualizing connections across your project's knowledge graph.",
     features: [
-      { title: "Universal Command Palette", description: "Press ⌘K to trigger actions, search files, or switch contexts instantly.", icon: "keyboard_command_key" },
-      { title: "Knowledge Graph", description: "See how tasks, documents, and people are connected in a live visual web.", icon: "hub" }
+      { title: "Universal Command Palette", description: "Press ⌘K to trigger actions, search files, or switch contexts instantly.", icon: Keyboard },
+      { title: "Knowledge Graph", description: "See how tasks, documents, and people are connected in a live visual web.", icon: Network }
     ],
     primaryButton: "Next"
   },
@@ -41,9 +43,9 @@ export const OnboardingData = {
     workspaceLabel: "Workspace Name",
     goalLabel: "Primary Focus Goal",
     goals: [
-        { label: "Coding", icon: "code", value: "coding" },
-        { label: "Writing", icon: "edit_note", value: "writing" },
-        { label: "Design", icon: "brush", value: "design" }
+        { label: "Coding", icon: Code, value: "coding" },
+        { label: "Writing", icon: FileEdit, value: "writing" },
+        { label: "Design", icon: Brush, value: "design" }
     ],
     aiToggle: { label: "Enable Focus AI", subLabel: "Automatically optimizes notifications based on your activity." },
     primaryButton: "Launch Workspace"

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrainCircuit, CheckCircle2, TrendingUp, BellRing } from 'lucide-react';
 
 interface VisualsProps {
   readonly className?: string;
@@ -21,13 +22,13 @@ export const Visuals: React.FC<VisualsProps> = ({ className = '' }) => {
           <div className="space-y-4">
             <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
               <div className="w-10 h-10 rounded bg-cu-purple/10 flex items-center justify-center text-cu-purple">
-                <span className="material-symbols-outlined">psychology</span>
+                <BrainCircuit className="w-6 h-6" />
               </div>
               <div className="flex-1">
                 <div className="h-3 w-32 bg-slate-200 rounded mb-2"></div>
                 <div className="h-2 w-20 bg-slate-100 rounded"></div>
               </div>
-              <span className="material-symbols-outlined text-cu-purple">check_circle</span>
+              <CheckCircle2 className="text-cu-purple w-6 h-6" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="h-32 bg-cu-blue/10 rounded-lg p-4">
@@ -51,7 +52,7 @@ export const Visuals: React.FC<VisualsProps> = ({ className = '' }) => {
         {/* Floater: Analytics */}
         <div className="absolute top-10 right-0 z-30 w-56 bg-white rounded-xl shadow-[0px_12px_32px_rgba(0,0,0,0.06)] p-4 border border-slate-50 rotate-6 hover:scale-105 transition-transform">
           <div className="flex items-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-cu-blue">auto_graph</span>
+            <TrendingUp className="text-cu-blue w-6 h-6" />
             <span className="font-bold text-sm text-slate-900">Productivity Peak</span>
           </div>
           <div className="w-full h-20 bg-slate-100 rounded"></div>
@@ -60,7 +61,7 @@ export const Visuals: React.FC<VisualsProps> = ({ className = '' }) => {
         <div className="absolute bottom-12 -left-4 z-10 w-64 bg-slate-900 text-white rounded-xl shadow-2xl p-4 -rotate-6 hover:rotate-0 transition-all">
           <div className="flex items-start gap-4">
             <div className="bg-cu-purple p-2 rounded-full">
-              <span className="material-symbols-outlined text-[16px]">notifications_active</span>
+              <BellRing className="w-4 h-4" />
             </div>
             <div>
               <p className="text-xs font-bold opacity-70 uppercase tracking-widest">Focus Mode Active</p>

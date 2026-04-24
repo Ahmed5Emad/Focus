@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import Hero from '../../sections/onboarding/Hero';
 import Visuals from '../../sections/onboarding/Visuals';
 import Header from '../../sections/onboarding/Header';
@@ -21,7 +22,7 @@ const OnboardingWelcome: React.FC = () => {
                 <span className="text-sm font-semibold text-slate-500">STEP 1 OF 4</span>
                 <button className="text-slate-900 font-bold">Back</button>
                 <Link to="/onboarding/deep-work" className="bg-cu-purple hover:bg-cu-purple/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2">
-                    Next <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    Next <ArrowRight className="w-4 h-4" />
                 </Link>
             </div>
         </div>

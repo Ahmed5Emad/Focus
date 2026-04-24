@@ -9,10 +9,12 @@ import OnboardingWelcome from "./Pages/Onboarding/OnboardingWelcome";
 import OnboardingDeepWork from "./Pages/Onboarding/OnboardingDeepWork";
 import OnboardingPowerTools from "./Pages/Onboarding/OnboardingPowerTools";
 import OnboardingFinalSetup from "./Pages/Onboarding/OnboardingFinalSetup";
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 function App() {
   return (
     <HashRouter>
+      <SpeedInsights />
       <Routes>
         <Route path="/" element={<Home />} />
 

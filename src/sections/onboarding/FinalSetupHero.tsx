@@ -1,4 +1,5 @@
 import React from 'react';
+import { Monitor } from 'lucide-react';
 import { OnboardingData } from '../../data/mockData';
 
 interface FinalSetupHeroProps {
@@ -19,7 +20,7 @@ export const FinalSetupHero: React.FC<FinalSetupHeroProps> = ({ className = '' }
       {/* Placeholder for workspace image - Increased height */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl mt-4 border border-slate-200 h-[350px]">
         <div className="w-full h-full bg-slate-900 flex items-center justify-center text-slate-500">
-            <span className="material-symbols-outlined text-8xl opacity-30">desktop_windows</span>
+            <Monitor className="w-24 h-24 opacity-30" />
         </div>
         {/* Decorative elements to fill the panel */}
         <div className="absolute top-4 left-4 flex gap-2">

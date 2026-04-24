@@ -19,7 +19,7 @@ export const PowerToolsHero: React.FC<PowerToolsHeroProps> = ({ className = '' }
         {powerTools.features.map((feature, index) => (
           <div key={index} className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center shrink-0 text-cu-purple">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{feature.icon}</span>
+              <feature.icon className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-bold text-slate-900">{feature.title}</h3>

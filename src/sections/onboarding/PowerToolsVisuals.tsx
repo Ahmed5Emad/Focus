@@ -1,4 +1,5 @@
 import React from 'react';
+import { Search, FileText, Zap, UserSearch, Timer } from 'lucide-react';
 
 interface PowerToolsVisualsProps {
   readonly className?: string;
@@ -10,7 +11,7 @@ export const PowerToolsVisuals: React.FC<PowerToolsVisualsProps> = ({ className 
       {/* Command Palette Mockup (Top) */}
       <div className="col-span-6 row-span-3 glass-panel rounded-xl shadow-[0px_12px_32px_rgba(0,0,0,0.08)] p-6 overflow-hidden relative border border-slate-200">
         <div className="flex items-center gap-4 border-b border-slate-100 pb-4 mb-4">
-          <span className="material-symbols-outlined text-cu-purple">search</span>
+          <Search className="text-cu-purple w-6 h-6" />
           <span className="text-slate-500 font-medium">Search or type a command...</span>
           <div className="ml-auto flex gap-1">
             <kbd className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-[10px] font-bold">⌘</kbd>
@@ -19,17 +20,17 @@ export const PowerToolsVisuals: React.FC<PowerToolsVisualsProps> = ({ className 
         </div>
         <div className="space-y-2">
           <div className="flex items-center gap-4 p-3 bg-cu-purple/10 rounded-lg border border-cu-purple/10">
-            <span className="material-symbols-outlined text-cu-purple">description</span>
+            <FileText className="text-cu-purple w-6 h-6" />
             <span className="font-medium text-slate-900">Product Requirements Doc</span>
             <span className="ml-auto text-xs text-slate-500">Recently opened</span>
           </div>
           <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-slate-500">bolt</span>
+            <Zap className="text-slate-500 w-6 h-6" />
             <span className="font-medium text-slate-900">Create new Sprint</span>
             <span className="ml-auto text-xs text-slate-500">Action</span>
           </div>
           <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-slate-500">person_search</span>
+            <UserSearch className="text-slate-500 w-6 h-6" />
             <span className="font-medium text-slate-900">Find Sarah Chen</span>
             <span className="ml-auto text-xs text-slate-500">Member</span>
           </div>
@@ -57,7 +58,7 @@ export const PowerToolsVisuals: React.FC<PowerToolsVisualsProps> = ({ className 
       {/* Small Metric Card (Bottom Right) */}
       <div className="col-span-2 row-span-3 bg-cu-purple rounded-xl shadow-lg p-6 flex flex-col justify-between text-white relative overflow-hidden">
         <div className="relative z-10">
-          <span className="material-symbols-outlined text-3xl">timer</span>
+          <Timer className="w-8 h-8" />
           <h4 className="text-4xl font-bold mt-2">40%</h4>
           <p className="text-xs opacity-80">Faster workflow completion</p>
         </div>

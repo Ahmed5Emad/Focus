@@ -1,4 +1,5 @@
 import React from "react";
+import { Sparkles, Rocket } from "lucide-react";
 import { OnboardingData } from "../../data/mockData";
 
 export const FinalSetupForm: React.FC = () => {
@@ -33,9 +34,7 @@ export const FinalSetupForm: React.FC = () => {
                   type="radio"
                   value={goal.value}
                 />
-                <span className="material-symbols-outlined text-4xl mb-3 text-slate-700">
-                  {goal.icon}
-                </span>
+                <goal.icon className="w-10 h-10 mb-3 text-slate-700" />
                 <span className="font-bold text-sm text-slate-900">
                   {goal.label}
                 </span>
@@ -44,9 +43,7 @@ export const FinalSetupForm: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center p-4 bg-cu-purple/10 border border-cu-purple/20 rounded-xl gap-4 mt-auto">
-          <span className="material-symbols-outlined text-cu-purple text-2xl">
-            auto_awesome
-          </span>
+          <Sparkles className="text-cu-purple w-6 h-6" />
           <div className="flex-1">
             <p className="font-bold text-slate-900">
               {finalSetup.aiToggle.label}
@@ -59,9 +56,7 @@ export const FinalSetupForm: React.FC = () => {
         </div>
         <button className="w-full bg-cu-purple hover:bg-cu-purple/90 text-white py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
           {finalSetup.primaryButton}{" "}
-          <span className="material-symbols-outlined text-sm">
-            rocket_launch
-          </span>
+          <Rocket className="w-4 h-4" />
         </button>
       </form>
     </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Zap, Star } from "lucide-react";
 import { OnboardingData } from "../../data/mockData";
 
 interface HeroProps {
@@ -12,12 +13,7 @@ export const Hero: React.FC<HeroProps> = ({ className = "" }) => {
       className={`lg:col-span-6 flex flex-col items-start gap-6 text-left ${className}`}
     >
       <div className="inline-flex items-center gap-2 px-4 py-1 bg-cu-purple/10 text-cu-purple border border-cu-purple/20 rounded-full mb-2">
-        <span
-          className="material-symbols-outlined text-[18px]"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          bolt
-        </span>
+        <Zap className="w-5 h-5 fill-current" />
         <span className="font-bold text-xs uppercase tracking-widest">
           {hero.badge}
         </span>
@@ -39,12 +35,7 @@ export const Hero: React.FC<HeroProps> = ({ className = "" }) => {
         <div className="text-sm font-medium">
           <p className="text-slate-900">Trusted by 12,000+ engineers</p>
           <div className="flex items-center gap-1 text-cu-green">
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              star
-            </span>
+            <Star className="w-4 h-4 fill-current" />
             <span className="text-slate-600">4.9 rating on App Store</span>
           </div>
         </div>

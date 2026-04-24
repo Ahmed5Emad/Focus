@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import Header from '../../sections/onboarding/Header';
 import { PowerToolsHero } from '../../sections/onboarding/PowerToolsHero';
 import { PowerToolsVisuals } from '../../sections/onboarding/PowerToolsVisuals';
@@ -21,7 +22,7 @@ const OnboardingPowerTools: React.FC = () => {
                 <span className="text-sm font-semibold text-slate-500">STEP 3 OF 4</span>
                 <Link to="/onboarding/deep-work" className="text-slate-900 font-bold">Back</Link>
                 <Link to="/onboarding/final-setup" className="bg-cu-purple hover:bg-cu-purple/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2">
-                    {OnboardingData.powerTools.primaryButton} <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    {OnboardingData.powerTools.primaryButton} <ArrowRight className="w-4 h-4" />
                 </Link>
             </div>
         </div>
