@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import Header from '../../sections/onboarding/Header';
 import { FinalSetupHero } from '../../sections/onboarding/FinalSetupHero';
 import { FinalSetupForm } from '../../sections/onboarding/FinalSetupForm';

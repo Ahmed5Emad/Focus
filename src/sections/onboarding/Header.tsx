@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 interface HeaderProps {
   readonly className?: string;
