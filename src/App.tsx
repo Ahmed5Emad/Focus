@@ -10,6 +10,8 @@ import OnboardingDeepWork from "./Pages/Onboarding/OnboardingDeepWork";
 import OnboardingPowerTools from "./Pages/Onboarding/OnboardingPowerTools";
 import OnboardingFinalSetup from "./Pages/Onboarding/OnboardingFinalSetup";
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { AppLayout } from "./App/AppLayout";
+import Dashboard from "./App/Pages/Dashboard/Dashboard";
 
 function App() {
   return (
@@ -27,6 +29,10 @@ function App() {
         <Route path="/onboarding/deep-work" element={<OnboardingDeepWork />} />
         <Route path="/onboarding/power-tools" element={<OnboardingPowerTools />} />
         <Route path="/onboarding/final-setup" element={<OnboardingFinalSetup />} />
+
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </HashRouter>
   )
