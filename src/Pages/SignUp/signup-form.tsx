@@ -46,7 +46,7 @@ export function SignupForm({
         return;
       }
 
-      navigate('/onboarding');
+      navigate('/auth/verification-pending');
     } catch (err: any) {
       setError(err.message || "An error occurred during sign up");
     } finally {
