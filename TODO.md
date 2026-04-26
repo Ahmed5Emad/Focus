@@ -13,9 +13,14 @@
 - [ ] Setup global state management for user session and app data.
 ## Phase 2: Core App Interface
 - [ ] Build User Dashboard (overview, quick actions).
-- [ ] Implement Task Management System (CRUD for tasks).
+- [x] Implement Task Management System (CRUD, assignment, and workspace structure).
 ---
-## Phase 3: "Focus" Productivity Features
+## Phase 3: "Focus" Productivity Features (Database & Collaboration)
+- [x] Database: Implement Workspace-based multi-tenancy (Workspaces, Members, RLS).
+- [x] Database: Implement Task assignment system with default creator-assignment.
+- [x] Frontend: Implement Workspace selection and context management.
+---
+## Phase 4: "Focus" Productivity Features
 - [ ] Develop the Focus Session Timer (Pomodoro).
 - [ ] Integrate Timer with Task list (track time per task).
 - [ ] Build Distraction Log component.
