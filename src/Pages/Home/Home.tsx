@@ -3,17 +3,12 @@ import { HeroSection } from "@/sections/hero/HeroSection";
 import Footer from "@/sections/footer/Footer";
 import { Header } from "@/components/layout/Header";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
 
 function Home() {
-  const { session, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return null;
-  }
-
-  if (session) {
-    return <Navigate to="/dashboard" replace />;
   }
 
   return (       
@@ -23,7 +18,6 @@ function Home() {
       <FeaturesSection />
       <Footer />
     </div>
-    
   );
 }
 
