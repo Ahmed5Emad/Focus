@@ -2,6 +2,8 @@ import Home from "./Pages/Home/Home"
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SignupForm } from "./Pages/SignUp/signup-form";
 import { LoginForm } from "./Pages/LogIn/login-form";
+import VerificationPending from "./Pages/Auth/VerificationPending";
+import AuthCallback from "./Pages/Auth/Callback";
 import Pricing from "./Pages/Pricing/Pricing";
 import About from "./Pages/About/About";
 import Featured from "./Pages/Featured/Featured";
@@ -51,6 +53,8 @@ function App() {
 
            <Route path="/signup" element={<SignupForm />} />
            <Route path="/login" element={<LoginForm />} />
+           <Route path="/auth/verification-pending" element={<VerificationPending />} />
+           <Route path="/auth/callback" element={<AuthCallback />} />
 
            <Route element={<AppLayout />}>
              <Route path="/dashboard" element={
