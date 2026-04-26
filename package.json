@@ -12,6 +12,8 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.104.1",
     "@tailwindcss/vite": "^4.2.0",
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",

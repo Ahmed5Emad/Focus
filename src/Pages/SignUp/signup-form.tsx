@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -10,16 +11,47 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import logo from "@/assets/logo.svg"
+import { createClient } from "@/lib/supabase/client"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [supabase] = useState(() => createClient());
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/onboarding');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      navigate('/onboarding');
+    } catch (err: any) {
+      setError(err.message || "An error occurred during sign up");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,6 +83,9 @@ export function SignupForm({
               placeholder="John Doe"
               className="h-12 rounded-xl bg-gray-50/50 border-gray-200 focus:bg-white focus:border-cu-purple focus:ring-cu-purple/20"
               required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
             />
             <FieldLabel htmlFor="email" className="font-semibold text-slate-700 mt-2">Email</FieldLabel>
             <Input
@@ -59,6 +94,9 @@ export function SignupForm({
               placeholder="m@example.com"
               className="h-12 rounded-xl bg-gray-50/50 border-gray-200 focus:bg-white focus:border-cu-purple focus:ring-cu-purple/20"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
             <Field className="mt-2">
             <FieldLabel htmlFor="password" className="font-semibold text-slate-700">Password</FieldLabel>
@@ -68,11 +106,21 @@ export function SignupForm({
               placeholder="••••••••"
               className="h-12 rounded-xl bg-gray-50/50 border-gray-200 focus:bg-white focus:border-cu-purple focus:ring-cu-purple/20"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </Field>
           </Field>
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+              {error}
+            </div>
+          )}
           <Field className="mt-6">
-            <Button type="submit" className="w-full bg-cu-purple hover:bg-cu-purple/90 text-white shadow-lg shadow-cu-purple/20 font-bold h-12 text-md rounded-xl transition-all hover:-translate-y-0.5">Create Account</Button>
+            <Button type="submit" disabled={isLoading} className="w-full bg-cu-purple hover:bg-cu-purple/90 text-white shadow-lg shadow-cu-purple/20 font-bold h-12 text-md rounded-xl transition-all hover:-translate-y-0.5">
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
           </Field>
           <FieldSeparator className="my-4 text-gray-400">Or continue with</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">

@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   Timer,
-  BarChart2,
+  Target,
   Archive,
   Settings,
   HelpCircle,
@@ -14,8 +14,8 @@ import { cn } from "../../lib/utils";
 const navItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Tasks", icon: CheckSquare, path: "/tasks" },
+  { name: "Goals", icon: Target, path: "/goals" },
   { name: "Focus Timer", icon: Timer, path: "/focus-timer" },
-  { name: "Analytics", icon: BarChart2, path: "/analytics" },
   { name: "Archive", icon: Archive, path: "/archive" },
 ];
 
