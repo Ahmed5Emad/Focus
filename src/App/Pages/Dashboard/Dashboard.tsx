@@ -1,6 +1,54 @@
-import { Zap, Play, BrainCircuit, Hourglass, CheckCircle2, MoreHorizontal, Check, Clock, Pause, Square, Timer } from "lucide-react";
+import { Zap, Play, BrainCircuit, Hourglass, CheckCircle2, MoreHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Dashboard() {
+  const { currentWorkspaceId } = useAuth();
+  const [stats, setStats] = useState<any>(null);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    if (!currentWorkspaceId) return;
+
+    const fetchData = async () => {
+      
+      // Fetch stats
+      const { data: statsData, error: statsError } = await supabase
+        .rpc('get_dashboard_stats', { p_workspace_id: currentWorkspaceId });
+      
+      if (statsError) console.error('Error fetching stats:', statsError);
+      else setStats(statsData);
+
+      // Fetch tasks
+      const { data: tasksData, error: tasksError } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('workspace_id', currentWorkspaceId)
+        .neq('status', 'completed')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (tasksError) console.error('Error fetching tasks:', tasksError);
+      else setTasks(tasksData || []);
+    };
+
+    fetchData();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel('tasks-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentWorkspaceId, supabase]);
+
   return (
     <div className="flex flex-col gap-4 items-center w-full px-8 pb-20">
       <div className="flex items-start justify-between w-full pt-4 md:pt-6 px-4 md:px-0">
@@ -43,7 +91,7 @@ export default function Dashboard() {
               </h3>
               <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
                 <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
-                  84
+                  {stats?.avg_flow_score ?? 0}
                 </span>
                 <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
                   /100
@@ -56,7 +104,7 @@ export default function Dashboard() {
           </div>
           
           <div className="bg-[#f1f5f9] h-1.5 relative rounded-2xl w-full overflow-hidden z-10">
-            <div className="absolute bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 left-0 w-[84%] rounded-2xl top-0" />
+            <div className="absolute bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 left-0 rounded-2xl top-0" style={{ width: `${stats?.avg_flow_score ?? 0}%` }} />
           </div>
           
           <div className="flex flex-col items-start w-full relative z-10">
@@ -77,7 +125,7 @@ export default function Dashboard() {
               </h3>
               <div className="flex flex-col items-start">
                 <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] tracking-[-0.6px] leading-9">
-                  3h 45m
+                  {stats ? `${Math.floor(stats.today_deep_work_seconds / 3600)}h ${Math.floor((stats.today_deep_work_seconds % 3600) / 60)}m` : '0h 0m'}
                 </span>
               </div>
             </div>
@@ -108,10 +156,10 @@ export default function Dashboard() {
               </h3>
               <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
                 <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
-                  12
+                  {stats?.tasks_completed ?? 0}
                 </span>
                 <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
-                  /16
+                  /{stats?.tasks_total ?? 0}
                 </span>
               </div>
             </div>
@@ -152,122 +200,30 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col w-full">
-          {/* Task 1 - Active */}
-          <div className="bg-white flex gap-4 items-center p-6 relative w-full">
-            <div className="absolute bg-cu-purple bottom-0 left-0 shadow-[2px_0px_8px_0px_rgba(139,92,246,0.2)] top-0 w-1" />
-            
-            <div className="bg-[#f5f3ff] border-2 border-cu-purple flex items-center justify-center rounded-md w-6 h-6 shrink-0">
-              <Check className="w-3 h-3 text-cu-purple" strokeWidth={3} />
-            </div>
-            
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <div className="flex gap-3 items-center w-full">
-                <h4 className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[16px] leading-[25.6px] m-0 truncate">
-                  Design System Documentation
+          {tasks.map((task, index) => (
+            <div key={task.id} className={`bg-white ${index !== 0 ? 'border-t border-[#f1f5f9]' : ''} flex gap-4 items-center p-6 relative w-full`}>
+              {index === 0 && <div className="absolute bg-cu-purple bottom-0 left-0 shadow-[2px_0px_8px_0px_rgba(139,92,246,0.2)] top-0 w-1" />}
+              
+              <div className="border-2 border-[#cbd5e1] rounded-md w-6 h-6 shrink-0" />
+              
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <h4 className="font-['Spline_Sans',sans-serif] font-medium text-[#334155] text-[16px] leading-[25.6px] m-0 truncate">
+                  {task.title}
                 </h4>
-                <div className="bg-[#ede9fe] px-2 py-0.5 rounded-sm shrink-0">
-                  <span className="font-['Spline_Sans',sans-serif] font-normal text-[#6d28d9] text-[10px] leading-4 block">
-                    IN PROGRESS
-                  </span>
-                </div>
-              </div>
-              <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0 truncate">
-                Draft the conflict resolution protocol for styling.
-              </p>
-            </div>
-            
-            <div className="flex gap-6 items-center shrink-0">
-              <div className="flex gap-1 items-center">
-                <Clock className="w-3.5 h-3.5 text-[#94a3b8]" />
-                <span className="font-['Spline_Sans',sans-serif] font-medium text-[#64748b] text-[14px] leading-3.5">
-                  45m
-                </span>
-              </div>
-              <div className="bg-[#f1f5f9] h-1 overflow-hidden relative rounded-2xl w-20 hidden sm:block">
-                <div className="absolute bg-cu-purple h-1 left-0 w-[40%] rounded-2xl top-0" />
+                {task.description && (
+                  <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0 truncate">
+                    {task.description}
+                  </p>
+                )}
               </div>
             </div>
-          </div>
-
-          {/* Task 2 - Inactive */}
-          <div className="bg-white border-t border-[#f1f5f9] flex gap-4 items-center px-6 py-6 w-full">
-            <div className="border-2 border-[#cbd5e1] rounded-md w-6 h-6 shrink-0" />
-            
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <h4 className="font-['Spline_Sans',sans-serif] font-medium text-[#334155] text-[16px] leading-[25.6px] m-0 truncate">
-                API Endpoint Review
-              </h4>
-              <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0 truncate">
-                Check authentication flow on /v2/users
-              </p>
-            </div>
-            
-            <div className="flex gap-1 items-center shrink-0">
-              <Clock className="w-3.5 h-3.5 text-[#94a3b8]" />
-              <span className="font-['Spline_Sans',sans-serif] font-medium text-[#64748b] text-[14px] leading-3.5">
-                30m
-              </span>
-            </div>
-          </div>
-
-          {/* Task 3 - Inactive */}
-          <div className="bg-white border-t border-[#f1f5f9] flex gap-4 items-center px-6 py-6 w-full">
-            <div className="border-2 border-[#cbd5e1] rounded-md w-6 h-6 shrink-0" />
-            
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <h4 className="font-['Spline_Sans',sans-serif] font-medium text-[#334155] text-[16px] leading-[25.6px] m-0 truncate">
-                Quarterly Planning Prep
-              </h4>
-              <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0 truncate">
-                Review OKRs from Q2 before meeting.
-              </p>
-            </div>
-            
-            <div className="flex gap-1 items-center shrink-0">
-              <Clock className="w-3.5 h-3.5 text-[#94a3b8]" />
-              <span className="font-['Spline_Sans',sans-serif] font-medium text-[#64748b] text-[14px] leading-3.5">
-                1h 15m
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="bg-[#f8fafc] border-t border-[#f1f5f9] flex items-center justify-center py-4 w-full cursor-pointer hover:bg-[#f1f5f9] transition-colors">
           <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[10px] tracking-[1px] uppercase leading-4">
             VIEW ALL TASKS
           </span>
-        </div>
-      </div>
-
-      <div className="sticky bottom-8 z-50 w-full mt-auto">
-        <div className="backdrop-blur-md bg-[rgba(255,255,255,0.9)] border border-[#e2e8f0] drop-shadow-[0px_8px_15px_rgba(0,0,0,0.08)] flex h-16 items-center justify-between px-4.25 py-px rounded-3xl w-full">
-          <div className="flex gap-4 items-center">
-            <div className="bg-[#f5f3ff] border border-[#ede9fe] flex items-center justify-center rounded-2xl w-10 h-10 shrink-0">
-              <Timer className="w-4.5 h-4.5 text-cu-purple" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-['Spline_Sans',sans-serif] font-bold text-cu-purple text-[10px] leading-4 tracking-[1px] uppercase">
-                ACTIVE FOCUS
-              </span>
-              <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[14px] leading-5">
-                Design System Documentation
-              </span>
-            </div>
-          </div>
-
-          <div className="flex gap-6 items-center">
-            <span className="font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[18px] leading-6">
-              24:18
-            </span>
-            <div className="flex gap-2 items-center">
-              <button className="bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer">
-                <Pause className="w-3.5 h-3.5 text-[#475569] fill-[#475569]" />
-              </button>
-              <button className="bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer">
-                <Square className="w-3 h-3 text-[#475569] fill-[#475569]" />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

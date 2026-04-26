@@ -9,7 +9,7 @@ export default function TaskCreation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, currentWorkspaceId } = useAuth();
   const supabase = createClient();
 
   useEffect(() => {
@@ -43,7 +43,11 @@ export default function TaskCreation() {
       try {
         const { error } = await supabase
           .from('tasks')
-          .insert([{ title: inputValue.trim(), user_id: user?.id }]);
+          .insert([{ 
+            title: inputValue.trim(), 
+            user_id: user?.id,
+            workspace_id: currentWorkspaceId 
+          }]);
         
         if (error) throw error;
         
