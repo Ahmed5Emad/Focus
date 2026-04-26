@@ -16,6 +16,7 @@ import Goals from "./App/Pages/Goals/Goals";
 import TaskCreation from "./App/Pages/Tasks/TaskCreation";
 import Management from "./App/Pages/Management/Management";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { FocusProvider } from "./contexts/FocusContext";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuth();
@@ -34,9 +35,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <AuthProvider>
-      <HashRouter>
-        <SpeedInsights />
-        <Routes>
+      <FocusProvider>
+        <HashRouter>
+          <SpeedInsights />
+          <Routes>
           <Route path="/" element={<Home />} />
 
           <Route path="/pricing" element={<Pricing />} />
@@ -79,6 +81,7 @@ function App() {
            </Route>
         </Routes>
       </HashRouter>
+      </FocusProvider>
     </AuthProvider>
   )
 }
