@@ -1,5 +1,5 @@
 import React from 'react';
-import { OnboardingData } from '../../data/mockData';
+import { OnboardingData } from '../../../data/mockData';
 
 interface PowerToolsHeroProps {
   readonly className?: string;

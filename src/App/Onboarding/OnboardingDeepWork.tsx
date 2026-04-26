@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Header from '../../sections/onboarding/Header';
-import { DeepWorkHero } from '../../sections/onboarding/DeepWorkHero';
-import { DeepWorkVisuals } from '../../sections/onboarding/DeepWorkVisuals';
+import Header from './components/Header';
+import { DeepWorkHero } from './components/DeepWorkHero';
+import { DeepWorkVisuals } from './components/DeepWorkVisuals';
 import { Slider } from '../../components/ui/slider';
 import { OnboardingData } from '../../data/mockData';
 

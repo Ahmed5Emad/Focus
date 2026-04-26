@@ -7,7 +7,6 @@ const TEAM = [
   { name: "Ahmed E.", role: "CEO" },
   { name: "Ahmed E.", role: "Engineering" },
   { name: "Ahmed E.", role: "Operations" },
-  { name: "Ahmed E.", role: "Development" },
 ];
 
 const Principle = ({ icon: Icon, title, description, colorClass, bgClass }: any) => (
@@ -117,6 +116,19 @@ export default function About() {
             {TEAM.map((member, index) => (
               <TeamMember key={index} name={member.name} role={member.role} />
             ))}
+            <Link to="/careers" className="group flex flex-col gap-4">
+              <div className="aspect-[3/4] rounded-xl bg-slate-900 flex flex-col items-center justify-center overflow-hidden relative transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-to-br from-cu-purple/40 via-transparent to-cu-pink/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="z-10 w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 border border-white/20">
+                  <ArrowRight className="w-6 h-6 text-white" />
+                </div>
+                <span className="z-10 text-white font-bold text-lg tracking-tight">Join the mission</span>
+              </div>
+              <div className="flex flex-col">
+                <h5 className="font-bold text-slate-900">Your Name Here?</h5>
+                <span className="text-xs font-medium text-slate-500 tracking-wider uppercase mt-1">Open Positions</span>
+              </div>
+            </Link>
           </div>
         </section>
 

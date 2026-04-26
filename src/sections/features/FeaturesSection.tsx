@@ -42,7 +42,7 @@ const features = [
 
 function FeaturesSection() {
   return (
-    <section className="flex flex-col self-stretch px-16 py-24 md:px-64 md:py-24 w-full gap-16 items-center">
+    <section className="flex flex-col self-stretch px-4 md:px-16 lg:px-64 py-16 md:py-24 w-full gap-8 md:gap-16 items-center">
     
         <div className="text-center gap-4 space-y-4">
           <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">

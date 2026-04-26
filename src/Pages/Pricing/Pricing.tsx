@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/sections/footer/Footer";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,55 @@ import { cn } from "@/lib/utils";
 
 // --- Extracted Sub-Components ---
 
+const comparisonFeatures = [
+  {
+    category: "Core Features",
+    features: [
+      { name: "Projects", personal: "1", pro: "Unlimited", enterprise: "Unlimited" },
+      { name: "Task History", personal: "7 days", pro: "Unlimited", enterprise: "Unlimited" },
+      { name: "File Uploads", personal: "5 MB", pro: "100 MB", enterprise: "5 GB" },
+    ],
+  },
+  {
+    category: "Collaboration",
+    features: [
+      { name: "Guests", personal: false, pro: true, enterprise: true },
+      { name: "Permissions", personal: false, pro: "Standard", enterprise: "Advanced" },
+    ],
+  },
+  {
+    category: "Security & Support",
+    features: [
+      { name: "SSO (SAML)", personal: false, pro: false, enterprise: true },
+      { name: "Support Level", personal: "Community", pro: "Priority Email", enterprise: "24/7 Dedicated" },
+    ],
+  },
+];
+
 const PricingFeature = ({ text, included = true }: { text: string; included?: boolean }) => (
   <li className={cn("flex items-center gap-3 font-medium text-sm", included ? "text-slate-700 dark:text-slate-200" : "text-slate-400")}>
     {included ? <Check className="w-5 h-5 text-slate-900 dark:text-white" /> : <Minus className="w-5 h-5" />}
     {text}
   </li>
 );
+
+const FeatureValue = ({ value, mobile = false }: { value: string | boolean; mobile?: boolean }) => {
+  if (typeof value === "boolean") {
+    return value ? (
+      <Check className={cn("w-5 h-5 text-slate-900", !mobile && "mx-auto")} />
+    ) : (
+      <Minus className={cn("w-5 h-5 text-slate-300", !mobile && "mx-auto")} />
+    );
+  }
+  return (
+    <span className={cn(
+      "font-light",
+      (value === "1" || value === "7 days" || value === "5 MB" || value === "Community") ? "text-slate-500!" : "text-slate-900"
+    )}>
+      {value}
+    </span>
+  );
+};
 
 const FAQItem = ({ question, answer }: { question: string; answer: string }) => (
   <details className="group border-b border-slate-800 pb-6 [&_summary::-webkit-details-marker]:hidden">
@@ -139,8 +182,8 @@ export default function Pricing() {
             <p className="text-slate-500 mt-4 text-lg">Detailed breakdown of what's included in each plan.</p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto shadow-sm">
-            <table className="w-full text-left border-collapse min-w-[600px]">
+          <div className="hidden md:block bg-white border border-gray-200 rounded-2xl overflow-x-auto shadow-sm">
+            <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-white border-b border-gray-200">
                   <th className="py-6 px-8 font-semibold text-slate-900 w-[40%] text-lg">Feature</th>
@@ -150,64 +193,54 @@ export default function Pricing() {
                 </tr>
               </thead>
               <tbody className="[&>tr>td:first-child]:font-medium [&>tr>td:first-child]:text-slate-900 [&>tr>td:not(:first-child)]:text-center [&>tr>td:not(:first-child)]:font-light [&>tr>td:not(:first-child)]:text-slate-900 text-base">
-                {/* Section Header */}
-                <tr className="bg-white">
-                  <td colSpan={4} className="py-4 px-8 text-sm font-semibold !text-slate-400 uppercase tracking-wider">Core Features</td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">Projects</td>
-                  <td className="py-5 px-8 !text-slate-500">1</td>
-                  <td className="py-5 px-8">Unlimited</td>
-                  <td className="py-5 px-8">Unlimited</td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">Task History</td>
-                  <td className="py-5 px-8 !text-slate-500">7 days</td>
-                  <td className="py-5 px-8">Unlimited</td>
-                  <td className="py-5 px-8">Unlimited</td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">File Uploads</td>
-                  <td className="py-5 px-8 !text-slate-500">5 MB</td>
-                  <td className="py-5 px-8">100 MB</td>
-                  <td className="py-5 px-8">5 GB</td>
-                </tr>
-
-                {/* Section Header */}
-                <tr className="bg-white border-t border-gray-200">
-                  <td colSpan={4} className="py-4 px-8 text-sm font-semibold !text-slate-400 uppercase tracking-wider">Collaboration</td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">Guests</td>
-                  <td className="py-5 px-8"><Minus className="w-5 h-5 mx-auto text-slate-300" /></td>
-                  <td className="py-5 px-8"><Check className="w-5 h-5 mx-auto text-slate-900" /></td>
-                  <td className="py-5 px-8"><Check className="w-5 h-5 mx-auto text-slate-900" /></td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">Permissions</td>
-                  <td className="py-5 px-8"><Minus className="w-5 h-5 mx-auto text-slate-300" /></td>
-                  <td className="py-5 px-8">Standard</td>
-                  <td className="py-5 px-8">Advanced</td>
-                </tr>
-
-                {/* Section Header */}
-                <tr className="bg-white border-t border-gray-200">
-                  <td colSpan={4} className="py-4 px-8 text-sm font-semibold !text-slate-400 uppercase tracking-wider">Security & Support</td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">SSO (SAML)</td>
-                  <td className="py-5 px-8"><Minus className="w-5 h-5 mx-auto text-slate-300" /></td>
-                  <td className="py-5 px-8"><Minus className="w-5 h-5 mx-auto text-slate-300" /></td>
-                  <td className="py-5 px-8"><Check className="w-5 h-5 mx-auto text-slate-900" /></td>
-                </tr>
-                <tr className="border-t border-gray-100">
-                  <td className="py-5 px-8">Support Level</td>
-                  <td className="py-5 px-8 !text-slate-500">Community</td>
-                  <td className="py-5 px-8">Priority Email</td>
-                  <td className="py-5 px-8">24/7 Dedicated</td>
-                </tr>
+                {comparisonFeatures.map((category, idx) => (
+                  <Fragment key={category.category}>
+                    <tr className={cn("bg-white", idx > 0 && "border-t border-gray-200")}>
+                      <td colSpan={4} className="py-4 px-8 text-sm font-semibold text-slate-400! uppercase tracking-wider">{category.category}</td>
+                    </tr>
+                    {category.features.map((feature) => (
+                      <tr key={feature.name} className="border-t border-gray-100">
+                        <td className="py-5 px-8">{feature.name}</td>
+                        <td className="py-5 px-8"><FeatureValue value={feature.personal} /></td>
+                        <td className="py-5 px-8"><FeatureValue value={feature.pro} /></td>
+                        <td className="py-5 px-8"><FeatureValue value={feature.enterprise} /></td>
+                      </tr>
+                    ))}
+                  </Fragment>
+                ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="md:hidden space-y-8">
+            {comparisonFeatures.map((category) => (
+              <div key={category.category} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-gray-50/50 px-6 py-3 border-b border-gray-200">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">{category.category}</h3>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {category.features.map((feature) => (
+                    <div key={feature.name} className="p-6">
+                      <p className="font-bold text-slate-900 mb-4">{feature.name}</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Personal</span>
+                          <div className="text-sm"><FeatureValue value={feature.personal} mobile /></div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pro</span>
+                          <div className="text-sm"><FeatureValue value={feature.pro} mobile /></div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enterprise</span>
+                          <div className="text-sm"><FeatureValue value={feature.enterprise} mobile /></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

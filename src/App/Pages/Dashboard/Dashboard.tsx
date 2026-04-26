@@ -3,10 +3,9 @@ import { Zap, Play, BrainCircuit, Hourglass, CheckCircle2, MoreHorizontal, Check
 export default function Dashboard() {
   return (
     <div className="flex flex-col gap-4 items-center w-full px-8 pb-20">
-      {/* Welcome Section */}
-      <div className="flex items-end justify-between w-full pt-6">
+      <div className="flex items-start justify-between w-full pt-4 md:pt-6 px-4 md:px-0">
         <div className="flex flex-col gap-0.5">
-          <h1 className="font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[48px] tracking-[-1.2px] leading-[52.8px] m-0">
+          <h1 className="font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[32px] md:text-[48px] tracking-[-1.2px] leading-tight m-0">
             Good morning.
           </h1>
           <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[16px] leading-[25.6px] m-0">

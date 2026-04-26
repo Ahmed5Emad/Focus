@@ -1,6 +1,6 @@
 import React from "react";
 import { Zap, Star } from "lucide-react";
-import { OnboardingData } from "../../data/mockData";
+import { OnboardingData } from "../../../data/mockData";
 
 interface HeroProps {
   readonly className?: string;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import Hero from '../../sections/onboarding/Hero';
-import Visuals from '../../sections/onboarding/Visuals';
-import Header from '../../sections/onboarding/Header';
+import Hero from './components/Hero';
+import Visuals from './components/Visuals';
+import Header from './components/Header';
 import { Slider } from '../../components/ui/slider';
 import { Link } from 'react-router-dom';
 

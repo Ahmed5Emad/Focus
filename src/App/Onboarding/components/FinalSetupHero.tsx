@@ -1,6 +1,6 @@
 import React from 'react';
 import { Monitor } from 'lucide-react';
-import { OnboardingData } from '../../data/mockData';
+import { OnboardingData } from '../../../data/mockData';
 
 interface FinalSetupHeroProps {
   readonly className?: string;

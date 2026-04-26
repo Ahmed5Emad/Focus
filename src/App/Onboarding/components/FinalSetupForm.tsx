@@ -1,6 +1,6 @@
 import React from "react";
 import { Sparkles, Rocket } from "lucide-react";
-import { OnboardingData } from "../../data/mockData";
+import { OnboardingData } from "../../../data/mockData";
 
 export const FinalSetupForm: React.FC = () => {
   const { finalSetup } = OnboardingData;

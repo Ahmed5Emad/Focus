@@ -1,6 +1,6 @@
 import React from "react";
 import { Zap } from "lucide-react";
-import { OnboardingData } from "../../data/mockData";
+import { OnboardingData } from "../../../data/mockData";
 
 interface DeepWorkHeroProps {
   readonly className?: string;

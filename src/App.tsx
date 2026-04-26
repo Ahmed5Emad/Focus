@@ -5,10 +5,10 @@ import { LoginForm } from "./Pages/LogIn/login-form";
 import Pricing from "./Pages/Pricing/Pricing";
 import About from "./Pages/About/About";
 import Featured from "./Pages/Featured/Featured";
-import OnboardingWelcome from "./Pages/Onboarding/OnboardingWelcome";
-import OnboardingDeepWork from "./Pages/Onboarding/OnboardingDeepWork";
-import OnboardingPowerTools from "./Pages/Onboarding/OnboardingPowerTools";
-import OnboardingFinalSetup from "./Pages/Onboarding/OnboardingFinalSetup";
+import OnboardingWelcome from "./App/Onboarding/OnboardingWelcome";
+import OnboardingDeepWork from "./App/Onboarding/OnboardingDeepWork";
+import OnboardingPowerTools from "./App/Onboarding/OnboardingPowerTools";
+import OnboardingFinalSetup from "./App/Onboarding/OnboardingFinalSetup";
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { AppLayout } from "./App/AppLayout";
 import Dashboard from "./App/Pages/Dashboard/Dashboard";

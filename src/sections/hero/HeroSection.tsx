@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom";
 export function HeroSection() {
   const navigate = useNavigate();
   return (
-    <div className="w-full flex my-16 self-stretch flex-col items-center px-32">
-      <div className="flex mb-4 flex-col w-1/2 items-center justify-center gap-2">
-        <h1 className="text-7xl md:text-8xl -tracking-wide text-center font-black">
+    <div className="w-full flex my-16 self-stretch flex-col items-center px-4 md:px-16 lg:px-32">
+      <div className="flex mb-4 flex-col w-full md:w-3/4 lg:w-1/2 items-center justify-center gap-2">
+        <h1 className="text-4xl md:text-7xl lg:text-8xl -tracking-wide text-center font-black">
           One App to <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">Replace Them All.</span>
         </h1>
-        <p className="text-center mt-8 text-gray-500 text-xl max-w-2xl">
-         All your work in one place: Tasks, Docs, Chat, Goals, & more. <br />
-         A vibrant workspace designed for high-performing teams who value speed and clarity.
+        <p className="text-center mt-8 text-gray-500 text-lg md:text-xl max-w-2xl">
+          All your work in one place: Tasks, Docs, Chat, Goals, & more. <br />
+          A vibrant workspace designed for high-performing teams who value speed and clarity.
         </p>
-        <div className="flex mt-10 mb-12 gap-4">
+        <div className="flex flex-col md:flex-row mt-10 mb-12 gap-4">
           <Button
             size="lg"
             className="shadow-xl bg-cu-purple hover:bg-cu-purple/90 text-white px-8 h-14 font-bold text-lg rounded-xl"
@@ -32,8 +32,8 @@ export function HeroSection() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col max-w-7xl w-full items-center content-start">
-        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[600px] gap-2 border border-gray-200 bg-white shadow-2xl overflow-hidden relative">
+      <div className="flex flex-col max-w-7xl w-full items-center content-start px-4 md:px-0">
+        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[300px] md:h-[600px] gap-2 border border-gray-200 bg-white shadow-2xl overflow-hidden relative">
           {/* Faux App Header */}
           <div className="h-14 border-b border-gray-100 flex items-center px-6 gap-4 bg-gray-50/50">
             <div className="flex gap-2">

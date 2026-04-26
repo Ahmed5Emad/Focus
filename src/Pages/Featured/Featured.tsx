@@ -38,14 +38,14 @@ export default function Featured() {
       <main className="flex-1 flex flex-col items-center w-full pb-24">
         
         {/* Hero Section */}
-        <section className="flex flex-col items-center w-full max-w-7xl pt-32 pb-24 px-6 gap-8 relative">
+        <section className="flex flex-col items-center w-full max-w-7xl pt-20 pb-16 px-4 md:pt-32 md:pb-24 md:px-6 gap-8 relative">
           <div className="absolute inset-0 bg-grid-slate-100/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-900/[0.04] dark:bg-[bottom_1px_center] mask-image:linear-gradient(to_bottom,transparent,black)"></div>
-          <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tight text-center leading-none z-10">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-slate-900 tracking-tight text-center leading-none z-10">
             Built for the <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">power user.</span>
           </h1>
-          <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-4xl mt-12 gap-8 z-10">
-            <p className="text-xl text-slate-500 max-w-lg leading-relaxed">
+          <div className="flex flex-col items-center w-full max-w-2xl mt-12 gap-8 z-10 text-center">
+            <p className="text-xl text-slate-500 leading-relaxed">
               Precision tools engineered for high-velocity workflows. No fluff, just pure performance.
             </p>
             <Button variant="outline" className="h-14 px-8 rounded-xl font-bold border-2 border-gray-200 text-slate-700 hover:bg-white shadow-sm flex items-center gap-2">
@@ -55,8 +55,8 @@ export default function Featured() {
         </section>
 
         {/* Feature 01: Real-time Sync */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6">
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-24 md:py-32 px-6">
+          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Activity} text="01_Sync" colorClass="text-cu-green" />
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
               Sub-millisecond synchronization.
@@ -159,8 +159,8 @@ export default function Featured() {
         </section>
 
         {/* Feature 03: Flow */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6">
+        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-24 md:py-32 px-6">
+          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Zap} text="03_Flow" colorClass="text-cu-pink" />
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
               Zero-latency interaction.
@@ -193,13 +193,13 @@ export default function Featured() {
         </section>
 
         {/* Feature 04: Global Graph */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-gray-50/50 py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6">
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-gray-50/50 py-24 md:py-32 px-6">
+          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Share2} text="04_Graph" colorClass="text-cu-blue" />
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
               Visualizing the network.
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed">
+            <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
               See how your projects, tasks, and data points interconnect. Our Global Graph engine generates architectural-style visualizations of your entire workflow architecture.
             </p>
             
@@ -218,7 +218,7 @@ export default function Featured() {
                 <div className="w-3 h-3 rounded-full bg-cu-yellow"></div>
                 <div className="w-3 h-3 rounded-full bg-cu-green"></div>
               </div>
-              <pre className="font-mono text-sm leading-loose overflow-x-auto pr-8">
+              <pre className="font-mono text-xs md:text-sm leading-loose overflow-x-auto pr-4 md:pr-8">
                 <code className="text-slate-400">{'// Initialize Graph Engine'}</code><br/>
                 <code className="text-cu-pink">const</code> <code className="text-white">graph =</code> <code className="text-cu-pink">new</code> <code className="text-cu-blue">FocusGraph</code><code className="text-white">({'{'} resolution: </code><code className="text-cu-orange">'high'</code> <code className="text-white">{'}'});</code><br/>
                 <code className="text-white">graph.</code><code className="text-cu-blue">linkNodes</code><code className="text-white">(process_01, data_stream_04);</code><br/>
@@ -228,8 +228,8 @@ export default function Featured() {
             </div>
           </div>
 
-          <div className="flex-1 w-full bg-white border border-gray-200 rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[450px]">
-            <div className="relative w-full max-w-sm aspect-square">
+          <div className="flex-1 w-full bg-white border border-gray-200 rounded-3xl p-4 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[450px]">
+            <div className="relative w-full max-w-[240px] md:max-w-sm aspect-square">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-cu-purple to-cu-blue shadow-xl z-20 flex items-center justify-center">
                 <div className="w-8 h-8 rounded-full bg-white/20"></div>
               </div>
