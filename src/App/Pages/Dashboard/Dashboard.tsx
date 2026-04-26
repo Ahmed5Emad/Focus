@@ -1,15 +1,5 @@
 import { Zap, Play, BrainCircuit, Hourglass, CheckCircle2, MoreHorizontal, Check, Clock, Pause, Square, Timer } from "lucide-react";
 
-interface Task {
-  id: string;
-  title: string;
-  is_completed: boolean;
-  created_at: string;
-  parent_task_id?: string;
-  project_id?: string;
-  goal_id?: number;
-}
-
 export default function Dashboard() {
   return (
     <div className="flex flex-col gap-4 items-center w-full px-8 pb-20">
