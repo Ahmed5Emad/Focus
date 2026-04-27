@@ -22,13 +22,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const WORKSPACE_STORAGE_KEY = 'focus_current_workspace_id';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(null);
+  const [currentWorkspaceId, setCurrentWorkspaceIdState] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(WORKSPACE_STORAGE_KEY);
+    }
+    return null;
+  });
   const supabase = createClient();
+
+  const setCurrentWorkspaceId = useCallback((id: string | null) => {
+    setCurrentWorkspaceIdState(id);
+    if (id) {
+      localStorage.setItem(WORKSPACE_STORAGE_KEY, id);
+    } else {
+      localStorage.removeItem(WORKSPACE_STORAGE_KEY);
+    }
+  }, []);
 
   const fetchWorkspaces = useCallback(async () => {
     try {
@@ -39,22 +55,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      const fetchedWorkspaces = data as Workspace[];
-      setWorkspaces(fetchedWorkspaces);
-      
-      if (fetchedWorkspaces.length > 0 && !currentWorkspaceId) {
-        setCurrentWorkspaceId(fetchedWorkspaces[0].id);
-      }
+      setWorkspaces(data as Workspace[]);
     } catch (error) {
       console.error('Error fetching workspaces:', error);
     }
-  }, [supabase, currentWorkspaceId]);
+  }, [supabase]);
 
   const refreshWorkspaces = useCallback(async () => {
     if (user) {
       await fetchWorkspaces();
     }
   }, [user, fetchWorkspaces]);
+
+  useEffect(() => {
+    if (workspaces.length > 0) {
+      const isValid = workspaces.some(w => w.id === currentWorkspaceId);
+      if (!currentWorkspaceId || !isValid) {
+        setCurrentWorkspaceId(workspaces[0].id);
+      }
+    }
+  }, [workspaces, currentWorkspaceId, setCurrentWorkspaceId]);
 
   useEffect(() => {
     const initializeAuth = async () => {
