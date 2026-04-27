@@ -30,7 +30,7 @@
 - [ ] **Real-time Synchronization:** Implement the promised "Instant Sync" mechanism using a real-time backend (e.g., Supabase/Firebase).
 ---
 ## Phase 5: Power User Tools
-- [ ] **Command Palette:** Develop the "02_Control" Command Palette (⌘K interface) for navigation and task manipulation, as promised in the `Featured` page.
+- [x] **Command Palette:** Develop the "02_Control" Command Palette (⌘K interface) for navigation and task manipulation, as promised in the `Featured` page.
 - [ ] **Custom Workflow Configuration:** Implement the ability to define custom statuses and fields for tasks.
 - [ ] **Global Graph Visualization:** Build the "04_Graph" engine to visualize the network interconnectivity of projects, tasks, and data points.
 ## Phase 6: Collaboration & Integration
