@@ -8,7 +8,7 @@
 - [x] Ensure navigation flow between Welcome -> Deep Work -> Power Tools -> Final Setup
 --- 
 ## Phase 1: Post-Auth Architecture
-- [ ] Create `AppLayout` component (authenticated shell with sidebar/header).
+- [x] Create `App` component (authenticated shell with sidebar/header).
 - [ ] Implement Protected Routes (redirect unauthenticated users to `/login`).
 - [ ] Setup global state management for user session and app data.
 ## Phase 2: Core App Interface
