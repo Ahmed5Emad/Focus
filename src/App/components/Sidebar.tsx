@@ -52,6 +52,7 @@ export function Sidebar() {
               onChange={(e) => setCurrentWorkspaceId(e.target.value)}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             >
+              <option value="" disabled>Select Workspace</option>
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
                   {workspace.name}

@@ -17,6 +17,7 @@ import Dashboard from "./App/Pages/Dashboard/Dashboard";
 import Goals from "./App/Pages/Goals/Goals";
 import TaskCreation from "./App/Pages/Tasks/TaskCreation";
 import Management from "./App/Pages/Management/Management";
+import Settings from "./App/Pages/Settings/Settings";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FocusProvider } from "./contexts/FocusContext";
 
@@ -80,6 +81,11 @@ function App() {
              <Route path="/management" element={
                <ProtectedRoute>
                  <Management />
+               </ProtectedRoute>
+             } />
+             <Route path="/settings" element={
+               <ProtectedRoute>
+                 <Settings />
                </ProtectedRoute>
              } />
            </Route>
