@@ -32,6 +32,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
       description,
       category: category || "General",
     });
+
     
     setTitle("");
     setDescription("");

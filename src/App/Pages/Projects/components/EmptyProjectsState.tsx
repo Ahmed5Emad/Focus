@@ -3,7 +3,7 @@ import { CreateProjectModal } from "./CreateProjectModal";
 import { Button } from "@/components/ui/button";
 
 interface EmptyProjectsStateProps {
-  onCreateProject: (newProject: { name: string; description: string; category: string }) => Promise<void>;
+  onCreateProject: (newProject: { title: string; description: string; category: string }) => Promise<void>;
 }
 
 export function EmptyProjectsState({ onCreateProject }: EmptyProjectsStateProps) {
