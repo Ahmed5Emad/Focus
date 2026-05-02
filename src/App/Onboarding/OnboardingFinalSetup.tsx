@@ -1,11 +1,10 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
 import Header from './components/Header';
 import { FinalSetupHero } from './components/FinalSetupHero';
 import { FinalSetupForm } from './components/FinalSetupForm';
 import { Slider } from '../../components/ui/slider';
 import { Link } from 'react-router-dom';
-import { OnboardingData } from '../../data/mockData';
+
 const OnboardingFinalSetup: React.FC = () => {
   return (
     <div className="h-screen bg-background text-foreground flex flex-col">
@@ -22,9 +21,6 @@ const OnboardingFinalSetup: React.FC = () => {
             <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-slate-500">STEP 4 OF 4</span>
                 <Link to="/onboarding/power-tools" className="text-slate-900 font-bold">Back</Link>
-		 <Link to="/dashboard" className="bg-cu-purple hover:bg-cu-purple/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2">
-                    {OnboardingData.powerTools.primaryButton} <ArrowRight className="w-4 h-4" />
-                </Link>
             </div>
         </div>
       </main>

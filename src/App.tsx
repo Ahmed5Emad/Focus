@@ -1,6 +1,9 @@
 import Home from "./Pages/Home/Home"
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundaryFallback } from "./components/ErrorBoundaryFallback";
 import { SignupForm } from "./Pages/SignUp/signup-form";
+
 import { LoginForm } from "./Pages/LogIn/login-form";
 import VerificationPending from "./Pages/Auth/VerificationPending";
 import AuthCallback from "./Pages/Auth/Callback";
@@ -12,12 +15,16 @@ import OnboardingDeepWork from "./App/Onboarding/OnboardingDeepWork";
 import OnboardingPowerTools from "./App/Onboarding/OnboardingPowerTools";
 import OnboardingFinalSetup from "./App/Onboarding/OnboardingFinalSetup";
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Analytics } from "@vercel/analytics/react"
 import { AppLayout } from "./App/AppLayout";
 import Dashboard from "./App/Pages/Dashboard/Dashboard";
 import Goals from "./App/Pages/Goals/Goals";
+import Projects from "./App/Pages/Projects/Projects";
+import Tasks from "./App/Pages/Tasks/Tasks";
 import TaskCreation from "./App/Pages/Tasks/TaskCreation";
 import Management from "./App/Pages/Management/Management";
 import Settings from "./App/Pages/Settings/Settings";
+import FocusTimer from "./App/Pages/FocusTimer/FocusTimer";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FocusProvider } from "./contexts/FocusContext";
 
@@ -39,9 +46,11 @@ function App() {
   return (
     <AuthProvider>
       <FocusProvider>
-        <HashRouter>
-          <SpeedInsights />
-          <Routes>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
+          <HashRouter>
+            <SpeedInsights />
+            <Analytics />
+            <Routes>
           <Route path="/" element={<Home />} />
 
           <Route path="/pricing" element={<Pricing />} />
@@ -65,14 +74,19 @@ function App() {
              } />
              <Route path="/tasks" element={
                <ProtectedRoute>
-                 <Dashboard />
+                 <Tasks />
                </ProtectedRoute>
              } />
-             <Route path="/goals" element={
-               <ProtectedRoute>
-                 <Goals />
-               </ProtectedRoute>
-             } />
+              <Route path="/goals" element={
+                <ProtectedRoute>
+                  <Goals />
+                </ProtectedRoute>
+              } />
+              <Route path="/projects" element={
+                <ProtectedRoute>
+                  <Projects />
+                </ProtectedRoute>
+              } />
              <Route path="/tasks/new" element={
                <ProtectedRoute>
                  <TaskCreation />
@@ -88,12 +102,19 @@ function App() {
                  <Settings />
                </ProtectedRoute>
              } />
+             <Route path="/focus-timer" element={
+               <ProtectedRoute>
+                 <FocusTimer />
+               </ProtectedRoute>
+             } />
            </Route>
-        </Routes>
-      </HashRouter>
+            </Routes>
+          </HashRouter>
+        </ErrorBoundary>
       </FocusProvider>
     </AuthProvider>
   )
+
 }
 
 export default App

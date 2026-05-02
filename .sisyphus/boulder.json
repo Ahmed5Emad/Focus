@@ -1,0 +1,17 @@
+{
+  "active_plan": "/home/leo/Documents/Mix Coding/Focus/.sisyphus/plans/app-enhancements.md",
+  "started_at": "2026-05-02T13:22:41.478Z",
+  "session_ids": [
+    "ses_217418bd1ffeaifX3CA33HgDDo",
+    "ses_217231c9bffeqoAQiJl5aPsuiH",
+    "ses_2170e40c2ffeZiQC1WXiOrRRVm"
+  ],
+  "session_origins": {
+    "ses_217418bd1ffeaifX3CA33HgDDo": "direct",
+    "ses_217231c9bffeqoAQiJl5aPsuiH": "direct",
+    "ses_2170e40c2ffeZiQC1WXiOrRRVm": "direct"
+  },
+  "plan_name": "app-enhancements",
+  "agent": "atlas",
+  "task_sessions": {}
+}

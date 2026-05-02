@@ -90,6 +90,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --primary-color: #7b68ee;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -141,5 +142,29 @@
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .page-container {
+    @apply flex flex-col gap-4 w-full pb-20;
+  }
+  .page-title {
+    @apply font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[48px] tracking-[-1.2px] leading-tight m-0;
+  }
+  .content-card {
+    @apply bg-white border border-[#f1f5f9] rounded-2xl shadow-sm;
+  }
+  .btn-primary {
+    @apply bg-linear-to-r from-[#7c3aed] to-[#4f46e5] hover:opacity-90 text-white shadow-lg shadow-purple-500/20 h-11 px-6 rounded-xl flex items-center gap-2 border-none;
+  }
+  .filter-tabs {
+    @apply bg-[#f5f3ff] rounded-full p-1 flex;
+  }
+  .filter-tab {
+    @apply px-4 py-2 rounded-full font-['Space_Grotesk',sans-serif] text-[14px] font-semibold leading-none transition-colors capitalize;
+  }
+  .filter-tab-active {
+    @apply bg-[#ede9fe] text-[#6d28d9] shadow-sm;
+  }
+  .filter-tab-inactive {
+    @apply text-[#494454] hover:text-[#6d28d9];
   }
 }
