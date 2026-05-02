@@ -48,6 +48,7 @@ export default function Projects() {
           {
             title: newProject.title,
             description: newProject.description,
+            category: newProject.category,
             user_id: user.id,
             workspace_id: currentWorkspaceId,
             status: "active",
@@ -55,6 +56,7 @@ export default function Projects() {
         ])
         .select()
         .single();
+
 
 
       if (error) throw error;
