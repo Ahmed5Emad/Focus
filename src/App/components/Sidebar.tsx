@@ -10,6 +10,7 @@ import {
   Plus,
   ChevronDown,
   Building2,
+  Layout,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const navItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Tasks", icon: CheckSquare, path: "/tasks" },
+  { name: "Projects", icon: Layout, path: "/projects" },
   { name: "Goals", icon: Target, path: "/goals" },
   { name: "Focus Timer", icon: Timer, path: "/focus-timer" },
   { name: "Archive", icon: Archive, path: "/archive" },

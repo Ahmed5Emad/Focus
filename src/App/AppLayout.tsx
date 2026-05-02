@@ -1,9 +1,9 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { useFocus } from "../contexts/FocusContext";
-import { Timer, Pause, Square } from "lucide-react";
+import { Timer, Pause, Square, AlertCircle, X } from "lucide-react";
 
 const formatTime = (seconds: number) => {
   const hrs = Math.floor(seconds / 3600);
@@ -18,7 +18,8 @@ const formatTime = (seconds: number) => {
 
 export function AppLayout() {
   const navigate = useNavigate();
-  const { isActive, activeSession, secondsElapsed, stopSession } = useFocus();
+  const { isActive, activeSession, secondsElapsed, stopSession, logDistraction } = useFocus();
+  const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -26,11 +27,18 @@ export function AppLayout() {
         e.preventDefault();
         navigate('/tasks/new');
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'd' && isActive) {
+        e.preventDefault();
+        setIsDistractionModalOpen(true);
+      }
+      if (e.key === 'Escape' && isDistractionModalOpen) {
+        setIsDistractionModalOpen(false);
+      }
     };
     
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [navigate]);
+  }, [navigate, isActive, isDistractionModalOpen]);
 
   return (
     <div 
@@ -72,6 +80,14 @@ export function AppLayout() {
                   </span>
                   <div className="flex gap-2 items-center">
                     <button 
+                      onClick={() => setIsDistractionModalOpen(true)}
+                      className="bg-[#fff7ed] hover:bg-[#ffedd5] transition-colors border-none flex items-center justify-center rounded-xl px-3 h-8 cursor-pointer gap-1.5 mr-2"
+                      title="Log Distraction (Cmd/Ctrl + D)"
+                    >
+                      <AlertCircle className="w-3.5 h-3.5 text-cu-orange" />
+                      <span className="text-xs font-semibold text-cu-orange">Log</span>
+                    </button>
+                    <button 
                       onClick={() => stopSession()}
                       className="bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer"
                     >
@@ -82,6 +98,64 @@ export function AppLayout() {
                       className="bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer"
                     >
                       <Square className="w-3 h-3 text-[#475569] fill-[#475569]" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {isDistractionModalOpen && isActive && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl shadow-xl border border-[#e2e8f0] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-4 border-b border-[#e2e8f0]">
+                  <h3 className="font-semibold text-[#0f172a] flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-cu-orange" />
+                    Log Distraction
+                  </h3>
+                  <button 
+                    onClick={() => setIsDistractionModalOpen(false)}
+                    className="text-[#64748b] hover:text-[#0f172a] transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="p-4 flex flex-col gap-4">
+                  <p className="text-sm text-[#64748b]">
+                    What kind of distraction was it? Logging helps calculate your flow score.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => {
+                        logDistraction('internal', 'minor');
+                        setIsDistractionModalOpen(false);
+                      }}
+                      className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#e2e8f0] hover:border-cu-blue hover:bg-[#f0f9ff] transition-all text-left gap-2"
+                    >
+                      <span className="font-semibold text-[#0f172a]">Internal</span>
+                      <span className="text-xs text-[#64748b] text-center">Lost focus, daydreaming, urge to check phone</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        logDistraction('external', 'minor');
+                        setIsDistractionModalOpen(false);
+                      }}
+                      className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#e2e8f0] hover:border-cu-orange hover:bg-[#fff7ed] transition-all text-left gap-2"
+                    >
+                      <span className="font-semibold text-[#0f172a]">External</span>
+                      <span className="text-xs text-[#64748b] text-center">Notification, someone talking to you, noise</span>
+                    </button>
+                  </div>
+                  
+                  <div className="mt-2 pt-4 border-t border-[#e2e8f0]">
+                    <button
+                      onClick={() => {
+                        logDistraction('external', 'major');
+                        setIsDistractionModalOpen(false);
+                      }}
+                      className="w-full flex items-center justify-center p-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-semibold transition-colors text-sm"
+                    >
+                      Major Interruption (15+ mins)
                     </button>
                   </div>
                 </div>
