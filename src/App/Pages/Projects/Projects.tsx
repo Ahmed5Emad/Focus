@@ -68,7 +68,7 @@ export default function Projects() {
     }
   };
 
-  const handleUpdateProject = async (id: number, updates: Partial<Project>) => {
+  const handleUpdateProject = async (id: string, updates: Partial<Project>) => {
     try {
       const { error } = await supabase
         .from("projects")
@@ -82,7 +82,7 @@ export default function Projects() {
     }
   };
 
-  const handleDeleteProject = async (id: number) => {
+  const handleDeleteProject = async (id: string) => {
     try {
       const { error } = await supabase
         .from("projects")

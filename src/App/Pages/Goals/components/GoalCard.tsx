@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export interface Goal {
-  id: number;
+  id: string;
   created_at: string;
   user_id: string;
   title: string;
@@ -20,8 +20,8 @@ export interface Goal {
 
 interface GoalCardProps {
   goal: Goal;
-  onUpdate: (id: number, updates: Partial<Goal>) => void;
-  onDelete: (id: number) => void;
+  onUpdate: (id: string, updates: Partial<Goal>) => void;
+  onDelete: (id: string) => void;
 }
 
 export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {

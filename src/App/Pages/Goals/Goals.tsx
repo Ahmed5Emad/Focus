@@ -83,7 +83,7 @@ export default function Goals() {
     }
   };
 
-  const handleUpdateGoal = async (id: number, updates: Partial<Goal>) => {
+  const handleUpdateGoal = async (id: string, updates: Partial<Goal>) => {
     try {
       const { error } = await supabase
         .from("goals")
@@ -97,7 +97,7 @@ export default function Goals() {
     }
   };
 
-  const handleDeleteGoal = async (id: number) => {
+  const handleDeleteGoal = async (id: string) => {
     try {
       const { error } = await supabase
         .from("goals")

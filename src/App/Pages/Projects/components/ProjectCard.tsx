@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export interface Project {
-  id: number;
+  id: string;
   created_at: string;
   user_id: string;
   title: string;
@@ -19,8 +19,8 @@ export interface Project {
 
 interface ProjectCardProps {
   project: Project;
-  onUpdate: (id: number, updates: Partial<Project>) => void;
-  onDelete: (id: number) => void;
+  onUpdate: (id: string, updates: Partial<Project>) => void;
+  onDelete: (id: string) => void;
 }
 
 export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
