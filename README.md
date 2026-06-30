@@ -64,3 +64,4 @@ The application is automatically deployed to GitHub Pages and can be viewed live
 
 ---
 *© Focus Technology Group. Built for the power user.*
+
