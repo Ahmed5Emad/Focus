@@ -47,7 +47,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
         {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-none rounded-2xl shadow-2xl">
-        <div className="bg-linear-to-br from-[#7b68ee] to-[#6d28d9] p-8 text-white relative overflow-hidden">
+        <div className="bg-linear-to-br from-[#7c3aed] to-[#4f46e5] p-8 text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Layout className="w-32 h-32 rotate-12" />
           </div>
@@ -70,7 +70,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
         <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
           <div className="space-y-2">
             <Label htmlFor="title" className="font-['Space_Grotesk',sans-serif] text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <Layout className="w-4 h-4 text-[#7b68ee]" />
+              <Layout className="w-4 h-4 text-[#7c3aed]" />
               Project Title
             </Label>
             <div className="relative">
@@ -79,7 +79,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Q3 Marketing Campaign"
-                className="h-12 rounded-xl border-slate-200 focus:border-[#7b68ee] focus:ring-[#7b68ee]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
+                className="h-12 rounded-xl border-slate-200 focus:border-[#7c3aed] focus:ring-[#7c3aed]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
                 required
               />
             </div>
@@ -87,7 +87,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
 
           <div className="space-y-2">
             <Label htmlFor="description" className="font-['Space_Grotesk',sans-serif] text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <AlignLeft className="w-4 h-4 text-[#7b68ee]" />
+              <AlignLeft className="w-4 h-4 text-[#7c3aed]" />
               Description
             </Label>
             <Input
@@ -95,13 +95,13 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Briefly describe the project goals..."
-              className="h-12 rounded-xl border-slate-200 focus:border-[#7b68ee] focus:ring-[#7b68ee]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
+               className="h-12 rounded-xl border-slate-200 focus:border-[#7c3aed] focus:ring-[#7c3aed]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="category" className="font-['Space_Grotesk',sans-serif] text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-[#7b68ee]" />
+              <Tag className="w-4 h-4 text-[#7c3aed]" />
               Category
             </Label>
             <Input
@@ -109,7 +109,7 @@ export function CreateProjectModal({ children, onCreate }: CreateProjectModalPro
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="e.g., Marketing, Development"
-              className="h-12 rounded-xl border-slate-200 focus:border-[#7b68ee] focus:ring-[#7b68ee]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
+               className="h-12 rounded-xl border-slate-200 focus:border-[#7c3aed] focus:ring-[#7c3aed]/20 font-['Inter',sans-serif] text-slate-900 placeholder:text-slate-400 transition-all"
             />
           </div>
 

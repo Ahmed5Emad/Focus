@@ -1,4 +1,5 @@
 import { Target } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { CreateGoalModal } from "./CreateGoalModal";
 
 interface EmptyGoalsStateProps {
@@ -28,9 +29,9 @@ export function EmptyGoalsState({ onCreateGoal, tasks }: EmptyGoalsStateProps) {
         </p>
         
         <CreateGoalModal onCreate={onCreateGoal} tasks={tasks}>
-          <button className="bg-[#6b38d4] text-[#ffffff] font-['Space_Grotesk',sans-serif] text-[16px] font-semibold py-4 px-10 rounded-xl hover:bg-[#8455ef] transition-all shadow-[0px_8px_20px_rgba(107,56,212,0.2)] hover:shadow-[0px_12px_24px_rgba(107,56,212,0.3)] hover:-translate-y-1 active:translate-y-0">
+          <Button className="btn-primary">
             Create Your First Goal
-          </button>
+          </Button>
         </CreateGoalModal>
       </div>
     </div>
