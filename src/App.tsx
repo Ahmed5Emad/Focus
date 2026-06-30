@@ -25,6 +25,8 @@ import TaskCreation from "./App/Pages/Tasks/TaskCreation";
 import Management from "./App/Pages/Management/Management";
 import Settings from "./App/Pages/Settings/Settings";
 import FocusTimer from "./App/Pages/FocusTimer/FocusTimer";
+import ArchivePage from "./App/Pages/Archive/Archive";
+import Support from "./App/Pages/Support/Support";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FocusProvider } from "./contexts/FocusContext";
 
@@ -102,12 +104,22 @@ function App() {
                  <Settings />
                </ProtectedRoute>
              } />
-             <Route path="/focus-timer" element={
-               <ProtectedRoute>
-                 <FocusTimer />
-               </ProtectedRoute>
-             } />
-           </Route>
+              <Route path="/focus-timer" element={
+                <ProtectedRoute>
+                  <FocusTimer />
+                </ProtectedRoute>
+              } />
+              <Route path="/archive" element={
+                <ProtectedRoute>
+                  <ArchivePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/support" element={
+                <ProtectedRoute>
+                  <Support />
+                </ProtectedRoute>
+              } />
+            </Route>
             </Routes>
           </HashRouter>
         </ErrorBoundary>
