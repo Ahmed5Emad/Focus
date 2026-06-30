@@ -125,7 +125,7 @@ export default function Goals() {
           <h1 className="page-title mb-2">
             My Goals
           </h1>
-          <p className="font-['Inter',sans-serif] text-[18px] leading-[1.6] text-[#494454]">
+          <p className="page-description">
             Track your long-term ambitions and milestones.
           </p>
         </div>

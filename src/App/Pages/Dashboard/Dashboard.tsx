@@ -59,10 +59,10 @@ export default function Dashboard() {
     <div className="page-container">
       <div className="flex items-start justify-between w-full pt-6 px-4 md:px-0">
         <div className="flex flex-col gap-0.5">
-          <h1 className="font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[32px] md:text-[48px] tracking-[-1.2px] leading-tight m-0">
+          <h1 className="page-title">
             Good morning.
           </h1>
-          <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[16px] leading-[25.6px] m-0">
+          <p className="page-description">
             You have {tasks.length} task{tasks.length !== 1 ? 's' : ''} for today's focus block.
           </p>
         </div>
@@ -80,12 +80,10 @@ export default function Dashboard() {
 
           <button
             onClick={() => currentWorkspaceId && startSession(null, currentWorkspaceId)}
-            className="bg-linear-to-r from-[#7c3aed] to-[#4f46e5] drop-shadow-[0px_4px_6px_rgba(139,92,246,0.2)] flex gap-2 items-center px-6 py-3.25 rounded-lg hover:opacity-90 transition-opacity cursor-pointer border-none"
+            className="btn-primary"
           >
             <Play className="w-[10.5px] h-[10.5px] text-white fill-white" />
-            <span className="font-['Spline_Sans',sans-serif] font-semibold text-[12px] text-white tracking-[1.2px] uppercase">
-              Start Session
-            </span>
+            Start Session
           </button>
         </div>
       </div>

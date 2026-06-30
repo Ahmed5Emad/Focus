@@ -108,20 +108,20 @@ export default function Projects() {
           <h1 className="page-title mb-2">
             Projects
           </h1>
-          <p className="font-['Inter',sans-serif] text-[18px] leading-[1.6] text-[#494454]">
+          <p className="page-description">
             Manage your initiatives and track high-level progress.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-[#f5f3ff] rounded-full p-1 flex">
+          <div className="filter-tabs">
             {(["active", "completed", "on_hold"] as const).map((status) => (
               <button 
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-full font-['Space_Grotesk',sans-serif] text-[14px] font-semibold leading-none transition-colors capitalize ${
+                className={`filter-tab ${
                   filter === status 
-                    ? "bg-[#ede9fe] text-[#6d28d9] shadow-sm" 
-                    : "text-[#494454] hover:text-[#6d28d9]"
+                    ? "filter-tab-active" 
+                    : "filter-tab-inactive"
                 }`}
               >
                 {status.replace("_", " ")}

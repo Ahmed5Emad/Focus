@@ -131,13 +131,13 @@ export default function Settings() {
   const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId);
 
   return (
-    <div className="w-full p-4 md:p-6 space-y-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-semibold text-foreground flex items-center gap-2">
+    <div className="page-container pt-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="page-title flex items-center gap-3">
           <SettingsIcon className="w-8 h-8 text-cu-purple" />
           Settings
-        </h2>
-        <p className="text-muted-foreground mt-2">Manage your account, preferences, and workspace environments.</p>
+        </h1>
+        <p className="page-description">Manage your account, preferences, and workspace environments.</p>
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">

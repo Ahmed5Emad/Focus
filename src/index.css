@@ -149,6 +149,9 @@
   .page-title {
     @apply font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] text-[48px] tracking-[-1.2px] leading-tight m-0;
   }
+  .page-description {
+    @apply font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[16px] leading-[25.6px] m-0;
+  }
   .content-card {
     @apply bg-white border border-[#f1f5f9] rounded-2xl shadow-sm;
   }

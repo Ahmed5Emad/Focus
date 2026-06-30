@@ -58,7 +58,7 @@ export default function Tasks() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6">
         <div className="flex flex-col gap-1">
           <h1 className="page-title">Tasks</h1>
-          <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[16px] leading-[25.6px] m-0">
+          <p className="page-description">
             Manage your focus and track your progress across projects.
           </p>
         </div>

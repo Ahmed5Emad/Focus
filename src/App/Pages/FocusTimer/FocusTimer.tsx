@@ -119,7 +119,7 @@ export default function FocusTimer() {
     <div className="page-container">
       <div className="flex flex-col gap-2 pt-6">
         <h1 className="page-title">Focus Timer</h1>
-        <p className="text-[#64748b] text-sm">Manage your deep work sessions and track distractions.</p>
+        <p className="page-description">Manage your deep work sessions and track distractions.</p>
       </div>
 
       <div className="bg-white rounded-3xl border border-[#e2e8f0] p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">

@@ -127,7 +127,7 @@ export default function TaskCreation() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] w-full px-4">
-      <div className="w-full max-w-2xl bg-white dark:bg-zinc-950 rounded-xl shadow-2xl overflow-hidden flex flex-col border border-zinc-200 dark:border-zinc-800">
+      <div className="w-full max-w-2xl content-card overflow-hidden flex flex-col">
         <div className="flex items-center px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 relative">
           <Plus className="text-zinc-400 w-6 h-6 mr-3" />
           <input
