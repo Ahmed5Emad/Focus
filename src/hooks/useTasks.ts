@@ -41,7 +41,10 @@ export function useTasks() {
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "title">("newest");
 
   useEffect(() => {
-    if (!currentWorkspaceId) return;
+    if (!currentWorkspaceId) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchData = async () => {
       setIsLoading(true);

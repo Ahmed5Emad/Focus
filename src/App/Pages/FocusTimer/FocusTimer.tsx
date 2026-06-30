@@ -49,7 +49,10 @@ export default function FocusTimer() {
 
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
       
       const { data, error } = await supabase
         .from('focus_sessions')

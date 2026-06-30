@@ -16,10 +16,12 @@ export default function Goals() {
   const [filter, setFilter] = useState<"active" | "completed">("active");
 
   useEffect(() => {
-    if (user && currentWorkspaceId) {
-      fetchGoals();
-      fetchTasks();
+    if (!user || !currentWorkspaceId) {
+      setIsLoading(false);
+      return;
     }
+    fetchGoals();
+    fetchTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentWorkspaceId]);
 

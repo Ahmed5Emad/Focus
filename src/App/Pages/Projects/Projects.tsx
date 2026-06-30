@@ -15,9 +15,11 @@ export default function Projects() {
   const [filter, setFilter] = useState<"active" | "completed" | "on_hold">("active");
 
   useEffect(() => {
-    if (user && currentWorkspaceId) {
-      fetchProjects();
+    if (!user || !currentWorkspaceId) {
+      setIsLoading(false);
+      return;
     }
+    fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentWorkspaceId]);
 
