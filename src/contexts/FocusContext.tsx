@@ -231,22 +231,6 @@ export function FocusProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isDistractionShortcut = (e.metaKey || e.ctrlKey) && e.key === 'd';
-      if (isDistractionShortcut) {
-        e.preventDefault();
-        if (activeSession) {
-          logDistraction('external', 'minor');
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeSession]);
-
-
   const value = {
     activeSession,
     isActive: !!activeSession,
