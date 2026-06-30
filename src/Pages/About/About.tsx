@@ -9,7 +9,15 @@ const TEAM = [
   { name: "Ahmed E.", role: "Operations" },
 ];
 
-const Principle = ({ icon: Icon, title, description, colorClass, bgClass }: any) => (
+interface PrincipleProps {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  colorClass: string;
+  bgClass: string;
+}
+
+const Principle = ({ icon: Icon, title, description, colorClass, bgClass }: PrincipleProps) => (
   <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${bgClass}`}>
       <Icon className={`w-6 h-6 ${colorClass}`} />

@@ -5,14 +5,26 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Search, Activity, Command, Zap, Layers, Share2, Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// --- Extracted Sub-Components ---
-const FeatureBadge = ({ icon: Icon, text, colorClass }: any) => (
+interface FeatureBadgeProps {
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
+  colorClass: string;
+}
+
+interface FlowItemProps {
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
+  colorClass: string;
+  bgClass: string;
+}
+
+const FeatureBadge = ({ icon: Icon, text, colorClass }: FeatureBadgeProps) => (
   <span className={cn("text-sm font-bold tracking-widest uppercase flex items-center gap-2", colorClass)}>
     <Icon className="w-4 h-4" /> {text}
   </span>
 );
 
-const FlowItem = ({ icon: Icon, text, colorClass, bgClass }: any) => (
+const FlowItem = ({ icon: Icon, text, colorClass, bgClass }: FlowItemProps) => (
   <li className="flex items-center gap-4 text-slate-700 font-bold text-sm">
     <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgClass)}>
       <Icon className={cn("w-4 h-4", colorClass)} />

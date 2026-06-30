@@ -27,7 +27,7 @@ export interface Goal {
 
 export function useTasks() {
   const { currentWorkspaceId } = useAuth();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);

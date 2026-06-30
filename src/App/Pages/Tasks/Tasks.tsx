@@ -134,7 +134,7 @@ export default function Tasks() {
 
           <div className="h-6 w-px bg-slate-200 mx-1 hidden lg:block" />
 
-          <Select value={sortBy} onValueChange={(val: any) => setSortBy(val)}>
+          <Select value={sortBy} onValueChange={(val: "newest" | "oldest" | "title") => setSortBy(val)}>
             <SelectTrigger className="w-[140px] bg-slate-50 border-slate-200 h-10 rounded-xl">
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />

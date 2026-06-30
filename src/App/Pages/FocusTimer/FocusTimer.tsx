@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useFocus } from '../../../contexts/FocusContext';
-import { createClient } from '../../../lib/supabase/client';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useFocus } from '@/contexts/FocusContext';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../../../components/ui/collapsible";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 
 interface SessionHistory {
   id: string;

@@ -9,7 +9,7 @@ import { EmptyGoalsState } from "./components/EmptyGoalsState";
 
 export default function Goals() {
   const { user, currentWorkspaceId } = useAuth();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [goals, setGoals] = useState<Goal[]>([]);
   const [tasks, setTasks] = useState<{ id: string; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +20,7 @@ export default function Goals() {
       fetchGoals();
       fetchTasks();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentWorkspaceId]);
 
   const fetchGoals = async () => {

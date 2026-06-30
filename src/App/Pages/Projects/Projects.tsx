@@ -9,7 +9,7 @@ import { EmptyProjectsState } from "./components/EmptyProjectsState";
 
 export default function Projects() {
   const { user, currentWorkspaceId } = useAuth();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"active" | "completed" | "on_hold">("active");
@@ -18,6 +18,7 @@ export default function Projects() {
     if (user && currentWorkspaceId) {
       fetchProjects();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentWorkspaceId]);
 
   const fetchProjects = async () => {

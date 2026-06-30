@@ -25,7 +25,7 @@ interface WorkspaceMember {
 
 export default function Settings() {
   const { currentWorkspaceId, workspaces, refreshWorkspaces, setCurrentWorkspaceId } = useAuth();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -44,6 +44,7 @@ export default function Settings() {
     if (currentWorkspaceId) {
       fetchMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);
 
   const fetchMembers = async () => {
@@ -56,7 +57,7 @@ export default function Settings() {
 
       if (error) throw error;
       setMembers(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching members:', error);
     } finally {
       setIsLoadingMembers(false);
@@ -83,8 +84,8 @@ export default function Settings() {
       setNewWorkspaceName('');
       
       if (data) setCurrentWorkspaceId(data);
-    } catch (error: any) {
-      setCreateError(error.message || 'Failed to create workspace');
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : 'Failed to create workspace');
     } finally {
       setIsCreating(false);
     }
@@ -120,8 +121,8 @@ export default function Settings() {
       setInviteSuccess('Member invited successfully!');
       setInviteEmail('');
       await fetchMembers();
-    } catch (error: any) {
-      setInviteError(error.message || 'Failed to invite member');
+    } catch (error) {
+      setInviteError(error instanceof Error ? error.message : 'Failed to invite member');
     } finally {
       setIsInviting(false);
     }

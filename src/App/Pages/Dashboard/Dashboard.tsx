@@ -24,7 +24,7 @@ export default function Dashboard() {
   const { startSession } = useFocus();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   useEffect(() => {
     if (!currentWorkspaceId) return;

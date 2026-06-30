@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -49,8 +50,8 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [supabase] = useState(() => createClient());
   
-  const timerRef = useRef<any>(null);
-  const heartbeatRef = useRef<any>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchActiveSession = useCallback(async () => {
     if (!user) return;
@@ -78,6 +79,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   }, [user, supabase]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchActiveSession();
   }, [fetchActiveSession]);
 
@@ -88,6 +90,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       }, 1000);
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (!activeSession) setSecondsElapsed(0);
     }
 
