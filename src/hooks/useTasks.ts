@@ -77,8 +77,8 @@ export function useTasks() {
     fetchData();
 
     const channel = supabase
-      .channel('tasks-hook-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+      .channel(`tasks-hook-${currentWorkspaceId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `workspace_id=eq.${currentWorkspaceId}` }, () => {
         fetchData();
       })
       .subscribe();
