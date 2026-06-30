@@ -1,7 +1,8 @@
 import { Zap, Play, BrainCircuit, Hourglass, CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFocus } from "@/contexts/FocusContext";
 import { createClient } from "@/lib/supabase/client";
 
 interface DashboardStats {
@@ -18,7 +19,9 @@ interface Task {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { currentWorkspaceId } = useAuth();
+  const { startSession } = useFocus();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const supabase = createClient();
@@ -60,19 +63,25 @@ export default function Dashboard() {
             Good morning.
           </h1>
           <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[16px] leading-[25.6px] m-0">
-            You have 4 primary tasks for today's focus block.
+            You have {tasks.length} task{tasks.length !== 1 ? 's' : ''} for today's focus block.
           </p>
         </div>
 
         <div className="flex gap-4 items-start">
-          <button className="bg-white border border-[#e2e8f0] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-2 items-center px-6.25 py-3.25 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+          <button
+            onClick={() => navigate('/tasks/new')}
+            className="bg-white border border-[#e2e8f0] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-2 items-center px-6.25 py-3.25 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+          >
             <Zap className="w-3 h-3.75 text-[#334155]" />
             <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#334155] text-[12px] tracking-[1.2px] uppercase">
               Quick Task
             </span>
           </button>
 
-          <button className="bg-linear-to-r from-[#7c3aed] to-[#4f46e5] drop-shadow-[0px_4px_6px_rgba(139,92,246,0.2)] flex gap-2 items-center px-6 py-3.25 rounded-lg hover:opacity-90 transition-opacity cursor-pointer border-none">
+          <button
+            onClick={() => currentWorkspaceId && startSession(null, currentWorkspaceId)}
+            className="bg-linear-to-r from-[#7c3aed] to-[#4f46e5] drop-shadow-[0px_4px_6px_rgba(139,92,246,0.2)] flex gap-2 items-center px-6 py-3.25 rounded-lg hover:opacity-90 transition-opacity cursor-pointer border-none"
+          >
             <Play className="w-[10.5px] h-[10.5px] text-white fill-white" />
             <span className="font-['Spline_Sans',sans-serif] font-semibold text-[12px] text-white tracking-[1.2px] uppercase">
               Start Session
