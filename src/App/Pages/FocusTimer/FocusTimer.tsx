@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useFocus } from '../../../contexts/FocusContext';
 import { createClient } from '../../../lib/supabase/client';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Square, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
+import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -39,7 +39,7 @@ const formatTime = (seconds: number) => {
 };
 
 export default function FocusTimer() {
-  const { activeSession, isActive, secondsElapsed, stopSession, logDistraction } = useFocus();
+  const { activeSession, isActive, isPaused, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
   const { user } = useAuth();
   const [supabase] = useState(() => createClient());
   
@@ -139,11 +139,15 @@ export default function FocusTimer() {
             
             <div className="flex gap-4">
               <button 
-                onClick={() => stopSession()}
+                onClick={() => isPaused ? resumeSession() : pauseSession()}
                 className="bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2"
               >
-                <Pause className="w-5 h-5" />
-                Pause
+                {isPaused ? (
+                  <Play className="w-5 h-5" />
+                ) : (
+                  <Pause className="w-5 h-5" />
+                )}
+                {isPaused ? 'Resume' : 'Pause'}
               </button>
               <button 
                 onClick={() => stopSession()}

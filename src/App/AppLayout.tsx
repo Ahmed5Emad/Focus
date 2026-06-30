@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { useFocus } from "../contexts/FocusContext";
-import { Timer, Pause, Square, AlertCircle, X } from "lucide-react";
+import { Timer, Play, Pause, Square, AlertCircle, X } from "lucide-react";
 
 const formatTime = (seconds: number) => {
   const hrs = Math.floor(seconds / 3600);
@@ -18,7 +18,7 @@ const formatTime = (seconds: number) => {
 
 export function AppLayout() {
   const navigate = useNavigate();
-  const { isActive, activeSession, secondsElapsed, stopSession, logDistraction } = useFocus();
+  const { isActive, isPaused, activeSession, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
   const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
 
   useEffect(() => {
@@ -88,10 +88,15 @@ export function AppLayout() {
                       <span className="text-xs font-semibold text-cu-orange">Log</span>
                     </button>
                     <button 
-                      onClick={() => stopSession()}
+                      onClick={() => isPaused ? resumeSession() : pauseSession()}
                       className="bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer"
+                      title={isPaused ? "Resume" : "Pause"}
                     >
-                      <Pause className="w-3.5 h-3.5 text-[#475569] fill-[#475569]" />
+                      {isPaused ? (
+                        <Play className="w-3.5 h-3.5 text-[#475569]" />
+                      ) : (
+                        <Pause className="w-3.5 h-3.5 text-[#475569] fill-[#475569]" />
+                      )}
                     </button>
                     <button 
                       onClick={() => stopSession()}

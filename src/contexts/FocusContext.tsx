@@ -31,8 +31,11 @@ export interface DistractionLog {
 interface FocusContextType {
   activeSession: FocusSession | null;
   isActive: boolean;
+  isPaused: boolean;
   secondsElapsed: number;
   startSession: (taskId: string | null, workspaceId: string) => Promise<void>;
+  pauseSession: () => Promise<void>;
+  resumeSession: () => Promise<void>;
   stopSession: () => Promise<void>;
   logDistraction: (type: 'internal' | 'external', severity: 'minor' | 'major') => Promise<void>;
 }
@@ -42,6 +45,7 @@ const FocusContext = createContext<FocusContextType | undefined>(undefined);
 export function FocusProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [supabase] = useState(() => createClient());
   
@@ -78,19 +82,19 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   }, [fetchActiveSession]);
 
   useEffect(() => {
-    if (activeSession && activeSession.status === 'active') {
+    if (activeSession && activeSession.status === 'active' && !isPaused) {
       timerRef.current = setInterval(() => {
         setSecondsElapsed(prev => prev + 1);
       }, 1000);
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
-      setSecondsElapsed(0);
+      if (!activeSession) setSecondsElapsed(0);
     }
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [activeSession]);
+  }, [activeSession, isPaused]);
 
   useEffect(() => {
     if (activeSession && activeSession.status === 'active') {
@@ -139,6 +143,40 @@ export function FocusProvider({ children }: { children: ReactNode }) {
     setSecondsElapsed(0);
   };
 
+  const pauseSession = async () => {
+    if (!activeSession || activeSession.status !== 'active') return;
+
+    const { error } = await supabase
+      .from('focus_sessions')
+      .update({ status: 'paused' })
+      .eq('id', activeSession.id);
+
+    if (error) {
+      console.error('Error pausing session:', error);
+      return;
+    }
+
+    setActiveSession(prev => prev ? { ...prev, status: 'paused' } : null);
+    setIsPaused(true);
+  };
+
+  const resumeSession = async () => {
+    if (!activeSession || activeSession.status !== 'paused') return;
+
+    const { error } = await supabase
+      .from('focus_sessions')
+      .update({ status: 'active', heartbeat_at: new Date().toISOString() })
+      .eq('id', activeSession.id);
+
+    if (error) {
+      console.error('Error resuming session:', error);
+      return;
+    }
+
+    setActiveSession(prev => prev ? { ...prev, status: 'active' } : null);
+    setIsPaused(false);
+  };
+
   const stopSession = async () => {
     if (!activeSession) return;
 
@@ -172,6 +210,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
     }
 
     setActiveSession(null);
+    setIsPaused(false);
     setSecondsElapsed(0);
   };
 
@@ -211,8 +250,11 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   const value = {
     activeSession,
     isActive: !!activeSession,
+    isPaused,
     secondsElapsed,
     startSession,
+    pauseSession,
+    resumeSession,
     stopSession,
     logDistraction,
   };
