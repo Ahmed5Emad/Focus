@@ -244,7 +244,7 @@ export default function TaskCreation() {
                             </div>
                           );
                         }}
-                        renderOption={(option, _isSelected) => {
+                        renderOption={(option) => {
                           const member = members.find(m => m.id === option.value);
                           return (
                             <div className="flex items-center gap-2">

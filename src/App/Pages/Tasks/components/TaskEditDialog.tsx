@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -47,15 +47,6 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
   const [projectId, setProjectId] = useState<string | null>(task?.project_id ?? null);
   const [assigneeId, setAssigneeId] = useState<string | null>(task?.assignee_id ?? null);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title ?? "");
-      setStatus(task.status ?? "todo");
-      setProjectId(task.project_id ?? null);
-      setAssigneeId(task.assignee_id ?? null);
-    }
-  }, [task]);
 
   const handleSave = async () => {
     if (!task || !title.trim() || isSaving) return;

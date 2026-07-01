@@ -373,6 +373,7 @@ export default function Tasks() {
       )}
 
       <TaskEditDialog
+        key={editTask?.id}
         task={editTask}
         projects={projects}
         members={members}
