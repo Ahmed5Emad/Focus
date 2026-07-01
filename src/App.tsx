@@ -27,6 +27,7 @@ import Settings from "./App/Pages/Settings/Settings";
 import FocusTimer from "./App/Pages/FocusTimer/FocusTimer";
 import ArchivePage from "./App/Pages/Archive/Archive";
 import Support from "./App/Pages/Support/Support";
+import Chat from "./App/Pages/Chat/Chat";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FocusProvider } from "./contexts/FocusContext";
 
@@ -104,11 +105,16 @@ function App() {
                  <Settings />
                </ProtectedRoute>
              } />
-              <Route path="/focus-timer" element={
-                <ProtectedRoute>
-                  <FocusTimer />
-                </ProtectedRoute>
-              } />
+               <Route path="/chat" element={
+                 <ProtectedRoute>
+                   <Chat />
+                 </ProtectedRoute>
+               } />
+               <Route path="/focus-timer" element={
+                 <ProtectedRoute>
+                   <FocusTimer />
+                 </ProtectedRoute>
+               } />
               <Route path="/archive" element={
                 <ProtectedRoute>
                   <ArchivePage />

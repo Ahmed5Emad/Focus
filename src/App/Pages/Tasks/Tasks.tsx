@@ -1,16 +1,16 @@
-import { 
+import {
   ListChecks,
-  Plus, 
-  Search, 
-  MoreHorizontal, 
-  Calendar, 
-  Folder, 
+  Plus,
+  Search,
+  MoreHorizontal,
+  Calendar,
+  Folder,
   Target,
   CheckCircle2,
   Circle,
   Trash2,
-  ChevronDown,
-  Check
+  Pencil,
+  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -21,22 +21,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { Dropdown } from "@/components/shared/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTasks } from "@/hooks/useTasks";
 import { useState } from "react";
+import { TaskEditDialog } from "./components/TaskEditDialog";
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All Status" },
@@ -49,13 +43,14 @@ const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
   { value: "oldest", label: "Oldest First" },
   { value: "title", label: "Title A-Z" },
-] as const;
+];
 
 export default function Tasks() {
   const {
     tasks,
     projects,
     goals,
+    members,
     isLoading,
     searchQuery,
     setSearchQuery,
@@ -65,24 +60,23 @@ export default function Tasks() {
     setProjectFilter,
     goalFilter,
     setGoalFilter,
+    assigneeFilter,
+    setAssigneeFilter,
     sortBy,
     setSortBy,
     filteredTasks,
     toggleTaskStatus,
-    deleteTask
+    updateTask,
+    deleteTask,
   } = useTasks();
 
-  const [projectOpen, setProjectOpen] = useState(false);
-  const [goalOpen, setGoalOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
+  const [editTask, setEditTask] = useState<(typeof tasks)[number] | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
 
-  const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? "Sort by";
-  const currentProjectLabel = projectFilter !== "all"
-    ? projects.find(p => p.id === projectFilter)?.title
-    : "All Projects";
-  const currentGoalLabel = goalFilter !== "all"
-    ? goals.find(g => g.id === goalFilter)?.title
-    : "All Goals";
+  const handleEdit = (task: (typeof tasks)[number]) => {
+    setEditTask(task);
+    setEditOpen(true);
+  };
 
   return (
     <div className="page-container">
@@ -93,7 +87,7 @@ export default function Tasks() {
             Manage your focus and track your progress across projects.
           </p>
         </div>
-        
+
         <Link to="/tasks/new">
           <Button className="btn-primary">
             <Plus className="w-4 h-4" />
@@ -130,135 +124,63 @@ export default function Tasks() {
             ))}
           </div>
 
-          <Popover open={projectOpen} onOpenChange={setProjectOpen}>
-            <PopoverTrigger asChild>
-              <button
-                role="combobox"
-                aria-expanded={projectOpen}
-                className="filter-tab filter-tab-inactive flex items-center gap-2"
-              >
-                <Folder className="w-3.5 h-3.5 text-[#7b68ee]" />
-                <span className="max-w-[100px] truncate">{currentProjectLabel}</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search projects..." />
-                <CommandList>
-                  <CommandEmpty>No project found.</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      value="all"
-                      onSelect={() => {
-                        setProjectFilter("all");
-                        setProjectOpen(false);
-                      }}
-                    >
-                      <Check className={cn("mr-2 h-4 w-4", projectFilter === "all" ? "opacity-100" : "opacity-0")} />
-                      All Projects
-                    </CommandItem>
-                    {projects.map((p) => (
-                      <CommandItem
-                        key={p.id}
-                        value={p.id}
-                        onSelect={(currentValue) => {
-                          setProjectFilter(currentValue === projectFilter ? "all" : currentValue);
-                          setProjectOpen(false);
-                        }}
-                      >
-                        <Check className={cn("mr-2 h-4 w-4", projectFilter === p.id ? "opacity-100" : "opacity-0")} />
-                        {p.title}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <Dropdown
+            value={projectFilter === "all" ? null : projectFilter}
+            onValueChange={(val) => setProjectFilter(val ?? "all")}
+            options={projects.map((p) => ({ value: p.id, label: p.title }))}
+            placeholder="All Projects"
+            searchPlaceholder="Search projects..."
+            emptyText="No project found."
+            noneLabel="All Projects"
+            icon={<Folder className="w-3.5 h-3.5 text-[#7b68ee]" />}
+            triggerClassName="filter-tab filter-tab-inactive w-44 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+          />
 
-          <Popover open={goalOpen} onOpenChange={setGoalOpen}>
-            <PopoverTrigger asChild>
-              <button
-                role="combobox"
-                aria-expanded={goalOpen}
-                className="filter-tab filter-tab-inactive flex items-center gap-2"
-              >
-                <Target className="w-3.5 h-3.5 text-[#7b68ee]" />
-                <span className="max-w-[100px] truncate">{currentGoalLabel}</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search goals..." />
-                <CommandList>
-                  <CommandEmpty>No goal found.</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      value="all"
-                      onSelect={() => {
-                        setGoalFilter("all");
-                        setGoalOpen(false);
-                      }}
-                    >
-                      <Check className={cn("mr-2 h-4 w-4", goalFilter === "all" ? "opacity-100" : "opacity-0")} />
-                      All Goals
-                    </CommandItem>
-                    {goals.map((g) => (
-                      <CommandItem
-                        key={g.id}
-                        value={g.id}
-                        onSelect={(currentValue) => {
-                          setGoalFilter(currentValue === goalFilter ? "all" : currentValue);
-                          setGoalOpen(false);
-                        }}
-                      >
-                        <Check className={cn("mr-2 h-4 w-4", goalFilter === g.id ? "opacity-100" : "opacity-0")} />
-                        {g.title}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <Dropdown
+            value={goalFilter === "all" ? null : goalFilter}
+            onValueChange={(val) => setGoalFilter(val ?? "all")}
+            options={goals.map((g) => ({ value: g.id, label: g.title }))}
+            placeholder="All Goals"
+            searchPlaceholder="Search goals..."
+            emptyText="No goal found."
+            noneLabel="All Goals"
+            icon={<Target className="w-3.5 h-3.5 text-[#7b68ee]" />}
+            triggerClassName="filter-tab filter-tab-inactive w-44 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+          />
+
+          <Dropdown
+            value={assigneeFilter === "all" ? null : assigneeFilter}
+            onValueChange={(val) => setAssigneeFilter(val ?? "all")}
+            options={members.map((m) => ({ value: m.id, label: m.display_name ?? m.email ?? "Unknown" }))}
+            placeholder="All Members"
+            searchPlaceholder="Search members..."
+            emptyText="No member found."
+            noneLabel="All Members"
+            icon={<User className="w-3.5 h-3.5 text-[#7b68ee]" />}
+            triggerClassName="filter-tab filter-tab-inactive w-44 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+            renderOption={(option) => {
+              const m = members.find(mem => mem.id === option.value);
+              return (
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-5 h-5">
+                    <AvatarImage src={m?.avatar_url ?? undefined} />
+                    <AvatarFallback className="text-[9px]">{(m?.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  {option.label}
+                </div>
+              );
+            }}
+          />
 
           <div className="h-6 w-px bg-slate-200 mx-1 hidden lg:block" />
 
-          <Popover open={sortOpen} onOpenChange={setSortOpen}>
-            <PopoverTrigger asChild>
-              <button
-                role="combobox"
-                aria-expanded={sortOpen}
-                className="filter-tab filter-tab-inactive flex items-center gap-2"
-              >
-                <span>{currentSortLabel}</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-0" align="start">
-              <Command>
-                <CommandList>
-                  <CommandGroup>
-                    {SORT_OPTIONS.map((opt) => (
-                      <CommandItem
-                        key={opt.value}
-                        value={opt.value}
-                        onSelect={(currentValue) => {
-                          setSortBy(currentValue as "newest" | "oldest" | "title");
-                          setSortOpen(false);
-                        }}
-                      >
-                        <Check className={cn("mr-2 h-4 w-4", sortBy === opt.value ? "opacity-100" : "opacity-0")} />
-                        {opt.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <Dropdown
+            value={sortBy}
+            onValueChange={(val) => setSortBy((val ?? "newest") as "newest" | "oldest" | "title")}
+            options={SORT_OPTIONS}
+            showSearch={false}
+            triggerClassName="filter-tab filter-tab-inactive w-44 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+          />
         </div>
       </div>
 
@@ -282,7 +204,8 @@ export default function Tasks() {
                 {searchQuery ||
                 statusFilter !== "all" ||
                 projectFilter !== "all" ||
-                goalFilter !== "all"
+                goalFilter !== "all" ||
+                assigneeFilter !== "all"
                   ? "No tasks found"
                   : "Start your task list"}
               </h2>
@@ -290,7 +213,8 @@ export default function Tasks() {
                 {searchQuery ||
                 statusFilter !== "all" ||
                 projectFilter !== "all" ||
-                goalFilter !== "all"
+                goalFilter !== "all" ||
+                assigneeFilter !== "all"
                   ? "Try adjusting your filters to find what you're looking for."
                   : "Begin organizing your work. Create your first task and stay productive."}
               </p>
@@ -349,6 +273,15 @@ export default function Tasks() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    {task.assignee && (
+                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+                        <Avatar className="w-4 h-4">
+                          <AvatarImage src={task.assignee.avatar_url ?? undefined} />
+                          <AvatarFallback className="text-[7px]">{(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span>{task.assignee.display_name}</span>
+                      </div>
+                    )}
                     {task.projects?.title && (
                       <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
                         <Folder className="w-3.5 h-3.5 text-[#7b68ee]" />
@@ -385,6 +318,13 @@ export default function Tasks() {
                       align="end"
                       className="w-40 rounded-xl"
                     >
+                      <DropdownMenuItem
+                        className="text-[#494454] cursor-pointer"
+                        onClick={() => handleEdit(task)}
+                      >
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-[#494454] cursor-pointer"
                         onClick={() => toggleTaskStatus(task.id, task.status)}
@@ -431,6 +371,18 @@ export default function Tasks() {
           </div>
         </div>
       )}
+
+      <TaskEditDialog
+        task={editTask}
+        projects={projects}
+        members={members}
+        open={editOpen}
+        onOpenChange={(open) => {
+          setEditOpen(open);
+          if (!open) setEditTask(null);
+        }}
+        onSave={updateTask}
+      />
     </div>
   );
 }

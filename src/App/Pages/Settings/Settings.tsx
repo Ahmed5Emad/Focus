@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { 
   Loader2, 
   Camera, 
@@ -13,18 +18,25 @@ import {
   User,
   Sliders,
   Briefcase,
-  Puzzle
+  Puzzle,
+  ListChecks,
+  Check,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
+import { Dropdown } from '@/components/shared/Dropdown';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface WorkspaceMember {
+  member_id: string;
+  user_id: string;
   email: string;
   role: string;
   joined_at: string;
 }
 
 export default function Settings() {
-  const { currentWorkspaceId, workspaces, refreshWorkspaces, setCurrentWorkspaceId } = useAuth();
+  const { user, currentWorkspaceId, workspaces, refreshWorkspaces, setCurrentWorkspaceId } = useAuth();
   const [supabase] = useState(() => createClient());
 
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
@@ -40,12 +52,84 @@ export default function Settings() {
   const [inviteError, setInviteError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState('');
 
+  // Account / Profile state
+  const [profile, setProfile] = useState<{ display_name: string; avatar_url: string } | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState('');
+
+  // Current user's role for permission checks
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [workspaceName, setWorkspaceName] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   useEffect(() => {
     if (currentWorkspaceId) {
       fetchMembers();
+      fetchCurrentUserRole();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);
+
+  useEffect(() => {
+    if (user) fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    setProfileLoading(true);
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('display_name, avatar_url')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (data) {
+        setProfile({ display_name: data.display_name ?? '', avatar_url: data.avatar_url ?? '' });
+      } else {
+        setProfile({ display_name: user.user_metadata?.name ?? '', avatar_url: '' });
+      }
+    } catch {
+      setProfile({ display_name: user.user_metadata?.name ?? '', avatar_url: '' });
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user || !profile) return;
+    setProfileSaving(true);
+    setProfileSaved(false);
+    setProfileError('');
+    try {
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        display_name: profile.display_name.trim() || null,
+        avatar_url: profile.avatar_url.trim() || null,
+      });
+      if (error) throw error;
+      setProfileSaved(true);
+    } catch (error) {
+      setProfileError(error instanceof Error ? error.message : 'Failed to save profile');
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const fetchCurrentUserRole = async () => {
+    if (!currentWorkspaceId || !user) return;
+    const { data } = await supabase
+      .from('workspace_members')
+      .select('role')
+      .eq('workspace_id', currentWorkspaceId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (data) setCurrentUserRole(data.role);
+  };
 
   const fetchMembers = async () => {
     if (!currentWorkspaceId) return;
@@ -63,6 +147,29 @@ export default function Settings() {
       setIsLoadingMembers(false);
     }
   };
+
+  const handleRoleChange = async (memberId: string, newRole: string) => {
+    try {
+      const { data, error } = await supabase.rpc('update_member_role', {
+        p_member_id: memberId,
+        p_new_role: newRole,
+      });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+      setMembers(prev => prev.map(m => m.member_id === memberId ? { ...m, role: newRole } : m));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to update role');
+    }
+  };
+
+  const canChangeRoles = currentUserRole === 'owner' || currentUserRole === 'admin';
+  const roleOptions = currentUserRole === 'owner'
+    ? ['admin', 'sub admin', 'member']
+    : ['sub admin', 'member'];
 
   const handleCreateWorkspace = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -130,6 +237,46 @@ export default function Settings() {
 
   const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId);
 
+  useEffect(() => {
+    if (currentWorkspace) setWorkspaceName(currentWorkspace.name);
+  }, [currentWorkspace]);
+
+  const canManageWorkspace = currentUserRole === 'owner' || currentUserRole === 'admin';
+
+  const handleRenameWorkspace = async () => {
+    if (!currentWorkspaceId || !workspaceName.trim() || isRenaming) return;
+    setIsRenaming(true);
+    try {
+      const { error } = await supabase.rpc('update_workspace_name', {
+        p_workspace_id: currentWorkspaceId,
+        p_name: workspaceName.trim(),
+      });
+      if (error) throw error;
+      await refreshWorkspaces();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to rename workspace');
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
+  const handleDeleteWorkspace = async () => {
+    if (!currentWorkspaceId || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.rpc('delete_workspace', {
+        p_workspace_id: currentWorkspaceId,
+      });
+      if (error) throw error;
+      setShowDeleteConfirm(false);
+      await refreshWorkspaces();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to delete workspace');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="page-container pt-6">
       <div className="flex flex-col gap-1">
@@ -161,26 +308,208 @@ export default function Settings() {
         </TabsList>
 
         <TabsContent value="account" className="space-y-6">
-          <div className="bg-card rounded-xl p-12 shadow-sm border border-dashed flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
-              <User className="w-8 h-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-card rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+                    <User className="w-5 h-5 text-[#7b68ee]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">Profile Information</h3>
+                    <p className="text-sm text-muted-foreground">Update your display name and avatar.</p>
+                  </div>
+                </div>
+
+                {profileLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
+                      <Input
+                        value={user?.email ?? ''}
+                        readOnly
+                        className="bg-muted/50 text-muted-foreground"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Display Name</Label>
+                      <Input
+                        value={profile?.display_name ?? ''}
+                        onChange={(e) => setProfile(prev => prev ? { ...prev, display_name: e.target.value } : null)}
+                        placeholder="Your name"
+                        className="bg-muted/50"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Avatar URL</Label>
+                      <Input
+                        value={profile?.avatar_url ?? ''}
+                        onChange={(e) => setProfile(prev => prev ? { ...prev, avatar_url: e.target.value } : null)}
+                        placeholder="https://example.com/avatar.jpg"
+                        className="bg-muted/50"
+                      />
+                    </div>
+
+                    {profileError && <p className="text-sm text-destructive">{profileError}</p>}
+                    {profileSaved && (
+                      <div className="flex items-center gap-2 text-sm text-cu-green">
+                        <Check className="w-4 h-4" />
+                        Profile updated successfully
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={handleSaveProfile}
+                      disabled={profileSaving}
+                      className="bg-[#7b68ee] hover:opacity-90 text-white"
+                    >
+                      {profileSaving ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                      ) : (
+                        'Save Profile'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Account Settings</h3>
-            <p className="text-muted-foreground max-w-md">
-              Manage your personal profile, email addresses, and security preferences. This section is coming soon.
-            </p>
+
+            <div className="space-y-6">
+              <div className="bg-card rounded-xl p-6 shadow-sm border">
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative mb-4">
+                    <Avatar className="w-24 h-24">
+                      <AvatarImage src={profile?.avatar_url || undefined} />
+                      <AvatarFallback className="text-2xl bg-[#f5f3ff] text-[#7b68ee]">
+                        {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <h3 className="text-lg font-semibold">{profile?.display_name || 'No name set'}</h3>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                </div>
+              </div>
+
+              <div className="bg-card rounded-xl p-6 shadow-sm border">
+                <h3 className="text-lg font-semibold mb-2">Account Info</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">User ID</span>
+                    <span className="font-mono text-xs truncate max-w-[180px]">{user?.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email verified</span>
+                    <span>{user?.email_confirmed_at ? 'Yes' : 'No'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="preferences" className="space-y-6">
-          <div className="bg-card rounded-xl p-12 shadow-sm border border-dashed flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
-              <Sliders className="w-8 h-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-card rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+                  <ListChecks className="w-5 h-5 text-[#7b68ee]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Task Defaults</h3>
+                  <p className="text-sm text-muted-foreground">Configure default behavior for new tasks.</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Default status for new tasks</p>
+                    <p className="text-xs text-muted-foreground">Tasks created without explicit status will use this.</p>
+                  </div>
+                  <Dropdown
+                    value="todo"
+                    onValueChange={() => {}}
+                    options={[{ value: "todo", label: "To Do" }, { value: "in_progress", label: "In Progress" }]}
+                    showSearch={false}
+                    triggerClassName="w-40 h-9 text-sm"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Auto-assign to self</p>
+                    <p className="text-xs text-muted-foreground">New tasks are automatically assigned to you.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" defaultChecked className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Auto-archive completed tasks</p>
+                    <p className="text-xs text-muted-foreground">Hide completed tasks after 7 days.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Show completed tasks</p>
+                    <p className="text-xs text-muted-foreground">Display completed tasks in the task list.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" defaultChecked className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2">App Preferences</h3>
-            <p className="text-muted-foreground max-w-md">
-              Customize your interface, notification settings, and language options. This section is coming soon.
-            </p>
+
+            <div className="bg-card rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+                  <Folder className="w-5 h-5 text-[#7b68ee]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Project Defaults</h3>
+                  <p className="text-sm text-muted-foreground">Manage how projects behave by default.</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Default project view</p>
+                    <p className="text-xs text-muted-foreground">Choose the default layout for projects.</p>
+                  </div>
+                  <Dropdown
+                    value="list"
+                    onValueChange={() => {}}
+                    options={[{ value: "list", label: "List" }, { value: "board", label: "Board" }]}
+                    showSearch={false}
+                    triggerClassName="w-40 h-9 text-sm"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Auto-close completed projects</p>
+                    <p className="text-xs text-muted-foreground">Mark projects as completed when all tasks are done.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
@@ -205,12 +534,25 @@ export default function Settings() {
                 <div className="space-y-4">
                   <div className="space-y-1">
                     <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace Name</Label>
-                    <Input 
-                      className="w-full bg-muted/50" 
-                      type="text" 
-                      value={currentWorkspace?.name || 'ProWorkspace'} 
-                      readOnly
-                    />
+                    <div className="flex gap-2">
+                      <Input 
+                        className="w-full bg-muted/50" 
+                        type="text" 
+                        value={workspaceName}
+                        onChange={(e) => setWorkspaceName(e.target.value)}
+                        readOnly={!canManageWorkspace}
+                      />
+                      {canManageWorkspace && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleRenameWorkspace}
+                          disabled={isRenaming || !workspaceName.trim() || workspaceName === currentWorkspace?.name}
+                        >
+                          {isRenaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit2 className="w-4 h-4" />}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace URL</Label>
@@ -310,16 +652,16 @@ export default function Settings() {
                   </div>
                   <div className="md:col-span-3 space-y-1">
                     <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</Label>
-                    <select 
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    <Dropdown
                       value={inviteRole}
-                      onChange={(e) => setInviteRole(e.target.value)}
-                      disabled={isInviting || !currentWorkspaceId}
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="sub admin">Sub Admin</option>
-                      <option value="member">Member</option>
-                    </select>
+                      onValueChange={(val) => val && setInviteRole(val)}
+                      options={roleOptions.map(opt => ({
+                        value: opt,
+                        label: opt === 'sub admin' ? 'Sub Admin' : opt.charAt(0).toUpperCase() + opt.slice(1)
+                      }))}
+                      showSearch={false}
+                      triggerClassName="w-full h-10"
+                    />
                   </div>
                   <div className="md:col-span-3">
                     <Button type="submit" disabled={isInviting || !inviteEmail.trim() || !currentWorkspaceId} className="w-full">
@@ -345,7 +687,7 @@ export default function Settings() {
                   ) : members.length > 0 ? (
                     <div className="space-y-2">
                       {members.map((member, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 border bg-muted/20 rounded-lg">
+                        <div key={member.member_id ?? idx} className="flex items-center justify-between p-3 border bg-muted/20 rounded-lg">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-bold uppercase">
                               {member.email.substring(0, 2)}
@@ -357,14 +699,22 @@ export default function Settings() {
                               </span>
                             </div>
                           </div>
-                          <select 
-                            className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize"
-                            defaultValue={member.role}
-                          >
-                            <option value="admin">Admin</option>
-                            <option value="sub admin">Sub Admin</option>
-                            <option value="member">Member</option>
-                          </select>
+                          {canChangeRoles ? (
+                            <Dropdown
+                              value={member.role}
+                              onValueChange={(val) => val && handleRoleChange(member.member_id, val)}
+                              options={roleOptions.map(opt => ({
+                                value: opt,
+                                label: opt === 'sub admin' ? 'Sub Admin' : opt
+                              }))}
+                              showSearch={false}
+                              triggerClassName="w-auto min-w-[90px] h-8 text-xs font-medium px-2 py-1 capitalize"
+                            />
+                          ) : (
+                            <span className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize">
+                              {member.role}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -391,6 +741,66 @@ export default function Settings() {
                   <p className="text-muted-foreground font-medium">There is no project yet</p>
                 </div>
               </div>
+
+              {canManageWorkspace && (
+                <div className="bg-card rounded-xl p-6 shadow-sm border border-destructive/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-destructive">Danger Zone</h3>
+                      <p className="text-sm text-muted-foreground">Irreversible actions for workspace admins.</p>
+                    </div>
+                  </div>
+
+                  {!showDeleteConfirm ? (
+                    <div className="flex items-center justify-between p-4 bg-destructive/5 rounded-lg border border-destructive/10">
+                      <div>
+                        <p className="text-sm font-medium">Delete this workspace</p>
+                        <p className="text-xs text-muted-foreground">Permanently remove the workspace and all its data.</p>
+                      </div>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => setShowDeleteConfirm(true)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Workspace
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-destructive/5 rounded-lg border border-destructive/10 space-y-3">
+                      <p className="text-sm font-medium">Are you absolutely sure?</p>
+                      <p className="text-xs text-muted-foreground">
+                        This will permanently delete the workspace <strong>{currentWorkspace?.name}</strong> and all associated data including tasks, messages, and projects. This action cannot be undone.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={handleDeleteWorkspace}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Deleting...</>
+                          ) : (
+                            <><Trash2 className="w-4 h-4 mr-2" /> Yes, delete workspace</>
+                          )}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowDeleteConfirm(false)}
+                          disabled={isDeleting}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-4 pt-6">
                 <Button variant="outline" className="px-6">Discard Changes</Button>

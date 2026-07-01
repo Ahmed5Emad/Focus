@@ -11,13 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Target, Tag, Calendar, Plus, Sparkles, CheckSquare } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dropdown } from "@/components/shared/Dropdown";
 
 interface CreateGoalModalProps {
   children: React.ReactNode;
@@ -128,19 +122,15 @@ export function CreateGoalModal({ children, onCreate, tasks }: CreateGoalModalPr
               <CheckSquare className="w-4 h-4 text-[#7c3aed]" />
               Related Task
             </Label>
-            <Select value={taskId || "none"} onValueChange={(val) => setTaskId(val === "none" ? null : val)}>
-              <SelectTrigger className="h-12 rounded-xl border-slate-200 focus:border-[#7c3aed] focus:ring-[#7c3aed]/20">
-                <SelectValue placeholder="Select a task..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No task</SelectItem>
-                {tasks?.map((task) => (
-                  <SelectItem key={task.id} value={task.id}>
-                    {task.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Dropdown
+              value={taskId}
+              onValueChange={setTaskId}
+              options={tasks?.map((t) => ({ value: t.id, label: t.title })) ?? []}
+              placeholder="Select a task..."
+              searchPlaceholder="Search tasks..."
+              emptyText="No tasks found."
+              noneLabel="No task"
+            />
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4">

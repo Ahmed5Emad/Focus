@@ -69,7 +69,7 @@ export function AppLayout() {
                       ACTIVE FOCUS
                     </span>
                     <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[14px] leading-5">
-                      {activeSession?.tasks?.title || 'No Task Selected'}
+                      {activeSession?.task_id ? 'Focusing on task' : 'No Task Selected'}
                     </span>
                   </div>
                 </div>

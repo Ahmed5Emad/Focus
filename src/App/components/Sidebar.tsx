@@ -8,11 +8,12 @@ import {
   Settings,
   HelpCircle,
   Plus,
-  ChevronDown,
   Building2,
   Layout,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { Dropdown } from "@/components/shared/Dropdown";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { name: "Tasks", icon: CheckSquare, path: "/tasks" },
   { name: "Projects", icon: Layout, path: "/projects" },
   { name: "Goals", icon: Target, path: "/goals" },
+  { name: "Chat", icon: MessageCircle, path: "/chat" },
   { name: "Focus Timer", icon: Timer, path: "/focus-timer" },
   { name: "Archive", icon: Archive, path: "/archive" },
 ];
@@ -33,8 +35,6 @@ export function Sidebar() {
   const location = useLocation();
   const { workspaces, currentWorkspaceId, setCurrentWorkspaceId } = useAuth();
 
-  const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId);
-
   return (
     <aside className="bg-white border-[#e2e8f0] border-r border-solid flex flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
       <div className="w-full flex flex-col gap-6">
@@ -47,32 +47,18 @@ export function Sidebar() {
               <p className="leading-[16px]">DEEP WORK ENGINE</p>
             </div>
           </div>
+        </div>
 
-          <div className="w-full relative group">
-            <select
-              value={currentWorkspaceId || ''}
-              onChange={(e) => setCurrentWorkspaceId(e.target.value)}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            >
-              <option value="" disabled>Select Workspace</option>
-              {workspaces.map((workspace) => (
-                <option key={workspace.id} value={workspace.id}>
-                  {workspace.name}
-                </option>
-              ))}
-            </select>
-            <div className="flex items-center justify-between w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md group-hover:bg-slate-100 transition-colors">
-              <div className="flex items-center gap-2 overflow-hidden">
-                <div className="w-6 h-6 rounded bg-cu-purple/10 flex items-center justify-center shrink-0">
-                  <Building2 className="w-3.5 h-3.5 text-cu-purple" />
-                </div>
-                <span className="text-[13px] font-medium text-slate-700 truncate">
-                  {currentWorkspace?.name || 'Select Workspace'}
-                </span>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-            </div>
-          </div>
+        <div className="px-[16px] w-full">
+          <Dropdown
+            value={currentWorkspaceId}
+            onValueChange={(val) => setCurrentWorkspaceId(val ?? workspaces[0]?.id)}
+            options={workspaces.map((w) => ({ value: w.id, label: w.name }))}
+            placeholder="Select Workspace"
+            icon={<Building2 className="w-3.5 h-3.5 shrink-0 text-cu-purple" />}
+            showSearch={false}
+            triggerClassName="w-full px-[16px] py-[12px] bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors h-auto"
+          />
         </div>
 
         <div className="px-[16px] w-full">

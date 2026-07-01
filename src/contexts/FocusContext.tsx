@@ -16,9 +16,6 @@ export interface FocusSession {
   heartbeat_at: string;
   flow_score: number | null;
   actual_duration_seconds: number;
-  tasks?: {
-    title: string;
-  };
 }
 
 export interface DistractionLog {
@@ -58,12 +55,12 @@ export function FocusProvider({ children }: { children: ReactNode }) {
 
     const { data, error } = await supabase
       .from('focus_sessions')
-      .select('*, tasks(title)')
+      .select('*')
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
+    if (error) {
       console.error('Error fetching active session:', error);
       return;
     }
@@ -134,8 +131,8 @@ export function FocusProvider({ children }: { children: ReactNode }) {
         heartbeat_at: new Date().toISOString(),
         actual_duration_seconds: 0
       })
-      .select('*, tasks(title)')
-      .single();
+      .select('*')
+      .maybeSingle();
 
     if (error) {
       console.error('Error starting session:', error);

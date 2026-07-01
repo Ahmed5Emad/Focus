@@ -1,30 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Folder, ArrowRight, CornerDownLeft, Check, ChevronsUpDown, Sparkles, ListChecks } from 'lucide-react';
+import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Dropdown } from "@/components/shared/Dropdown"
 
 interface Project {
   id: string;
@@ -36,18 +21,26 @@ interface Task {
   title: string;
 }
 
+interface MemberProfile {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  email?: string;
+}
+
 export default function TaskCreation() {
   const [inputValue, setInputValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScheduledForToday, setIsScheduledForToday] = useState(false);
-  
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [parentTasks, setParentTasks] = useState<Task[]>([]);
+  const [members, setMembers] = useState<MemberProfile[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedParentTaskId, setSelectedParentTaskId] = useState<string | null>(null);
-  const [isParentTaskOpen, setIsParentTaskOpen] = useState(false);
+  const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const { user, currentWorkspaceId } = useAuth();
@@ -56,25 +49,48 @@ export default function TaskCreation() {
   useEffect(() => {
     if (!currentWorkspaceId) return;
 
-      const fetchData = async () => {
-        setIsLoadingData(true);
-        try {
-        const [projectsRes, tasksRes] = await Promise.all([
+    const fetchData = async () => {
+      setIsLoadingData(true);
+      try {
+        const [projectsRes, tasksRes, memberRowsRes] = await Promise.all([
           supabase.from('projects').select('id, title').eq('workspace_id', currentWorkspaceId),
-          supabase.from('tasks').select('id, title').eq('workspace_id', currentWorkspaceId).neq('status', 'done')
+          supabase.from('tasks').select('id, title').eq('workspace_id', currentWorkspaceId).neq('status', 'done'),
+          supabase.rpc('get_workspace_members_with_email', { p_workspace_id: currentWorkspaceId }),
         ]);
 
         if (projectsRes.data) setProjects(projectsRes.data);
-          if (tasksRes.data) setParentTasks(tasksRes.data);
-        } catch (error) {
-          console.error('Error fetching relationship data:', error);
-        } finally {
-          setIsLoadingData(false);
+        if (tasksRes.data) setParentTasks(tasksRes.data);
+
+        const memberRowsData = (memberRowsRes.data ?? []) as Array<{ member_id: string; user_id: string; email: string; role: string; joined_at: string }>;
+        const userIds = memberRowsData.map((r) => r.user_id);
+        const emailMap = new Map<string, string>();
+        memberRowsData.forEach((r) => emailMap.set(r.user_id, r.email));
+
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, display_name, avatar_url')
+            .in('id', userIds);
+          const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+          const merged = userIds
+            .filter(id => id !== user?.id)
+            .map(id => ({
+              id,
+              display_name: profileMap.get(id)?.display_name ?? (emailMap.get(id)?.split('@')[0] ?? null),
+              avatar_url: profileMap.get(id)?.avatar_url ?? null,
+              email: emailMap.get(id),
+            }));
+          setMembers(merged);
         }
-      };
+      } catch (error) {
+        console.error('Error fetching relationship data:', error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
 
     fetchData();
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId, supabase, user?.id]);
 
   const createTask = async () => {
     if (!inputValue.trim() || isSubmitting) return;
@@ -82,17 +98,17 @@ export default function TaskCreation() {
     try {
       const { error } = await supabase
         .from('tasks')
-        .insert([{ 
-          title: inputValue.trim(), 
+        .insert([{
+          title: inputValue.trim(),
           workspace_id: currentWorkspaceId,
           user_id: user?.id,
           project_id: selectedProjectId,
-          parent_task_id: selectedParentTaskId
+          parent_task_id: selectedParentTaskId,
+          assignee_id: selectedAssigneeId,
         }]);
-      
+
       if (error) throw error;
-      
-      navigate('/dashboard');
+      navigate('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
       alert('Failed to create task. Please try again.');
@@ -103,7 +119,7 @@ export default function TaskCreation() {
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        navigate('/dashboard');
+        navigate('/tasks');
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -112,7 +128,7 @@ export default function TaskCreation() {
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
-      navigate('/dashboard');
+      navigate('/tasks');
       return;
     }
 
@@ -169,9 +185,9 @@ export default function TaskCreation() {
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Actions</span>
                   {isLoadingData && <span className="text-[10px] text-slate-400 animate-pulse">Loading data...</span>}
                 </div>
-                
+
                 <div className="space-y-3">
-                  <button 
+                  <button
                     onClick={() => setIsScheduledForToday(!isScheduledForToday)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-[#faf5ff]'}`}>
                     <div className="flex items-center gap-3">
@@ -182,89 +198,79 @@ export default function TaskCreation() {
                     </div>
                   </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Project</label>
-                      <Select value={selectedProjectId || "none"} onValueChange={(val) => setSelectedProjectId(val === "none" ? null : val)}>
-                        <SelectTrigger className="w-full bg-white border-slate-200 h-11 rounded-xl">
-                          <div className="flex items-center gap-2">
-                            <Folder className="w-4 h-4 text-purple-500" />
-                            <SelectValue placeholder="Select Project" />
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No Project</SelectItem>
-                          {projects.map((project) => (
-                            <SelectItem key={project.id} value={project.id}>{project.title}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Dropdown
+                        value={selectedProjectId}
+                        onValueChange={setSelectedProjectId}
+                        options={projects.map((p) => ({ value: p.id, label: p.title }))}
+                        placeholder="Select project..."
+                        searchPlaceholder="Search projects..."
+                        emptyText="No project found."
+                        noneLabel="No Project"
+                        icon={<Folder className="w-4 h-4 text-purple-500" />}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Assignee</label>
+                      <Dropdown
+                        value={selectedAssigneeId}
+                        onValueChange={setSelectedAssigneeId}
+                        options={members.map((m) => ({ value: m.id, label: m.display_name ?? m.email ?? "Unknown" }))}
+                        placeholder="Assign to..."
+                        searchPlaceholder="Search members..."
+                        emptyText="No member found."
+                        noneLabel="Unassigned"
+                        renderTrigger={(selected) => {
+                          const member = selected ? members.find(m => m.id === selected.value) : null;
+                          return (
+                            <div className="flex items-center gap-2">
+                              {member ? (
+                                <>
+                                  <Avatar className="w-5 h-5">
+                                    <AvatarImage src={member.avatar_url ?? undefined} />
+                                    <AvatarFallback className="text-[9px]">{(member.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                                  </Avatar>
+                                  <span className="truncate text-slate-700">{member.display_name}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <User className="w-4 h-4 text-slate-400" />
+                                  <span className="truncate text-slate-500">Assign to...</span>
+                                </>
+                              )}
+                            </div>
+                          );
+                        }}
+                        renderOption={(option, _isSelected) => {
+                          const member = members.find(m => m.id === option.value);
+                          return (
+                            <div className="flex items-center gap-2">
+                              <Avatar className="w-5 h-5">
+                                <AvatarImage src={member?.avatar_url ?? undefined} />
+                                <AvatarFallback className="text-[9px]">{(member?.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              {option.label}
+                            </div>
+                          );
+                        }}
+                      />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Parent Task</label>
-                      <Popover open={isParentTaskOpen} onOpenChange={setIsParentTaskOpen}>
-                        <PopoverTrigger asChild>
-                          <button
-                            role="combobox"
-                            aria-expanded={isParentTaskOpen}
-                            className="w-full flex items-center justify-between px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors h-11"
-                          >
-                            <div className="flex items-center gap-2">
-                              <CornerDownLeft className="w-4 h-4 text-orange-500 rotate-180" />
-                              <span className="truncate text-slate-500">
-                                {selectedParentTaskId
-                                  ? parentTasks.find((task) => task.id === selectedParentTaskId)?.title
-                                  : "Select parent task..."}
-                              </span>
-                            </div>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Search tasks..." />
-                            <CommandList>
-                              <CommandEmpty>No task found.</CommandEmpty>
-                              <CommandGroup>
-                                <CommandItem
-                                  value="none"
-                                  onSelect={() => {
-                                    setSelectedParentTaskId(null)
-                                    setIsParentTaskOpen(false)
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      selectedParentTaskId === null ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  No Parent Task
-                                </CommandItem>
-                                {parentTasks.map((task) => (
-                                  <CommandItem
-                                    key={task.id}
-                                    value={task.id}
-                                    onSelect={(currentValue) => {
-                                      setSelectedParentTaskId(currentValue === selectedParentTaskId ? null : currentValue)
-                                      setIsParentTaskOpen(false)
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        selectedParentTaskId === task.id ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {task.title}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Dropdown
+                        value={selectedParentTaskId}
+                        onValueChange={setSelectedParentTaskId}
+                        options={parentTasks.map((t) => ({ value: t.id, label: t.title }))}
+                        placeholder="Select parent task..."
+                        searchPlaceholder="Search tasks..."
+                        emptyText="No task found."
+                        noneLabel="No Parent Task"
+                        icon={<ListChecks className="w-4 h-4 text-slate-400" />}
+                      />
                     </div>
                   </div>
                 </div>
@@ -296,7 +302,7 @@ export default function TaskCreation() {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/tasks')}
               className="h-10 px-5 rounded-xl font-['Space_Grotesk',sans-serif] font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all"
             >
               Cancel

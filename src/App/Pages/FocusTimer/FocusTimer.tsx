@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 
 interface SessionHistory {
   id: string;
+  task_id: string | null;
   start_time: string;
   end_time: string | null;
   status: string;
   flow_score: number | null;
   actual_duration_seconds: number;
-  tasks?: { title: string };
 }
 
 interface DistractionLog {
@@ -56,7 +56,7 @@ export default function FocusTimer() {
       
       const { data, error } = await supabase
         .from('focus_sessions')
-        .select('*, tasks(title)')
+        .select('*')
         .eq('user_id', user.id)
         .order('start_time', { ascending: false })
         .limit(10);
@@ -133,7 +133,7 @@ export default function FocusTimer() {
             </div>
             
             <h2 className="text-2xl font-semibold text-[#0f172a] mb-2 text-center">
-              {activeSession?.tasks?.title || 'Unassigned Task'}
+              {activeSession?.task_id ? 'Focusing on task' : 'Unassigned Task'}
             </h2>
             
             <div className="text-[80px] font-bold text-[#0f172a] font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
@@ -295,7 +295,7 @@ export default function FocusTimer() {
                       {history.map(session => (
                         <tr key={session.id} className="border-b border-[#f1f5f9] last:border-0">
                           <td className="py-4 text-sm font-medium text-[#0f172a]">
-                            {session.tasks?.title || 'Unassigned Task'}
+                            {session.task_id ? 'Task session' : 'Unassigned Task'}
                           </td>
                           <td className="py-4 text-sm text-[#64748b]">
                             {new Date(session.start_time).toLocaleDateString()}

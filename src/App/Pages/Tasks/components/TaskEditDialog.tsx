@@ -1,0 +1,206 @@
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { Loader2, User, Folder, ListChecks } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Dropdown } from "@/components/shared/Dropdown";
+import type { Task, MemberProfile, Project } from "@/hooks/useTasks";
+
+const STATUS_OPTIONS = [
+  { value: "todo", label: "To Do" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "done", label: "Done" },
+];
+
+const statusColor = (s: string) => {
+  switch (s) {
+    case "todo": return "bg-slate-100 text-slate-600";
+    case "in_progress": return "bg-blue-50 text-blue-600";
+    case "done": return "bg-emerald-50 text-emerald-600";
+    default: return "bg-slate-100 text-slate-600";
+  }
+};
+
+interface TaskEditDialogProps {
+  task: Task | null;
+  projects: Project[];
+  members: MemberProfile[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null }>) => Promise<boolean>;
+}
+
+export function TaskEditDialog({ task, projects, members, open, onOpenChange, onSave }: TaskEditDialogProps) {
+  const [title, setTitle] = useState(task?.title ?? "");
+  const [status, setStatus] = useState(task?.status ?? "todo");
+  const [projectId, setProjectId] = useState<string | null>(task?.project_id ?? null);
+  const [assigneeId, setAssigneeId] = useState<string | null>(task?.assignee_id ?? null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title ?? "");
+      setStatus(task.status ?? "todo");
+      setProjectId(task.project_id ?? null);
+      setAssigneeId(task.assignee_id ?? null);
+    }
+  }, [task]);
+
+  const handleSave = async () => {
+    if (!task || !title.trim() || isSaving) return;
+    setIsSaving(true);
+    const success = await onSave(task.id, {
+      title: title.trim(),
+      status,
+      project_id: projectId,
+      assignee_id: assigneeId,
+    });
+    setIsSaving(false);
+    if (success) onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent key={task?.id ?? "new"} className="sm:max-w-lg rounded-xl">
+        <DialogHeader>
+          <DialogTitle className="font-['Spline_Sans',sans-serif] text-lg">Edit Task</DialogTitle>
+          <DialogDescription>Update the task details below.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-5 py-2">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Task title"
+              className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7b68ee] focus:ring-2 focus:ring-[#7b68ee]/20 outline-none transition-all text-[#0b1c30] placeholder:text-slate-400"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</label>
+              <Dropdown
+                value={status}
+                onValueChange={(val) => setStatus(val ?? "todo")}
+                options={STATUS_OPTIONS}
+                showSearch={false}
+                renderTrigger={(selected) => (
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="w-4 h-4 text-slate-400" />
+                    <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", statusColor(selected?.value ?? status))}>
+                      {selected?.label ?? "To Do"}
+                    </span>
+                  </div>
+                )}
+                renderOption={(option) => (
+                  <div className="flex items-center gap-2">
+                    <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", statusColor(option.value))}>
+                      {option.label}
+                    </span>
+                  </div>
+                )}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Project</label>
+              <Dropdown
+                value={projectId}
+                onValueChange={setProjectId}
+                options={projects.map((p) => ({ value: p.id, label: p.title }))}
+                placeholder="No Project"
+                searchPlaceholder="Search projects..."
+                emptyText="No project found."
+                noneLabel="No Project"
+                icon={<Folder className="w-4 h-4 text-slate-400" />}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Assignee</label>
+            <Dropdown
+              value={assigneeId}
+              onValueChange={setAssigneeId}
+              options={members.map((m) => ({ value: m.id, label: m.display_name ?? m.email ?? "Unknown" }))}
+              placeholder="Unassigned"
+              searchPlaceholder="Search members..."
+              emptyText="No member found."
+              noneLabel="Unassigned"
+              renderTrigger={(selected) => {
+                const member = selected ? members.find(m => m.id === selected.value) : null;
+                return (
+                  <div className="flex items-center gap-2">
+                    {member ? (
+                      <>
+                        <Avatar className="w-5 h-5">
+                          <AvatarImage src={member.avatar_url ?? undefined} />
+                          <AvatarFallback className="text-[9px]">{(member.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span>{member.display_name ?? member.email ?? "Unknown"}</span>
+                      </>
+                    ) : (
+                      <>
+                        <User className="w-4 h-4 text-slate-400" />
+                        <span className="text-slate-500">Unassigned</span>
+                      </>
+                    )}
+                  </div>
+                );
+              }}
+              renderOption={(option) => {
+                const member = members.find(m => m.id === option.value);
+                return (
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-5 h-5">
+                      <AvatarImage src={member?.avatar_url ?? undefined} />
+                      <AvatarFallback className="text-[9px]">{(member?.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    {option.label}
+                  </div>
+                );
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            className="h-9 px-4 rounded-lg text-slate-500"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!title.trim() || isSaving}
+            className="h-9 px-5 rounded-lg bg-[#7b68ee] hover:opacity-90 text-white"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
