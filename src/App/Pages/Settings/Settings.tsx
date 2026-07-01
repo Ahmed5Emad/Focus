@@ -23,6 +23,9 @@ import {
   Check,
   Trash2,
   AlertTriangle,
+  Calendar,
+  MessageCircle,
+  FileText,
 } from 'lucide-react';
 import { Dropdown } from '@/components/shared/Dropdown';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -811,14 +814,122 @@ export default function Settings() {
         </TabsContent>
 
         <TabsContent value="integrations" className="space-y-6">
-          <div className="bg-card rounded-xl p-12 shadow-sm border border-dashed flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
-              <Puzzle className="w-8 h-8" />
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+              <Puzzle className="w-5 h-5 text-[#7b68ee]" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Integrations</h3>
-            <p className="text-muted-foreground max-w-md">
-              Connect your favorite tools like Slack, GitHub, and Discord to streamline your workflow. This section is coming soon.
+            <div>
+              <h3 className="text-lg font-semibold">Integrations</h3>
+              <p className="text-sm text-muted-foreground">
+                Connect your favorite tools to streamline your workflow.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              {
+                name: "Slack",
+                description: "Get task notifications and updates directly in your Slack channels.",
+                icon: MessageCircle,
+                color: "bg-[#f5f3ff]",
+                iconColor: "text-[#7b68ee]",
+                connected: false,
+              },
+              {
+                name: "GitHub",
+                description: "Link pull requests and issues to tasks and track progress automatically.",
+                icon: Folder,
+                color: "bg-[#f1f5f9]",
+                iconColor: "text-[#334155]",
+                connected: true,
+              },
+              {
+                name: "Discord",
+                description: "Receive focus session updates and task reminders in your Discord server.",
+                icon: MessageCircle,
+                color: "bg-[#ede9fe]",
+                iconColor: "text-[#6d28d9]",
+                connected: false,
+              },
+              {
+                name: "Google Calendar",
+                description: "Sync your tasks and deadlines with Google Calendar for better scheduling.",
+                icon: Calendar,
+                color: "bg-[#f0f9ff]",
+                iconColor: "text-[#3b82f6]",
+                connected: false,
+              },
+              {
+                name: "Notion",
+                description: "Export tasks and goals to Notion for extended documentation.",
+                icon: FileText,
+                color: "bg-[#f5f3ff]",
+                iconColor: "text-[#7b68ee]",
+                connected: false,
+              },
+              {
+                name: "Linear",
+                description: "Two-way sync between Focus tasks and Linear issues.",
+                icon: ListChecks,
+                color: "bg-[#f1f5f9]",
+                iconColor: "text-[#334155]",
+                connected: false,
+              },
+            ].map((integration) => (
+              <div
+                key={integration.name}
+                className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div
+                    className={`w-10 h-10 rounded-lg ${integration.color} flex items-center justify-center`}
+                  >
+                    <integration.icon
+                      className={`w-5 h-5 ${integration.iconColor}`}
+                    />
+                  </div>
+                  {integration.connected && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
+                      Connected
+                    </span>
+                  )}
+                </div>
+                <h4 className="text-sm font-semibold text-[#0b1c30] mb-1">
+                  {integration.name}
+                </h4>
+                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                  {integration.description}
+                </p>
+                <Button
+                  variant={integration.connected ? "outline" : "default"}
+                  size="sm"
+                  className={
+                    integration.connected
+                      ? ""
+                      : "bg-[#7b68ee] hover:opacity-90 text-white"
+                  }
+                >
+                  {integration.connected ? "Disconnect" : "Connect"}
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-card rounded-xl p-6 shadow-sm border border-dashed flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-full bg-[#f5f3ff] flex items-center justify-center mb-3">
+              <Puzzle className="w-6 h-6 text-[#7b68ee]" />
+            </div>
+            <h4 className="text-sm font-semibold text-[#0b1c30] mb-1">
+              API Access
+            </h4>
+            <p className="text-xs text-muted-foreground max-w-md mb-4">
+              Build custom integrations using our REST API. Generate an API key
+              to get started.
             </p>
+            <Button variant="outline" size="sm">
+              Generate API Key
+            </Button>
           </div>
         </TabsContent>
       </Tabs>
