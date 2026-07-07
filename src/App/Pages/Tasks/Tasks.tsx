@@ -10,9 +10,12 @@ import {
   Circle,
   Trash2,
   Pencil,
+  Archive,
   User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -70,6 +73,8 @@ export default function Tasks() {
     deleteTask,
   } = useTasks();
 
+  const supabase = createClient();
+
   const [editTask, setEditTask] = useState<(typeof tasks)[number] | null>(null);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -98,7 +103,7 @@ export default function Tasks() {
 
       <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white p-2 flex flex-col lg:flex-row gap-4 items-center">
         <div className="relative w-full lg:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#494454]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
           <Input
             placeholder="Search tasks..."
             className="pl-10 bg-white border-slate-100 focus:bg-white transition-all h-10 rounded-xl"
@@ -188,7 +193,7 @@ export default function Tasks() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
-            <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-[#494454] font-medium">Loading your tasks...</p>
+            <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-slate-600 font-medium">Loading your tasks...</p>
           </div>
         ) : filteredTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-6 text-center relative overflow-hidden">
@@ -200,7 +205,7 @@ export default function Tasks() {
               <div className="w-24 h-24 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] rounded-3xl flex items-center justify-center mb-8 shadow-sm rotate-3 group-hover:rotate-0 transition-transform duration-500">
                 <ListChecks className="w-12 h-12 text-[#7b68ee]" />
               </div>
-              <h2 className="font-['Spline_Sans',sans-serif] text-[32px] md:text-[40px] leading-tight font-bold text-[#0b1c30] mb-4 tracking-tight">
+              <h2 className="font-['Spline_Sans',sans-serif] text-[32px] md:text-[40px] leading-tight font-bold text-slate-900 mb-4 tracking-tight">
                 {searchQuery ||
                 statusFilter !== "all" ||
                 projectFilter !== "all" ||
@@ -209,7 +214,7 @@ export default function Tasks() {
                   ? "No tasks found"
                   : "Start your task list"}
               </h2>
-              <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-[#494454] max-w-lg mb-10">
+              <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-slate-600 max-w-lg mb-10">
                 {searchQuery ||
                 statusFilter !== "all" ||
                 projectFilter !== "all" ||
@@ -227,11 +232,11 @@ export default function Tasks() {
             </div>
           </div>
         ) : (
-          <div className="divide-y divide-[#f1f5f9]">
+          <div className="divide-y divide-slate-200">
             {filteredTasks.map((task) => (
               <div
                 key={task.id}
-                className="group flex items-center gap-4 p-5 hover:bg-[#f8f7fc] transition-colors relative"
+                className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors relative"
               >
                 {task.status === "done" && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />
@@ -270,8 +275,8 @@ export default function Tasks() {
                       className={cn(
                         "font-['Spline_Sans',sans-serif] text-[16px] leading-[1.3] font-semibold truncate",
                         task.status === "done"
-                          ? "text-[#494454] line-through"
-                          : "text-[#0b1c30]",
+                          ? "text-slate-600 line-through"
+                          : "text-slate-900",
                       )}
                     >
                       {task.title}
@@ -285,7 +290,7 @@ export default function Tasks() {
 
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     {task.assignee && (
-                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                         <Avatar className="w-4 h-4">
                           <AvatarImage src={task.assignee.avatar_url ?? undefined} />
                           <AvatarFallback className="text-[7px]">{(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
@@ -294,13 +299,13 @@ export default function Tasks() {
                       </div>
                     )}
                     {task.projects?.title && (
-                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                         <Folder className="w-3.5 h-3.5 text-[#7b68ee]" />
                         <span>{task.projects.title}</span>
                       </div>
                     )}
                     {task.goals?.title && (
-                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+                      <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                         <Target className="w-3.5 h-3.5 text-[#7b68ee]" />
                         <span>{task.goals.title}</span>
                       </div>
@@ -310,7 +315,7 @@ export default function Tasks() {
                         "flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal",
                         task.status !== "done" && new Date(task.due_date) < new Date(new Date().toDateString())
                           ? "text-red-500"
-                          : "text-[#494454]",
+                          : "text-slate-600",
                       )}>
                         <Calendar className="w-3.5 h-3.5" />
                         <span>
@@ -320,7 +325,7 @@ export default function Tasks() {
                         </span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+                    <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>
                         {new Date(task.created_at).toLocaleDateString()}
@@ -329,35 +334,47 @@ export default function Tasks() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2 transition-opacity">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-[#494454] hover:text-[#0b1c30]"
+                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-slate-900"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="w-40 rounded-xl"
+                      className="w-44 rounded-xl"
                     >
                       <DropdownMenuItem
-                        className="text-[#494454] cursor-pointer"
+                        className="text-slate-600 cursor-pointer"
                         onClick={() => handleEdit(task)}
                       >
                         <Pencil className="w-4 h-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-[#494454] cursor-pointer"
+                        className="text-slate-600 cursor-pointer"
                         onClick={() => toggleTaskStatus(task.id, task.status)}
                       >
                         {task.status === "done"
                           ? "Mark as Todo"
-                          : "Mark as Done"}
+                          : task.status === "in_progress"
+                          ? "Mark as Done"
+                          : "Mark as In Progress"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-slate-600 cursor-pointer"
+                        onClick={async () => {
+                          await supabase.from("tasks").update({ is_archived: true, archived_at: new Date().toISOString() }).eq("id", task.id);
+                          toast.success("Task archived");
+                        }}
+                      >
+                        <Archive className="w-4 h-4 mr-2" />
+                        Archive
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 cursor-pointer"
@@ -377,20 +394,20 @@ export default function Tasks() {
 
       {!isLoading && filteredTasks.length > 0 && (
         <div className="mt-6 flex items-center justify-between px-2">
-          <p className="font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454] font-medium">
+          <p className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600 font-medium">
             Showing {filteredTasks.length}{" "}
             {filteredTasks.length === 1 ? "task" : "tasks"}
           </p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+              <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                 {tasks.filter((t) => t.status === "done").length} Completed
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#7b68ee]" />
-              <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
+              <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
                 {tasks.filter((t) => t.status !== "done").length} Remaining
               </span>
             </div>

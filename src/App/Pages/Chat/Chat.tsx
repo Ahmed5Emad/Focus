@@ -141,7 +141,15 @@ export default function Chat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [groupChat.messages, dmChat.messages]);
+  }, [groupChat.messages, dmChat.messages, groupChat, dmChat]);
+
+  useEffect(() => {
+    if (mode === "channel" && groupChat.messages.length > 0 && user) {
+      const latest = groupChat.messages.filter(m => m.user_id !== user.id && m.status !== "read");
+      latest.forEach(m => groupChat.markAsRead(m.id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, groupChat.messages, groupChat.markAsRead, user]);
 
   const active = mode === "channel" ? groupChat : dmChat;
   const selectedMember = useMemo(
@@ -272,8 +280,8 @@ export default function Chat() {
         confirmLabel="Clear"
         destructive
       />
-      <div className="page-container h-full flex flex-col">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6 pb-4">
+      <div className="flex flex-col w-full h-full min-h-0">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6 pb-4 shrink-0">
         <div>
           <h1 className="page-title mb-2">Chat</h1>
           <p className="page-description">
@@ -282,7 +290,7 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex-1 flex rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-[500px]">
+      <div className="flex-1 flex rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-0">
         {/* Sidebar */}
         <div className="w-56 shrink-0 border-r border-slate-100 flex flex-col bg-[#fafafa]">
           <div className="p-3">
@@ -365,7 +373,7 @@ export default function Chat() {
           {/* Header bar */}
           <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100">
             <div>
-              <h2 className="text-sm font-semibold text-[#0b1c30] flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                 {mode === "channel" ? (
                   <Hash className="w-4 h-4 text-[#7b68ee]" />
                 ) : (
@@ -422,12 +430,12 @@ export default function Chat() {
                 <div className="w-16 h-16 bg-[#f5f3ff] rounded-2xl flex items-center justify-center mb-6">
                   <MessageCircle className="w-8 h-8 text-[#7b68ee]" />
                 </div>
-                <h3 className="font-['Spline_Sans',sans-serif] text-xl font-bold text-[#0b1c30] mb-2">
+                <h3 className="font-['Spline_Sans',sans-serif] text-xl font-bold text-slate-900 mb-2">
                   {mode === "channel"
                     ? "No messages in #general"
                     : `No messages with ${selectedMember?.display_name ?? "this user"} yet`}
                 </h3>
-                <p className="font-['Inter',sans-serif] text-sm text-[#494454] max-w-sm">
+                <p className="font-['Inter',sans-serif] text-sm text-slate-600 max-w-sm">
                   {mode === "channel"
                     ? "Send the first message to your workspace team."
                     : `Send the first message to ${selectedMember?.display_name ?? "them"}.`}
@@ -480,7 +488,7 @@ export default function Chat() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="p-2 text-slate-400 hover:text-[#7b68ee] hover:bg-white rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                className="p-2 text-slate-400 hover:text-[#7b68ee] rounded-lg transition-colors shrink-0 disabled:opacity-50"
               >
                 <Paperclip className="w-4 h-4" />
               </button>
@@ -502,7 +510,7 @@ export default function Chat() {
                     : `Message @ ${selectedMember?.display_name ?? "user"}`
                 }
                 rows={1}
-                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-[#0b1c30] placeholder:text-[#94a3b8] resize-none max-h-[120px]"
+                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-slate-900 placeholder:text-slate-400 resize-none max-h-[120px]"
                 style={{ minHeight: "36px" }}
                 onInput={(e) => {
                   const el = e.currentTarget;

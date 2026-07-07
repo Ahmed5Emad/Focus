@@ -82,8 +82,8 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
           className={cn(
             "flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors",
             currentTaskId
-              ? "text-[#7b68ee] bg-[#ede9fe] hover:bg-[#ddd6fe]"
-              : "text-[#94a3b8] hover:text-[#64748b] hover:bg-[#f1f5f9]"
+              ? "text-[#7b68ee] bg-[#ede9fe] hover:bg-slate-100"
+              : "text-slate-400 hover:text-slate-500 hover:bg-slate-100"
           )}
         >
           {currentTask?.status === "done" ? (
@@ -126,12 +126,12 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
                   {task.status === "done" ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   ) : (
-                    <Circle className="w-3.5 h-3.5 text-[#94a3b8] shrink-0" />
+                    <Circle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   )}
                   <div className="flex flex-col min-w-0">
                     <span className="truncate">{task.title}</span>
                     {task.projects?.title && (
-                      <span className="text-[10px] text-[#94a3b8] truncate">
+                      <span className="text-[10px] text-slate-400 truncate">
                         {task.projects.title}
                       </span>
                     )}

@@ -221,12 +221,12 @@ export default function Documents() {
               <section key={projectId}>
                 <div className="flex items-center gap-2 mb-3">
                   <FolderOpen className="w-5 h-5 text-[#7b68ee]" />
-                  <h3 className="font-['Spline_Sans',sans-serif] text-lg font-semibold text-[#0b1c30]">
+                  <h3 className="font-['Spline_Sans',sans-serif] text-lg font-semibold text-slate-900">
                     {projectName}
                   </h3>
                   <button
                     onClick={() => handleCreate(projectId)}
-                    className="ml-1 p-1 rounded-md text-[#94a3b8] hover:text-[#7b68ee] hover:bg-[#f5f3ff] transition-colors"
+                    className="ml-1 p-1 rounded-md text-slate-400 hover:text-[#7b68ee] hover:bg-slate-50 transition-colors"
                     title="Add document to this project"
                   >
                     <Plus className="w-4 h-4" />
@@ -253,21 +253,21 @@ export default function Documents() {
                               if (e.key === "Enter") handleRename(doc.id);
                               if (e.key === "Escape") setEditingId(null);
                             }}
-                            className="text-sm font-semibold text-[#0f172a] bg-[#f8fafc] border border-[#e2e8f0] rounded px-2 py-1 w-full outline-none focus:border-[#7b68ee]"
+                            className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2 py-1 w-full outline-none focus:border-[#7b68ee]"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <h3 className="text-sm font-semibold text-[#0f172a] truncate">
+                          <h3 className="text-sm font-semibold text-slate-900 truncate">
                             {doc.title}
                           </h3>
                         )}
                         <div className="flex items-center gap-3 mt-1">
-                          <span className="flex items-center gap-1 text-[11px] text-[#94a3b8]">
+                          <span className="flex items-center gap-1 text-[11px] text-slate-400">
                             <Clock className="w-3 h-3" />
                             {formatDate(doc.updated_at)}
                           </span>
-                          <span className="flex items-center gap-1 text-[11px] text-[#94a3b8]">
+                          <span className="flex items-center gap-1 text-[11px] text-slate-400">
                             <User className="w-3 h-3" />
                             {doc.created_by === user?.id ? "You" : "Collaborator"}
                           </span>
@@ -285,7 +285,7 @@ export default function Documents() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-md text-[#94a3b8] hover:text-[#475569] opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>

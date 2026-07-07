@@ -6,7 +6,9 @@ import {
   MessageCircle,
   BookOpen,
   Search,
+  ExternalLink,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -98,7 +100,7 @@ export default function Support() {
       </div>
 
       <div className="relative w-full max-w-md mb-5">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#494454]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <Input
           placeholder="Search FAQs..."
           className="pl-10 bg-white border-slate-100 h-10 rounded-xl"
@@ -109,39 +111,39 @@ export default function Support() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#f1f5f9]">
-              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#334155] text-[12px] tracking-[1.2px] uppercase">
+          <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100">
+              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-slate-700 text-[12px] tracking-[1.2px] uppercase">
                 Frequently Asked Questions
               </h3>
             </div>
 
             {filteredFaqs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <HelpCircle className="w-12 h-12 text-[#cbd5e1] mb-4" />
-                <p className="font-['Inter',sans-serif] text-[16px] text-[#494454] font-medium">
+                <HelpCircle className="w-12 h-12 text-slate-300 mb-4" />
+                <p className="font-['Inter',sans-serif] text-[16px] text-slate-600 font-medium">
                   No matching questions found
                 </p>
-                <p className="text-sm text-[#64748b] mt-1">
+                <p className="text-sm text-slate-500 mt-1">
                   Try a different search term or browse the categories below.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-[#f1f5f9]">
+              <div className="divide-y divide-slate-200">
                 {filteredFaqs.map((faq, index) => (
                   <div key={index}>
                     <button
                       onClick={() =>
                         setOpenIndex(openIndex === index ? null : index)
                       }
-                      className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-[#f8f7fc] transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors cursor-pointer"
                     >
-                      <span className="font-['Spline_Sans',sans-serif] text-[15px] font-semibold text-[#0b1c30] pr-4">
+                      <span className="font-['Spline_Sans',sans-serif] text-[15px] font-semibold text-slate-900 pr-4">
                         {faq.question}
                       </span>
                       <ChevronDown
                         className={cn(
-                          "w-4 h-4 text-[#64748b] shrink-0 transition-transform duration-200",
+                          "w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200",
                           openIndex === index && "rotate-180",
                         )}
                       />
@@ -153,7 +155,7 @@ export default function Support() {
                       )}
                     >
                       <div className="px-6 pb-4">
-                        <p className="font-['Inter',sans-serif] text-[14px] leading-relaxed text-[#64748b]">
+                        <p className="font-['Inter',sans-serif] text-[14px] leading-relaxed text-slate-500">
                           {faq.answer}
                         </p>
                       </div>
@@ -166,7 +168,7 @@ export default function Support() {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-6">
+          <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
                 <HelpCircle className="w-5 h-5 text-[#7b68ee]" />
@@ -180,40 +182,45 @@ export default function Support() {
             </div>
 
             <div className="space-y-3">
-              {supportOptions.map((option) => (
-                <a
-                  key={option.title}
-                  href={option.href}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-[#f1f5f9] hover:bg-[#f8f7fc] transition-colors no-underline"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-[#f5f3ff] flex items-center justify-center shrink-0">
-                    <option.icon className="w-4 h-4 text-[#7b68ee]" />
+              {supportOptions.map((option) => {
+                const isExternal = option.href.startsWith("http") || option.href.startsWith("mailto:");
+                const isHashRoute = option.href.startsWith("/");
+                const content = (
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors no-underline">
+                    <div className="w-9 h-9 rounded-lg bg-[#f5f3ff] flex items-center justify-center shrink-0">
+                      <option.icon className="w-4 h-4 text-[#7b68ee]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {option.title}
+                      </p>
+                      <p className="text-xs text-slate-500 truncate">
+                        {option.description}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs font-semibold text-[#7b68ee] shrink-0"
+                    >
+                      {option.action}
+                      {isExternal && <ExternalLink className="w-3 h-3 ml-1" />}
+                    </Button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#0b1c30]">
-                      {option.title}
-                    </p>
-                    <p className="text-xs text-[#64748b] truncate">
-                      {option.description}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs font-semibold text-[#7b68ee] shrink-0"
-                  >
-                    {option.action}
-                  </Button>
-                </a>
-              ))}
+                );
+                if (isHashRoute) {
+                  return <Link key={option.title} to={option.href} className="no-underline block">{content}</Link>;
+                }
+                return <a key={option.title} href={option.href} className="no-underline block" target={isExternal ? "_blank" : undefined} rel={isExternal ? "noopener noreferrer" : undefined}>{content}</a>;
+              })}
             </div>
           </div>
 
           <div className="bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] border border-[#e0d6ff] rounded-xl p-6">
-            <h3 className="font-['Spline_Sans',sans-serif] text-[18px] font-semibold text-[#0b1c30] mb-2">
+            <h3 className="font-['Spline_Sans',sans-serif] text-[18px] font-semibold text-slate-900 mb-2">
               Join our community
             </h3>
-            <p className="text-sm text-[#494454] mb-4">
+            <p className="text-sm text-slate-600 mb-4">
               Connect with other power users, share tips, and get early access
               to new features.
             </p>

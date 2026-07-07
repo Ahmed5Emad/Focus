@@ -49,7 +49,7 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
       <div className="bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between hover:-translate-y-0.5 transition-transform duration-300">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-[#0b1c30]">
+            <h2 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-slate-900">
               {goal.title}
             </h2>
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#57dffe] text-[#006172] font-['Space_Grotesk',sans-serif] text-[12px] font-bold leading-none tracking-[0.05em] mt-2">
@@ -80,7 +80,7 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
         </div>
 
       <div className="mt-auto">
-        <div className="flex justify-between font-['Inter',sans-serif] text-[14px] leading-[1.4] text-[#494454] mb-2">
+        <div className="flex justify-between font-['Inter',sans-serif] text-[14px] leading-[1.4] text-slate-600 mb-2">
           <span>Progress</span>
           <span className="font-semibold text-[#6b38d4]">{goal.progress}%</span>
         </div>
@@ -91,7 +91,7 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
           ></div>
         </div>
         <div className="mt-4 flex gap-2">
-          <div className="flex items-center gap-1 text-[#494454] font-['Inter',sans-serif] text-[14px] leading-[1.4] bg-[#eff4ff] px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-1 text-slate-600 font-['Inter',sans-serif] text-[14px] leading-[1.4] bg-[#eff4ff] px-3 py-1.5 rounded-lg">
             <Calendar className="w-4.5 h-4.5" />
             <span>{formattedDate}</span>
           </div>

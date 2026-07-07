@@ -158,7 +158,7 @@ export function useTasks() {
   }, [currentWorkspaceId, supabase, fetchMembers]);
 
   const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'done' ? 'todo' : 'done';
+    const newStatus = currentStatus === 'todo' ? 'in_progress' : currentStatus === 'in_progress' ? 'done' : 'todo';
     try {
       const { error } = await supabase
         .from('tasks')

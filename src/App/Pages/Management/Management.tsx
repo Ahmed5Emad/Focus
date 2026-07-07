@@ -159,7 +159,7 @@ export default function Management() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-5">
+              <div key={i} className="bg-white border border-slate-100 rounded-xl shadow-sm p-5">
                 <Skeleton className="h-10 w-10 rounded-lg" />
                 <Skeleton className="h-8 w-16 mt-3" />
                 <Skeleton className="h-4 w-20 mt-1" />
@@ -167,7 +167,7 @@ export default function Management() {
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-6">
+            <div className="lg:col-span-2 bg-white border border-slate-100 rounded-xl shadow-sm p-6">
               <Skeleton className="h-4 w-48 mb-6" />
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="mb-4">
@@ -179,11 +179,11 @@ export default function Management() {
                 </div>
               ))}
             </div>
-            <div className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm">
-              <div className="px-6 py-4 border-b border-[#f1f5f9]">
+            <div className="bg-white border border-slate-100 rounded-xl shadow-sm">
+              <div className="px-6 py-4 border-b border-slate-100">
                 <Skeleton className="h-4 w-32" />
               </div>
-              <div className="divide-y divide-[#f1f5f9]">
+              <div className="divide-y divide-slate-200">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3 px-5 py-4">
                     <Skeleton className="h-8 w-8 rounded-full" />
@@ -207,10 +207,10 @@ export default function Management() {
             <div className="w-24 h-24 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] rounded-3xl flex items-center justify-center mb-8 shadow-sm">
               <Target className="w-12 h-12 text-[#7b68ee]" />
             </div>
-            <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-[#0b1c30] mb-4 tracking-tight">
+            <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-slate-900 mb-4 tracking-tight">
               No active tasks or goals
             </h2>
-            <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-[#494454] max-w-lg mb-6">
+            <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-slate-600 max-w-lg mb-6">
               Get started by creating your first task or goal to manage your workflow and track team progress.
             </p>
             <Link to="/tasks/new">
@@ -227,23 +227,23 @@ export default function Management() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-5"
+                className="bg-white border border-slate-100 rounded-xl shadow-sm p-5"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center`}>
                     <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-[#0b1c30]">{stat.value}</p>
-                <p className="text-sm text-[#64748b] mt-0.5">{stat.label}</p>
+                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{stat.label}</p>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white border border-[#f1f5f9] rounded-xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
-                <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#334155] text-[12px] tracking-[1.2px] uppercase">
+            <div className="lg:col-span-2 bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-slate-700 text-[12px] tracking-[1.2px] uppercase">
                   Task Distribution by Status
                 </h3>
               </div>
@@ -256,12 +256,12 @@ export default function Management() {
                   ].map((item) => (
                     <div key={item.label}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-sm font-medium text-[#0b1c30]">{item.label}</span>
-                        <span className="text-sm text-[#64748b]">
+                        <span className="text-sm font-medium text-slate-900">{item.label}</span>
+                        <span className="text-sm text-slate-500">
                           {item.count} / {taskCounts.total}
                         </span>
                       </div>
-                      <div className="h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${item.color}`}
                           style={{
@@ -275,23 +275,23 @@ export default function Management() {
               </div>
             </div>
 
-            <div className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#f1f5f9]">
-                <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#334155] text-[12px] tracking-[1.2px] uppercase">
+            <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100">
+                <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-slate-700 text-[12px] tracking-[1.2px] uppercase">
                   Team Workload
                 </h3>
               </div>
-              <div className="divide-y divide-[#f1f5f9]">
+              <div className="divide-y divide-slate-200">
                 {members.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center px-4">
-                    <AlertCircle className="w-8 h-8 text-[#cbd5e1] mb-2" />
-                    <p className="text-sm text-[#64748b]">No members found</p>
+                    <AlertCircle className="w-8 h-8 text-slate-300 mb-2" />
+                    <p className="text-sm text-slate-500">No members found</p>
                   </div>
                 ) : (
                   members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 px-5 py-4 hover:bg-[#f8f7fc] transition-colors"
+                      className="flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors"
                     >
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={member.avatar_url ?? undefined} />
@@ -300,19 +300,19 @@ export default function Management() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#0b1c30] truncate">
+                        <p className="text-sm font-semibold text-slate-900 truncate">
                           {member.display_name}
                         </p>
-                        <p className="text-xs text-[#64748b] truncate">{member.email}</p>
+                        <p className="text-xs text-slate-500 truncate">{member.email}</p>
                       </div>
                       <div className="flex items-center gap-3 text-xs">
                         <div className="flex items-center gap-1">
-                          <Folder className="w-3 h-3 text-[#64748b]" />
-                          <span className="font-medium text-[#0b1c30]">{member.taskCount}</span>
+                          <Folder className="w-3 h-3 text-slate-500" />
+                          <span className="font-medium text-slate-900">{member.taskCount}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                          <span className="font-medium text-[#0b1c30]">{member.completedCount}</span>
+                          <span className="font-medium text-slate-900">{member.completedCount}</span>
                         </div>
                       </div>
                     </div>

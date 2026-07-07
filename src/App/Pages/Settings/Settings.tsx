@@ -72,15 +72,29 @@ export default function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [applyBrandingToEmail, setApplyBrandingToEmail] = useState(true);
 
+  const [latestProjects, setLatestProjects] = useState<{ id: string; title: string; status: string }[]>([]);
+
   const { preferences, updatePreference } = usePreferences();
 
   useEffect(() => {
     if (currentWorkspaceId) {
       fetchMembers();
       fetchCurrentUserRole();
+      fetchLatestProjects();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);
+
+  const fetchLatestProjects = async () => {
+    if (!currentWorkspaceId) return;
+    const { data } = await supabase
+      .from("projects")
+      .select("id, title, status")
+      .eq("workspace_id", currentWorkspaceId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    setLatestProjects(data ?? []);
+  };
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -174,10 +188,12 @@ export default function Settings() {
     }
   };
 
-  const canChangeRoles = currentUserRole === 'owner' || currentUserRole === 'admin';
+  const canChangeRoles = currentUserRole === 'owner' || currentUserRole === 'admin' || currentUserRole === 'sub admin';
   const roleOptions = currentUserRole === 'owner'
     ? ['admin', 'sub admin', 'member']
-    : ['sub admin', 'member'];
+    : currentUserRole === 'admin'
+      ? ['sub admin', 'member']
+      : ['member'];
 
   const handleCreateWorkspace = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -221,17 +237,7 @@ export default function Settings() {
         p_role: inviteRole,
       });
 
-      if (error) {
-        if (error.message.includes('named parameter "p_role"')) {
-          const { error: fallbackError } = await supabase.rpc('invite_user_to_workspace', {
-            p_email: inviteEmail.trim(),
-            p_workspace_id: currentWorkspaceId,
-          });
-          if (fallbackError) throw fallbackError;
-        } else {
-          throw error;
-        }
-      }
+      if (error) throw error;
 
       setInviteSuccess('Member invited successfully!');
       setInviteEmail('');
@@ -248,6 +254,24 @@ export default function Settings() {
   useEffect(() => {
     if (currentWorkspace) setWorkspaceName(currentWorkspace.name);
   }, [currentWorkspace]);
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!confirm('Are you sure you want to remove this member?')) return;
+    try {
+      const { data, error } = await supabase.rpc('remove_member', {
+        p_member_id: memberId,
+      });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+      setMembers(prev => prev.filter(m => m.member_id !== memberId));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to remove member');
+    }
+  };
 
   const canManageWorkspace = currentUserRole === 'owner' || currentUserRole === 'admin';
 
@@ -704,26 +728,37 @@ export default function Settings() {
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-foreground">{member.email}</span>
                               <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
-                                {member.role} • Joined {new Date(member.joined_at).toLocaleDateString()}
+                                {member.role === 'owner' ? 'Owner' : member.role === 'sub admin' ? 'Sub Admin' : member.role.charAt(0).toUpperCase() + member.role.slice(1)} • Joined {new Date(member.joined_at).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
-                          {canChangeRoles ? (
-                            <Dropdown
-                              value={member.role}
-                              onValueChange={(val) => val && handleRoleChange(member.member_id, val)}
-                              options={roleOptions.map(opt => ({
-                                value: opt,
-                                label: opt === 'sub admin' ? 'Sub Admin' : opt
-                              }))}
-                              showSearch={false}
-                              triggerClassName="w-auto min-w-[90px] h-8 text-xs font-medium px-2 py-1 capitalize"
-                            />
-                          ) : (
-                            <span className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize">
-                              {member.role}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {canChangeRoles ? (
+                              <Dropdown
+                                value={member.role}
+                                onValueChange={(val) => val && handleRoleChange(member.member_id, val)}
+                                options={roleOptions.map(opt => ({
+                                  value: opt,
+                                  label: opt === 'sub admin' ? 'Sub Admin' : opt.charAt(0).toUpperCase() + opt.slice(1)
+                                }))}
+                                showSearch={false}
+                                triggerClassName="w-auto min-w-36 h-8 text-xs font-medium px-2 py-1 capitalize"
+                              />
+                            ) : (
+                              <span className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize">
+                                {member.role === 'owner' ? 'Owner' : member.role === 'sub admin' ? 'Sub Admin' : member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                              </span>
+                            )}
+                            {member.role !== 'owner' && currentUserRole && ['owner', 'admin', 'sub admin'].includes(currentUserRole) && (
+                              <button
+                                onClick={() => handleRemoveMember(member.member_id)}
+                                className="p-1.5 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                title="Remove member"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -746,9 +781,23 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center py-12 text-center border rounded-xl bg-muted/10 border-dashed">
-                  <p className="text-muted-foreground font-medium">There is no project yet</p>
-                </div>
+                {latestProjects.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center border rounded-xl bg-muted/10 border-dashed">
+                    <p className="text-muted-foreground font-medium">There is no project yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {latestProjects.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-3">
+                          <Folder className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">{p.title}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{p.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {canManageWorkspace && (
@@ -812,8 +861,8 @@ export default function Settings() {
               )}
 
               <div className="flex items-center justify-end gap-4 pt-6">
-                <Button variant="outline" className="px-6">Discard Changes</Button>
-                <Button className="px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Save Configuration</Button>
+                <Button variant="outline" className="px-6" onClick={() => { if (currentWorkspace) setWorkspaceName(currentWorkspace.name); }}>Discard Changes</Button>
+                <Button className="px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={handleRenameWorkspace}>Save Configuration</Button>
               </div>
             </div>
           </div>
@@ -846,8 +895,8 @@ export default function Settings() {
                 name: "GitHub",
                 description: "Link pull requests and issues to tasks and track progress automatically.",
                 icon: Folder,
-                color: "bg-[#f1f5f9]",
-                iconColor: "text-[#334155]",
+                color: "bg-slate-100",
+                iconColor: "text-slate-700",
                 connected: true,
               },
               {
@@ -878,8 +927,8 @@ export default function Settings() {
                 name: "Linear",
                 description: "Two-way sync between Focus tasks and Linear issues.",
                 icon: ListChecks,
-                color: "bg-[#f1f5f9]",
-                iconColor: "text-[#334155]",
+                color: "bg-slate-100",
+                iconColor: "text-slate-700",
                 connected: false,
               },
             ].map((integration) => (
@@ -901,7 +950,7 @@ export default function Settings() {
                     </span>
                   )}
                 </div>
-                <h4 className="text-sm font-semibold text-[#0b1c30] mb-1">
+                <h4 className="text-sm font-semibold text-slate-900 mb-1">
                   {integration.name}
                 </h4>
                 <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
@@ -927,7 +976,7 @@ export default function Settings() {
             <div className="w-12 h-12 rounded-full bg-[#f5f3ff] flex items-center justify-center mb-3">
               <Puzzle className="w-6 h-6 text-[#7b68ee]" />
             </div>
-            <h4 className="text-sm font-semibold text-[#0b1c30] mb-1">
+            <h4 className="text-sm font-semibold text-slate-900 mb-1">
               API Access
             </h4>
             <p className="text-xs text-muted-foreground max-w-md mb-4">

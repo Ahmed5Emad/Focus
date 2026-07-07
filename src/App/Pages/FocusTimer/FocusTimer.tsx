@@ -18,6 +18,7 @@ interface SessionHistory {
   status: string;
   flow_score: number | null;
   actual_duration_seconds: number;
+  tasks?: { title: string } | null;
 }
 
 interface DistractionLog {
@@ -56,13 +57,13 @@ export default function FocusTimer() {
       
       const { data, error } = await supabase
         .from('focus_sessions')
-        .select('*')
+        .select('*, tasks!focus_sessions_task_id_fkey(title)')
         .eq('user_id', user.id)
         .order('start_time', { ascending: false })
         .limit(10);
         
       if (!error && data) {
-        setHistory(data);
+        setHistory(data as SessionHistory[]);
       }
       setIsLoading(false);
     };
@@ -122,7 +123,7 @@ export default function FocusTimer() {
         <p className="page-description">Manage your deep work sessions and track distractions.</p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-[#e2e8f0] p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cu-purple to-cu-pink opacity-20"></div>
         
         {isActive ? (
@@ -132,18 +133,18 @@ export default function FocusTimer() {
               ACTIVE SESSION
             </div>
             
-            <h2 className="text-2xl font-semibold text-[#0f172a] mb-2 text-center">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-2 text-center">
               {activeSession?.task_id ? 'Focusing on task' : 'Unassigned Task'}
             </h2>
             
-            <div className="text-[80px] font-bold text-[#0f172a] font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
+            <div className="text-[80px] font-bold text-slate-900 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
               {formatTime(secondsElapsed)}
             </div>
             
             <div className="flex gap-4">
               <button 
                 onClick={() => isPaused ? resumeSession() : pauseSession()}
-                className="bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2"
               >
                 {isPaused ? (
                   <Play className="w-5 h-5" />
@@ -163,15 +164,15 @@ export default function FocusTimer() {
           </>
         ) : (
           <>
-            <div className="bg-[#f1f5f9] text-[#64748b] px-4 py-1.5 rounded-full text-sm font-semibold mb-8">
+            <div className="bg-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-sm font-semibold mb-8">
               READY TO FOCUS
             </div>
             
-            <div className="text-[80px] font-bold text-[#94a3b8] font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
+            <div className="text-[80px] font-bold text-slate-400 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
               00:00
             </div>
             
-            <p className="text-[#64748b] text-center max-w-md mb-8">
+            <p className="text-slate-500 text-center max-w-md mb-8">
               Start a session from your Tasks or Dashboard to begin tracking your deep work.
             </p>
           </>
@@ -187,7 +188,7 @@ export default function FocusTimer() {
           <CollapsibleTrigger asChild>
             <Button 
               variant="ghost" 
-              className="flex items-center gap-2 text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] rounded-full px-6"
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full px-6"
             >
               <Settings2 className="w-4 h-4" />
               <span>{isDetailsOpen ? 'Hide' : 'Show'} Session Details & History</span>
@@ -198,9 +199,9 @@ export default function FocusTimer() {
 
         <CollapsibleContent className="space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 bg-white rounded-3xl border border-[#e2e8f0] p-6 shadow-sm flex flex-col h-[400px]">
+            <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col h-[400px]">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-[#0f172a] flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-cu-orange" />
                   Distractions
                 </h3>
@@ -213,30 +214,30 @@ export default function FocusTimer() {
               
               <div className="flex-1 overflow-y-auto pr-2 space-y-3">
                 {!isActive ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-[#94a3b8]">
+                  <div className="h-full flex flex-col items-center justify-center text-center text-slate-400">
                     <AlertCircle className="w-8 h-8 mb-2 opacity-20" />
                     <p className="text-sm">Start a session to log distractions</p>
                   </div>
                 ) : currentLogs.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-[#94a3b8]">
-                    <div className="w-12 h-12 rounded-full bg-[#f8fafc] flex items-center justify-center mb-3">
+                  <div className="h-full flex flex-col items-center justify-center text-center text-slate-400">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
                       <span className="text-xl">🎯</span>
                     </div>
-                    <p className="text-sm font-medium text-[#64748b]">Zero distractions!</p>
+                    <p className="text-sm font-medium text-slate-500">Zero distractions!</p>
                     <p className="text-xs mt-1">Keep up the great work.</p>
                   </div>
                 ) : (
                   currentLogs.map(log => (
-                    <div key={log.id} className="bg-[#f8fafc] border border-[#f1f5f9] rounded-xl p-3 flex items-start gap-3">
+                    <div key={log.id} className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-start gap-3">
                       <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${log.severity === 'major' ? 'bg-red-500' : 'bg-amber-400'}`} />
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold text-[#0f172a] capitalize">{log.type}</span>
-                          <span className="text-[10px] font-medium text-[#64748b] uppercase tracking-wider bg-white px-1.5 py-0.5 rounded border border-[#e2e8f0]">
+                          <span className="text-sm font-semibold text-slate-900 capitalize">{log.type}</span>
+                          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider bg-white px-1.5 py-0.5 rounded border border-slate-200">
                             {log.severity}
                           </span>
                         </div>
-                        <div className="text-xs text-[#64748b]">
+                        <div className="text-xs text-slate-500">
                           {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
@@ -246,16 +247,16 @@ export default function FocusTimer() {
               </div>
               
               {isActive && (
-                <div className="mt-4 pt-4 border-t border-[#e2e8f0] grid grid-cols-2 gap-2">
+                <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => logDistraction('internal', 'minor')}
-                    className="bg-[#f8fafc] hover:bg-[#f1f5f9] text-[#475569] text-xs font-semibold py-2 rounded-lg transition-colors border border-[#e2e8f0]"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200"
                   >
                     + Internal
                   </button>
                   <button 
                     onClick={() => logDistraction('external', 'minor')}
-                    className="bg-[#f8fafc] hover:bg-[#f1f5f9] text-[#475569] text-xs font-semibold py-2 rounded-lg transition-colors border border-[#e2e8f0]"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200"
                   >
                     + External
                   </button>
@@ -263,8 +264,8 @@ export default function FocusTimer() {
               )}
             </div>
 
-            <div className="lg:col-span-2 bg-white rounded-3xl border border-[#e2e8f0] p-6 shadow-sm overflow-hidden">
-              <h3 className="text-lg font-semibold text-[#0f172a] mb-6 flex items-center gap-2">
+            <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm overflow-hidden">
+              <h3 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-cu-blue" />
                 Recent Sessions
               </h3>
@@ -272,52 +273,52 @@ export default function FocusTimer() {
               {isLoading ? (
                 <div className="animate-pulse flex flex-col gap-4">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-[#f1f5f9] rounded-xl w-full"></div>
+                    <div key={i} className="h-16 bg-slate-100 rounded-xl w-full"></div>
                   ))}
                 </div>
               ) : history.length === 0 ? (
-                <div className="text-center py-8 text-[#64748b]">
+                <div className="text-center py-8 text-slate-500">
                   No sessions recorded yet.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-[#e2e8f0]">
-                        <th className="pb-3 font-semibold text-[#64748b] text-sm">Task</th>
-                        <th className="pb-3 font-semibold text-[#64748b] text-sm">Date</th>
-                        <th className="pb-3 font-semibold text-[#64748b] text-sm">Duration</th>
-                        <th className="pb-3 font-semibold text-[#64748b] text-sm">Flow Score</th>
-                        <th className="pb-3 font-semibold text-[#64748b] text-sm">Status</th>
+                      <tr className="border-b border-slate-200">
+                        <th className="pb-3 font-semibold text-slate-500 text-sm">Task</th>
+                        <th className="pb-3 font-semibold text-slate-500 text-sm">Date</th>
+                        <th className="pb-3 font-semibold text-slate-500 text-sm">Duration</th>
+                        <th className="pb-3 font-semibold text-slate-500 text-sm">Flow Score</th>
+                        <th className="pb-3 font-semibold text-slate-500 text-sm">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {history.map(session => (
-                        <tr key={session.id} className="border-b border-[#f1f5f9] last:border-0">
-                          <td className="py-4 text-sm font-medium text-[#0f172a]">
-                            {session.task_id ? 'Task session' : 'Unassigned Task'}
+                        <tr key={session.id} className="border-b border-slate-100 last:border-0">
+                          <td className="py-4 text-sm font-medium text-slate-900">
+                            {session.tasks?.title ?? (session.task_id ? 'Task session' : 'Unassigned Task')}
                           </td>
-                          <td className="py-4 text-sm text-[#64748b]">
+                          <td className="py-4 text-sm text-slate-500">
                             {new Date(session.start_time).toLocaleDateString()}
                           </td>
-                          <td className="py-4 text-sm text-[#0f172a] font-medium">
+                          <td className="py-4 text-sm text-slate-900 font-medium">
                             {formatTime(session.actual_duration_seconds)}
                           </td>
                           <td className="py-4">
                             {session.flow_score !== null ? (
                               <div className="flex items-center gap-1.5">
                                 <Activity className="w-4 h-4 text-cu-green" />
-                                <span className="text-sm font-bold text-[#0f172a]">{session.flow_score}</span>
+                                <span className="text-sm font-bold text-slate-900">{session.flow_score}</span>
                               </div>
                             ) : (
-                              <span className="text-sm text-[#94a3b8]">-</span>
+                              <span className="text-sm text-slate-400">-</span>
                             )}
                           </td>
                           <td className="py-4">
                             <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${
                               session.status === 'completed' ? 'bg-[#f0fdf4] text-cu-green' :
                               session.status === 'active' ? 'bg-[#f5f3ff] text-cu-purple' :
-                              'bg-[#f1f5f9] text-[#64748b]'
+                              'bg-slate-100 text-slate-500'
                             }`}>
                               {session.status}
                             </span>

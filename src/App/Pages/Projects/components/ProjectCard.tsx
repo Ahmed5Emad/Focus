@@ -1,4 +1,4 @@
-import { MoreHorizontal, CheckSquare, Calendar, Trash2, Clock, FileText, Plus } from "lucide-react";
+import { MoreHorizontal, CheckSquare, Calendar, Trash2, Clock, FileText, Plus, Archive } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "@/lib/supabase/client";
@@ -73,14 +73,14 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-['Spline_Sans',sans-serif] text-[22px] leading-[1.3] font-semibold text-[#0b1c30] truncate">
+            <h2 className="font-['Spline_Sans',sans-serif] text-[22px] leading-[1.3] font-semibold text-slate-900 truncate">
               {project.title}
             </h2>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-['Space_Grotesk',sans-serif] text-[10px] font-bold leading-none tracking-[0.05em] uppercase ${statusColors[project.status]}`}>
               {project.status.replace("_", " ")}
             </span>
           </div>
-          <p className="font-['Inter',sans-serif] text-[14px] leading-[1.5] text-[#494454] line-clamp-2 mb-3">
+          <p className="font-['Inter',sans-serif] text-[14px] leading-[1.5] text-slate-600 line-clamp-2 mb-3">
             {project.description || "No description provided."}
           </p>
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#f5f3ff] text-[#6b38d4] font-['Space_Grotesk',sans-serif] text-[12px] font-bold leading-none tracking-[0.05em]">
@@ -106,6 +106,10 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
               <Clock className="w-4 h-4 mr-2" />
               Put on Hold
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onUpdate(project.id, { status: "archived" as Project["status"] }); }}>
+              <Archive className="w-4 h-4 mr-2" />
+              Archive
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(project.id); }} className="text-red-600">
               <Trash2 className="w-4 h-4 mr-2" />
               Delete
@@ -116,18 +120,18 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 
       <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[#64748b] font-['Inter',sans-serif] text-[13px]">
+          <div className="flex items-center gap-1.5 text-slate-500 font-['Inter',sans-serif] text-[13px]">
             <Calendar className="w-4 h-4" />
             <span>Created {formattedDate}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[#64748b] font-['Inter',sans-serif] text-[13px]">
+          <div className="flex items-center gap-1.5 text-slate-500 font-['Inter',sans-serif] text-[13px]">
             <FileText className="w-4 h-4" />
             <span>{docCount} {docCount === 1 ? "doc" : "docs"}</span>
           </div>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); handleCreateDoc(); }}
-          className="p-2 rounded-lg text-[#64748b] hover:text-[#7b68ee] hover:bg-[#f5f3ff] transition-colors"
+          className="p-2 rounded-lg text-slate-500 hover:text-[#7b68ee] hover:bg-slate-50 transition-colors"
           title="Create document in this project"
         >
           <Plus className="w-4 h-4" />

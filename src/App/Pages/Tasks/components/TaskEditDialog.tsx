@@ -16,6 +16,7 @@ import { Loader2, User, Folder, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/shared/Dropdown";
 import type { Task, MemberProfile, Project, Priority } from "@/hooks/useTasks";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const STATUS_OPTIONS = [
   { value: "todo", label: "To Do" },
@@ -47,7 +48,9 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
   const [projectId, setProjectId] = useState<string | null>(task?.project_id ?? null);
   const [assigneeId, setAssigneeId] = useState<string | null>(task?.assignee_id ?? null);
   const [priority, setPriority] = useState<Priority>(task?.priority ?? "none");
-  const [dueDate, setDueDate] = useState(task?.due_date ?? "");
+  const [dueDate, setDueDate] = useState<Date | undefined>(
+    task?.due_date ? new Date(task.due_date) : undefined
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -59,7 +62,7 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
       project_id: projectId,
       assignee_id: assigneeId,
       priority,
-      due_date: dueDate || null,
+      due_date: dueDate?.toISOString() ?? null,
     });
     setIsSaving(false);
     if (success) onOpenChange(false);
@@ -74,19 +77,19 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
         </DialogHeader>
 
         <div className="space-y-5 py-2">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Title</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
-              className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7b68ee] focus:ring-2 focus:ring-[#7b68ee]/20 outline-none transition-all text-[#0b1c30] placeholder:text-slate-400"
+              className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 outline-none transition-all text-slate-700 placeholder:text-slate-500"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Status</label>
               <Dropdown
                 value={status}
                 onValueChange={(val) => setStatus(val ?? "todo")}
@@ -110,8 +113,8 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Project</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Project</label>
               <Dropdown
                 value={projectId}
                 onValueChange={setProjectId}
@@ -125,8 +128,8 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Assignee</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Assignee</label>
             <Dropdown
               value={assigneeId}
               onValueChange={setAssigneeId}
@@ -171,9 +174,9 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Priority</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Priority</label>
               <Dropdown
                 value={priority}
                 onValueChange={(val) => setPriority((val ?? "none") as Priority)}
@@ -202,13 +205,12 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Due Date</label>
-              <input
-                type="date"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Due Date</label>
+              <DatePicker
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7b68ee] focus:ring-2 focus:ring-[#7b68ee]/20 outline-none transition-all text-[#0b1c30]"
+                onChange={setDueDate}
+                placeholder="Pick a due date"
               />
             </div>
           </div>

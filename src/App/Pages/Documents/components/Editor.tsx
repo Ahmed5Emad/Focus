@@ -106,8 +106,8 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
         if (destroyed || !data?.yjs_snapshot) return;
         try {
           Y.applyUpdate(ydoc, hexToUint8(data.yjs_snapshot as string));
-        } catch {
-          ydoc.destroy();
+        } catch (e) {
+          console.error("Failed to load Yjs snapshot, starting fresh document:", e);
         }
       });
 
@@ -335,13 +335,13 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
         onExportPDF={exportAsPDF}
         onExportHTML={exportAsHTML}
       />
-      <div className="flex-1 overflow-y-auto bg-white border border-[#f1f5f9] rounded-b-2xl shadow-sm">
+      <div className="flex-1 overflow-y-auto bg-white border border-slate-100 rounded-b-2xl shadow-sm">
         <div className="px-8 pt-4">
           <input
             value={documentTitle}
             onChange={(e) => onTitleChange(e.target.value)}
             placeholder="Untitled Document"
-            className="w-full text-[32px] font-['Spline_Sans',sans-serif] font-bold text-[#0f172a] tracking-[-0.8px] border-none outline-none bg-transparent placeholder:text-[#cbd5e1]"
+            className="w-full text-[32px] font-['Spline_Sans',sans-serif] font-bold text-slate-900 tracking-[-0.8px] border-none outline-none bg-transparent placeholder:text-slate-300"
           />
         </div>
         <EditorContent editor={editor} />

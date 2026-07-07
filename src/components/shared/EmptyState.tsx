@@ -42,11 +42,11 @@ export function EmptyState({
           <Icon className="w-12 h-12" style={{ color: iconColor }} />
         </div>
 
-        <h2 className="font-['Spline_Sans',sans-serif] text-[32px] md:text-[40px] leading-tight font-bold text-[#0b1c30] mb-4 tracking-tight">
+        <h2 className="font-['Spline_Sans',sans-serif] text-[32px] md:text-[40px] leading-tight font-bold text-slate-900 mb-4 tracking-tight">
           {title}
         </h2>
 
-        <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-[#494454] max-w-lg mb-10">
+        <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-slate-600 max-w-lg mb-10">
           {description}
         </p>
 

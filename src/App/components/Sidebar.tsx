@@ -54,10 +54,10 @@ function SidebarContent() {
       <div className="w-full flex flex-col gap-6">
         <div className="flex flex-col gap-[16px] items-start px-[24px] w-full">
           <div className="flex flex-col gap-[4px] w-full">
-            <div className="flex flex-col font-['Spline_Sans',sans-serif] font-bold justify-center text-[#0f172a] text-[24px] tracking-[-1.2px] w-full">
+            <div className="flex flex-col font-['Spline_Sans',sans-serif] font-bold justify-center text-slate-900 text-[24px] tracking-[-1.2px] w-full">
               <p className="leading-[32px]">FOCUS</p>
             </div>
-            <div className="flex flex-col font-['Inter',sans-serif] font-normal justify-center text-[#64748b] text-[12px] tracking-[1.2px] uppercase w-full">
+            <div className="flex flex-col font-['Inter',sans-serif] font-normal justify-center text-slate-500 text-[12px] tracking-[1.2px] uppercase w-full">
               <p className="leading-[16px]">DEEP WORK ENGINE</p>
             </div>
           </div>
@@ -95,10 +95,10 @@ function SidebarContent() {
                   "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
                   active
                     ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
-                    : "text-[#475569] hover:bg-slate-50"
+                    : "text-slate-600 hover:bg-slate-50"
                 )}
               >
-                <item.icon className={cn("w-[18px] h-[18px]", active ? "text-[#6d28d9]" : "text-[#475569]")} />
+                <item.icon className={cn("w-[18px] h-[18px]", active ? "text-[#6d28d9]" : "text-slate-600")} />
                 <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">
                   {item.name}
                 </span>
@@ -108,7 +108,7 @@ function SidebarContent() {
         </nav>
       </div>
 
-      <div className="border-[#f1f5f9] border-t w-full pb-[16px] pt-[17px] px-[16px] flex flex-col gap-[4px]">
+      <div className="border-slate-100 border-t w-full pb-[16px] pt-[17px] px-[16px] flex flex-col gap-[4px]">
         {bottomNavItems.map((item) => {
           const active = isActive(item.path);
           return (
@@ -119,10 +119,10 @@ function SidebarContent() {
                 "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
                 active
                   ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
-                  : "text-[#475569] hover:bg-slate-50"
+                  : "text-slate-600 hover:bg-slate-50"
               )}
             >
-              <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-[#475569]")} />
+              <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-slate-600")} />
               <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">{item.name}</span>
             </Link>
           );
@@ -135,7 +135,7 @@ function SidebarContent() {
 export function Sidebar() {
   return (
     <>
-      <aside className="hidden lg:flex bg-white border-[#e2e8f0] border-r border-solid flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
+      <aside className="hidden lg:flex bg-white border-slate-200 border-r border-solid flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
         <SidebarContent />
       </aside>
 
@@ -144,7 +144,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm hover:bg-white"
+            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm"
           >
             <Menu className="w-5 h-5 text-slate-600" />
           </Button>

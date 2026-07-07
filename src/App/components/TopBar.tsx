@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CommandPalette } from "./CommandPalette";
+import { ThemeToggle } from "./ThemeToggle";
 
 function timeAgo(dateString: string): string {
   const now = Date.now();
@@ -60,7 +61,7 @@ export function TopBar() {
           <button
             data-search-trigger
             onClick={() => setPaletteOpen(true)}
-            className="flex items-center gap-3 bg-white/50 hover:bg-white/70 transition-all duration-300 px-6 py-2.5 rounded-full border border-white/40 text-slate-500 text-sm group cursor-pointer shadow-sm focus-within:ring-2 focus-within:ring-purple-500/30 hover:scale-[1.01] active:scale-[0.99] w-full max-w-[600px]"
+            className="flex items-center gap-3 bg-white/50 transition-all duration-300 px-6 py-2.5 rounded-full border border-white/40 text-slate-500 text-sm group cursor-pointer shadow-sm focus-within:ring-2 focus-within:ring-purple-500/30 hover:scale-[1.01] active:scale-[0.99] w-full max-w-[600px]"
           >
             <Search className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
             <span className="font-medium">Search anything...</span>
@@ -72,12 +73,13 @@ export function TopBar() {
           <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
           <div className="flex items-center gap-[12px]">
-            <button className="p-2 hover:bg-white/50 rounded-xl transition-colors text-slate-600 cursor-pointer group">
+            <ThemeToggle />
+            <button onClick={() => navigate('/focus-timer')} className="p-2 rounded-xl transition-colors text-slate-600 cursor-pointer group">
               <Timer className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </button>
             <Popover open={notifOpen} onOpenChange={setNotifOpen}>
               <PopoverTrigger asChild>
-                <button className="p-2 hover:bg-white/50 rounded-xl transition-colors text-slate-600 relative cursor-pointer group">
+                <button className="p-2 rounded-xl transition-colors text-slate-600 relative cursor-pointer group">
                   <BellRing className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full px-1 shadow-sm border border-white">
@@ -158,7 +160,7 @@ export function TopBar() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-9 h-9 rounded-full border-2 border-white/60 overflow-hidden bg-white/50 hover:border-white hover:bg-white/80 transition-all shadow-sm flex items-center justify-center cursor-pointer group">
+                <button className="w-9 h-9 rounded-full border-2 border-white/60 overflow-hidden bg-white/50 transition-all shadow-sm flex items-center justify-center cursor-pointer group">
                   <Avatar className="size-9">
                     <AvatarFallback className="bg-purple-100 text-purple-700 text-xs font-semibold">
                       {user?.email?.charAt(0).toUpperCase() ?? <User className="w-4 h-4" />}

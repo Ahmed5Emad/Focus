@@ -114,8 +114,8 @@ export function useDirectMessages(otherUserId: string | null) {
         const state = presenceChannel.presenceState();
         const typing: { userId: string; displayName: string }[] = [];
         Object.values(state).forEach((presences) => {
-          (presences as unknown as { userId: string; displayName: string }[]).forEach((p) => {
-            if (p.userId !== user.id) {
+          (presences as unknown as { userId: string; displayName: string; is_typing?: boolean }[]).forEach((p) => {
+            if (p.userId !== user.id && p.is_typing !== false) {
               typing.push(p);
             }
           });

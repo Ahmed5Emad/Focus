@@ -32,7 +32,10 @@ interface DropdownProps {
   showSearch?: boolean;
   triggerClassName?: string;
   renderTrigger?: (selected: DropdownOption | null) => React.ReactNode;
-  renderOption?: (option: DropdownOption, isSelected: boolean) => React.ReactNode;
+  renderOption?: (
+    option: DropdownOption,
+    isSelected: boolean,
+  ) => React.ReactNode;
 }
 
 export function Dropdown({
@@ -61,7 +64,7 @@ export function Dropdown({
           aria-expanded={open}
           className={cn(
             "flex items-center justify-between px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors h-11",
-            triggerClassName
+            triggerClassName,
           )}
         >
           {renderTrigger ? (
@@ -69,17 +72,26 @@ export function Dropdown({
           ) : (
             <div className="flex items-center gap-2 min-w-0">
               {icon}
-              <span className={cn("truncate", selected ? "text-slate-700" : "text-slate-500")}>
+              <span
+                className={cn(
+                  "whitespace-nowrap",
+                  selected ? "text-slate-700" : "text-slate-500",
+                )}
+              >
                 {selected ? selected.label : placeholder}
               </span>
             </div>
           )}
-          <ChevronDown className={cn("ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200", open && "rotate-180")} />
+          <ChevronDown
+            className={cn(
+              "ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="p-0"
-        style={{ width: "var(--radix-popover-trigger-width)" }}
+        className="p-0 w-(--radix-popover-trigger-width)"
         align="start"
       >
         <Command>
@@ -95,9 +107,7 @@ export function Dropdown({
                     setOpen(false);
                   }}
                 >
-                  <Check
-                    className={cn("mr-2 h-4 w-4", !value ? "opacity-100" : "opacity-0")}
-                  />
+                  {!value && <Check className="mr-2 h-4 w-4" />}
                   {noneLabel}
                 </CommandItem>
               )}
@@ -114,9 +124,9 @@ export function Dropdown({
                     renderOption(option, value === option.value)
                   ) : (
                     <>
-                      <Check
-                        className={cn("mr-2 h-4 w-4", value === option.value ? "opacity-100" : "opacity-0")}
-                      />
+                      {value === option.value && (
+                        <Check className="mr-2 h-4 w-4" />
+                      )}
                       {icon && <span className="mr-2">{icon}</span>}
                       {option.label}
                     </>

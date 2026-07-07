@@ -94,7 +94,7 @@ export function ChatMessage({
   return (
     <div
       className={cn(
-        "group flex gap-3 px-4 py-2 hover:bg-[#f8f7fc] transition-colors rounded-lg relative",
+        "group flex gap-3 px-4 py-2 hover:bg-slate-50 transition-colors rounded-lg relative",
         isOwn && "flex-row-reverse"
       )}
     >
@@ -107,12 +107,12 @@ export function ChatMessage({
 
       <div className={cn("flex flex-col max-w-[70%]", isOwn && "items-end")}>
         <div className="flex items-baseline gap-2 mb-0.5">
-          <span className="text-sm font-semibold text-[#0b1c30]">
+          <span className="text-sm font-semibold text-slate-900">
             {senderName ?? "Unknown"}
           </span>
-          <span className="text-[11px] text-[#94a3b8]">{time}</span>
+          <span className="text-[11px] text-slate-400">{time}</span>
           {isEdited && (
-            <span className="text-[11px] text-[#94a3b8] italic">
+            <span className="text-[11px] text-slate-400 italic">
               (edited {editedTime})
             </span>
           )}
@@ -141,8 +141,8 @@ export function ChatMessage({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg border text-sm transition-colors",
                   isOwn
-                    ? "bg-white/10 border-white/20 text-white hover:bg-white/20"
-                    : "bg-slate-50 border-slate-200 text-[#0b1c30] hover:bg-slate-100"
+                    ? "bg-white/10 border-white/20 text-white"
+                    : "bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-100"
                 )}
               >
                 <FileIcon className="w-5 h-5 shrink-0" />
@@ -165,7 +165,7 @@ export function ChatMessage({
               onKeyDown={handleKeyDown}
               className={cn(
                 "flex-1 px-3 py-1.5 text-sm rounded-lg border outline-none",
-                "border-[#7b68ee] ring-1 ring-[#7b68ee]/20 bg-white text-[#0b1c30]"
+                "border-[#7b68ee] ring-1 ring-[#7b68ee]/20 bg-white text-slate-900"
               )}
             />
             <button
@@ -189,14 +189,14 @@ export function ChatMessage({
                   "px-3 py-2 text-sm leading-relaxed rounded-lg",
                   isOwn
                     ? "bg-[#7b68ee] text-white"
-                    : "bg-white border border-slate-100 shadow-sm text-[#0b1c30]",
+                    : "bg-white border border-slate-100 shadow-sm text-slate-900",
                 )}
               >
                 {message.content}
               </div>
             )}
             {isOwn && (
-              <span className="text-[10px] text-[#94a3b8] mt-0.5 flex items-center gap-1">
+              <span className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
                 <span className={cn(
                   message.status === "read" && "text-[#7b68ee]",
                   message.status === "delivered" && "text-[#7b68ee]",
@@ -216,7 +216,7 @@ export function ChatMessage({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 rounded-md text-[#94a3b8] hover:text-[#0b1c30] hover:bg-slate-100"
+                className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-900 hover:bg-slate-100"
               >
                 <MoreHorizontal className="w-3.5 h-3.5" />
               </Button>

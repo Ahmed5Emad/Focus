@@ -15,10 +15,16 @@ export default function DocumentEditor() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "unsaved">("saved");
-  const saveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const mountedRef = useRef(true);
+  const titleSaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     if (!id) return;
+    let cancelled = false;
     const fetchDocument = async () => {
       setLoading(true);
       try {
@@ -27,6 +33,7 @@ export default function DocumentEditor() {
           .select("title, task_id")
           .eq("id", id)
           .single();
+        if (cancelled) return;
         if (error) {
           setNotFound(true);
           return;
@@ -34,35 +41,35 @@ export default function DocumentEditor() {
         setTitle(data.title);
         setTaskId(data.task_id);
       } catch {
-        setNotFound(true);
+        if (!cancelled) setNotFound(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     fetchDocument();
+    return () => { cancelled = true; };
   }, [id, supabase]);
 
   useEffect(() => {
     if (!id || loading) return;
-    setSaveState("unsaved");
+    if (titleSaveTimer.current) clearTimeout(titleSaveTimer.current);
 
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-
-    saveTimer.current = setTimeout(async () => {
+    titleSaveTimer.current = setTimeout(async () => {
+      if (!mountedRef.current) return;
       setSaveState("saving");
       try {
         await supabase
           .from("documents")
           .update({ title, updated_at: new Date().toISOString() })
           .eq("id", id);
-        setSaveState("saved");
+        if (mountedRef.current) setSaveState("saved");
       } catch {
-        setSaveState("unsaved");
+        if (mountedRef.current) setSaveState("unsaved");
       }
     }, 800);
 
     return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
+      if (titleSaveTimer.current) clearTimeout(titleSaveTimer.current);
     };
   }, [title, id, supabase, loading]);
 
@@ -78,8 +85,8 @@ export default function DocumentEditor() {
     return (
       <div className="page-container pt-6">
         <div className="flex flex-col items-center justify-center py-20">
-          <h2 className="text-2xl font-bold text-[#0f172a] mb-2">Document not found</h2>
-          <p className="text-[#64748b] mb-6">This document doesn't exist or you don't have access.</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Document not found</h2>
+          <p className="text-slate-500 mb-6">This document doesn't exist or you don't have access.</p>
           <Button onClick={() => navigate("/documents")} className="btn-primary">
             Back to Documents
           </Button>
@@ -94,7 +101,7 @@ export default function DocumentEditor() {
         <Button
           variant="ghost"
           onClick={() => navigate("/documents")}
-          className="flex items-center gap-2 text-[#64748b] hover:text-[#0f172a]"
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-900"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Documents
@@ -106,10 +113,10 @@ export default function DocumentEditor() {
             currentTaskId={taskId}
             onTaskChange={setTaskId}
           />
-          <span className="text-xs text-[#94a3b8] italic">
+          <span className="text-xs text-slate-400 italic">
             Collaborators will see changes in real-time
           </span>
-          <div className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
+          <div className="flex items-center gap-1.5 text-xs text-slate-400">
             {saveState === "saving" ? (
               <>
                 <Cloud className="w-3.5 h-3.5 animate-pulse text-[#7b68ee]" />

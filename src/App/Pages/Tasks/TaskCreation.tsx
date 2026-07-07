@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { type Priority } from "@/hooks/useTasks";
 import { toast } from "sonner";
+import { usePreferences } from "@/hooks/usePreferences";
 import {
   Avatar,
   AvatarFallback,
@@ -13,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Dropdown } from "@/components/shared/Dropdown"
 import { cn } from "@/lib/utils"
+import { DatePicker } from "@/components/ui/date-picker"
 
 interface Project {
   id: string;
@@ -44,12 +46,20 @@ export default function TaskCreation() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedParentTaskId, setSelectedParentTaskId] = useState<string | null>(null);
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
+  const { user, currentWorkspaceId } = useAuth();
+  const { preferences } = usePreferences();
+
   const [selectedPriority, setSelectedPriority] = useState<Priority>("none");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState<Date>();
 
   const navigate = useNavigate();
-  const { user, currentWorkspaceId } = useAuth();
   const [supabase] = useState(() => createClient());
+
+  useEffect(() => {
+    if (preferences.autoAssignToSelf && user) {
+      setSelectedAssigneeId(user.id);
+    }
+  }, [preferences.autoAssignToSelf, user]);
 
   useEffect(() => {
     if (!currentWorkspaceId) return;
@@ -77,9 +87,7 @@ export default function TaskCreation() {
             .select('id, display_name, avatar_url')
             .in('id', userIds);
           const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
-          const merged = userIds
-            .filter(id => id !== user?.id)
-            .map(id => ({
+          const merged = userIds.map(id => ({
               id,
               display_name: profileMap.get(id)?.display_name ?? (emailMap.get(id)?.split('@')[0] ?? null),
               avatar_url: profileMap.get(id)?.avatar_url ?? null,
@@ -101,17 +109,20 @@ export default function TaskCreation() {
     if (!inputValue.trim() || isSubmitting) return;
     setIsSubmitting(true);
     try {
+      const taskStatus = preferences.defaultTaskStatus || "todo";
+      const assigneeId = selectedAssigneeId ?? (preferences.autoAssignToSelf ? user?.id ?? null : null);
       const { error } = await supabase
         .from('tasks')
         .insert([{
           title: inputValue.trim(),
+          status: taskStatus,
           workspace_id: currentWorkspaceId,
           user_id: user?.id,
           project_id: selectedProjectId,
           parent_task_id: selectedParentTaskId,
-          assignee_id: selectedAssigneeId,
+          assignee_id: assigneeId,
           priority: selectedPriority,
-          due_date: dueDate || null,
+          due_date: dueDate?.toISOString() ?? null,
         }]);
 
       if (error) throw error;
@@ -128,6 +139,7 @@ export default function TaskCreation() {
       }
 
       toast.success("Task created");
+      setIsSubmitting(false);
       navigate('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
@@ -209,7 +221,7 @@ export default function TaskCreation() {
                 <div className="space-y-3">
                   <button
                     onClick={() => setIsScheduledForToday(!isScheduledForToday)}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-[#faf5ff]'}`}>
+                    className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-slate-50'}`}>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
                         <Calendar className="w-4 h-4" />
@@ -329,11 +341,10 @@ export default function TaskCreation() {
 
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Due Date</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                        className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 outline-none transition-all text-slate-700"
+                        onChange={setDueDate}
+                        placeholder="Pick a due date"
                       />
                     </div>
                   </div>

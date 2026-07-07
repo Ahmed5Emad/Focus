@@ -34,6 +34,7 @@ export default function Goals() {
         .from("goals")
         .select("*")
         .eq("workspace_id", currentWorkspaceId)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -208,10 +209,10 @@ export default function Goals() {
             <div className="rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-[#6b38d4] via-transparent to-transparent"></div>
               <Trophy className="w-12 h-12 text-[#6b38d4] mb-4" />
-              <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-[#0b1c30] mb-2">
+              <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-slate-900 mb-2">
                 Ready for a new challenge?
               </h3>
-              <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-[#494454] mb-6">
+              <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-slate-600 mb-6">
                 Define a new objective and start tracking your progress today.
               </p>
               <CreateGoalModal onCreate={handleCreateGoal} tasks={tasks}>

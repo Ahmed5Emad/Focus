@@ -80,7 +80,7 @@ export default function ArchivePage() {
 
   const handleRestore = async (type: "tasks" | "projects", id: string) => {
     if (type === "tasks") {
-      await supabase.from("tasks").update({ is_archived: false }).eq("id", id);
+      await supabase.from("tasks").update({ is_archived: false, archived_at: null }).eq("id", id);
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } else {
       await supabase.from("projects").update({ status: "active" }).eq("id", id);
@@ -136,7 +136,7 @@ export default function ArchivePage() {
         </div>
 
         <div className="relative w-full lg:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#494454]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
           <Input
             placeholder={`Search archived ${activeTab}...`}
             className="pl-10 bg-white border-slate-100 h-10 rounded-xl"
@@ -150,7 +150,7 @@ export default function ArchivePage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
-            <p className="font-['Inter',sans-serif] text-[16px] text-[#494454] font-medium">
+            <p className="font-['Inter',sans-serif] text-[16px] text-slate-600 font-medium">
               Loading archive...
             </p>
           </div>
@@ -159,47 +159,47 @@ export default function ArchivePage() {
             <div className="w-24 h-24 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] rounded-3xl flex items-center justify-center mb-8 shadow-sm">
               <Archive className="w-12 h-12 text-[#7b68ee]" />
             </div>
-            <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-[#0b1c30] mb-4 tracking-tight">
+            <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-slate-900 mb-4 tracking-tight">
               {searchQuery
                 ? "No archived items found"
                 : "Nothing archived yet"}
             </h2>
-            <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-[#494454] max-w-lg">
+            <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-slate-600 max-w-lg">
               {searchQuery
                 ? "Try a different search term."
                 : `Completed or inactive ${activeTab === "tasks" ? "tasks" : "projects"} will appear here after archiving.`}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-[#f1f5f9]">
+          <div className="divide-y divide-slate-200">
             {activeTab === "tasks"
               ? filteredTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="group flex items-center gap-4 p-5 hover:bg-[#f8f7fc] transition-colors"
+                    className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center shrink-0">
-                      <ListChecks className="w-5 h-5 text-[#64748b]" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                      <ListChecks className="w-5 h-5 text-slate-500" />
                     </div>
 
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-[#0b1c30] truncate">
+                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-slate-900 truncate">
                         {task.title}
                       </h4>
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                         {task.projects?.title && (
-                          <div className="flex items-center gap-1.5 text-[14px] text-[#494454]">
+                          <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
                             <Folder className="w-3.5 h-3.5 text-[#7b68ee]" />
                             <span>{task.projects.title}</span>
                           </div>
                         )}
                         {task.goals?.title && (
-                          <div className="flex items-center gap-1.5 text-[14px] text-[#494454]">
+                          <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
                             <Target className="w-3.5 h-3.5 text-[#7b68ee]" />
                             <span>{task.goals.title}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1.5 text-[14px] text-[#494454]">
+                        <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>{new Date(task.archived_at).toLocaleDateString()}</span>
                         </div>
@@ -211,7 +211,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleRestore("tasks", task.id)}
-                        className="h-8 w-8 rounded-lg text-[#494454] hover:text-cu-green"
+                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-cu-green"
                         title="Restore"
                       >
                         <RotateCcw className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDelete("tasks", task.id)}
-                        className="h-8 w-8 rounded-lg text-[#494454] hover:text-red-600"
+                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-red-600"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -231,21 +231,21 @@ export default function ArchivePage() {
               : filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="group flex items-center gap-4 p-5 hover:bg-[#f8f7fc] transition-colors"
+                    className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center shrink-0">
-                      <Folder className="w-5 h-5 text-[#64748b]" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                      <Folder className="w-5 h-5 text-slate-500" />
                     </div>
 
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-[#0b1c30] truncate">
+                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-slate-900 truncate">
                         {project.title}
                       </h4>
                       <div className="flex items-center gap-x-4 gap-y-1">
                         <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
                           {project.status}
                         </span>
-                        <div className="flex items-center gap-1.5 text-[14px] text-[#494454]">
+                        <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>{new Date(project.archived_at).toLocaleDateString()}</span>
                         </div>
@@ -257,7 +257,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleRestore("projects", project.id)}
-                        className="h-8 w-8 rounded-lg text-[#494454] hover:text-cu-green"
+                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-cu-green"
                         title="Restore"
                       >
                         <RotateCcw className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDelete("projects", project.id)}
-                        className="h-8 w-8 rounded-lg text-[#494454] hover:text-red-600"
+                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-red-600"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -280,7 +280,7 @@ export default function ArchivePage() {
 
       {!isLoading && !isEmpty && (
         <div className="mt-4 flex items-center justify-between px-2">
-          <p className="font-['Inter',sans-serif] text-[14px] text-[#494454] font-medium">
+          <p className="font-['Inter',sans-serif] text-[14px] text-slate-600 font-medium">
             Showing{" "}
             {activeTab === "tasks"
               ? filteredTasks.length

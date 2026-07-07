@@ -33,7 +33,7 @@ const typeConfig = {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
-  const { currentWorkspaceId } = useAuth();
+  const { user, currentWorkspaceId } = useAuth();
   const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<SearchItem[]>([]);
 
@@ -43,7 +43,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     const fetchItems = async () => {
       const [tasksRes, goalsRes, projectsRes, docsRes] = await Promise.all([
         supabase.from("tasks").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
-        supabase.from("goals").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
+        supabase.from("goals").select("id, title").eq("workspace_id", currentWorkspaceId).eq("user_id", user?.id).limit(20),
         supabase.from("projects").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
         supabase.from("documents").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
       ]);
