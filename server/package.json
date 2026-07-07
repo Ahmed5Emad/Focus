@@ -1,0 +1,19 @@
+{
+  "name": "focus-hocuspocus",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx hocuspocus.ts"
+  },
+  "dependencies": {
+    "@hocuspocus/server": "^2",
+    "@hocuspocus/extension-database": "^2",
+    "@hocuspocus/extension-logger": "^2",
+    "@supabase/supabase-js": "^2",
+    "yjs": "^13",
+    "dotenv": "^16"
+  },
+  "devDependencies": {
+    "tsx": "^4"
+  }
+}
