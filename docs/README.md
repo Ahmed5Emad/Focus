@@ -10,21 +10,21 @@
 ## Backend
 - [Database Schema](backend/database.md) — Tables, RLS policies, migrations
 - [Authentication](backend/authentication.md) — Auth flow, PKCE, session handling
-- [Real-time Collaboration](backend/realtime-collaboration.md) — Hocuspocus + Yjs + TipTap
+- [Real-time Collaboration](backend/realtime-collaboration.md) — Yjs + Supabase Realtime
 
 ## Operations
-- [Deployment](deployment.md) — Vercel + Railway deployment
+- [Deployment](deployment.md) — Vercel deployment
 - [Troubleshooting](troubleshooting.md) — Common issues and solutions
 
 ## Features
 - **Command Palette** — Universal search (Cmd+K) across tasks, goals, projects, documents
-- **Collaborative Documents** — Real-time editing with TipTap + Hocuspocus + Yjs
+- **Collaborative Documents** — Real-time editing with TipTap + Yjs + Supabase Realtime
 - **Workspace Chat** — Real-time messaging with typing indicators, file uploads, read status
-- **Notifications** — In-app bell with real-time updates, mark-as-read, assignment alerts
+- **Notifications** — In-app bell with real-time updates, assignment alerts
 - **Tasks** — Kanban/list view, priorities, due dates, assignments, subtasks
-- **Goals** — Progress tracking with grid layout, linked tasks
+- **Goals** — Progress tracking with linked tasks
 - **Projects** — Task grouping by project
 - **Focus Timer** — Pomodoro/flow timer sessions
 - **Dashboard** — Real stats (flow score, deep work time, task counts) from RPC
 - **Onboarding** — 4-step wizard for new users
-- **Settings** — Preferences, integrations, workspace management, branding
+- **Settings** — Preferences, integrations, workspace management

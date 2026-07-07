@@ -20,7 +20,7 @@ Focus/
 │   │       ├── Tasks/               # List view, priority dots, due dates, creation/edit dialogs
 │   │       ├── Projects/            # Project cards with task grouping
 │   │       ├── Goals/               # 3-column grid, progress tracking, edit modal
-│   │       ├── Documents/           # TipTap editor, Hocuspocus provider, collaboration cursors
+│   │       ├── Documents/           # TipTap editor + Yjs + Supabase Realtime collaboration
 │   │       ├── Chat/                # Real-time chat, typing indicators, file uploads, message status
 │   │       ├── FocusTimer/          # Pomodoro/flow timer
 │   │       ├── Management/          # Workspace management
@@ -82,9 +82,6 @@ Focus/
 │   │   └── mockData.ts
 │   │
 │   └── assets/                      # SVG icons, images
-│
-├── server/
-│   └── hocuspocus.ts                # Hocuspocus collaborative editing server
 │
 ├── supabase/
 │   └── migrations/                  # SQL migration files (7+ files)

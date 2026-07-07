@@ -13,10 +13,9 @@ Create `.env.local` in the project root:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
-VITE_HOCUSPOCUS_URL=ws://localhost:1234
 ```
 
-> `VITE_HOCUSPOCUS_URL` is only needed for collaborative document editing. The app works without it — only the Documents feature will be unavailable.
+> No other env vars needed. Collaborative document editing syncs through Supabase Realtime — no separate server required.
 
 ## Installation
 
@@ -41,44 +40,24 @@ supabase db push
 
 ## Running Locally
 
-### Start the frontend only:
-
 ```bash
 bun run dev
 ```
 
-Opens at `http://localhost:5174` (or 5173 if 5174 is taken).
-
-### Start the Hocuspocus server (for collaborative docs):
-
-```bash
-bun run server
-```
-
-Starts the WebSocket server on port 1234.
-
-### Start both (recommended):
-
-```bash
-bun run dev:all
-```
-
-Runs Vite dev server + Hocuspocus server concurrently.
+Opens at `http://localhost:5174`.
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
 | `bun run dev` | Start Vite dev server |
-| `bun run server` | Start Hocuspocus WebSocket server |
-| `bun run dev:all` | Start both concurrently |
 | `bun run build` | TypeScript check + Vite production build |
 | `bun run lint` | Run ESLint |
 
 ## Build
 
 ```bash
-bun run build   # tsc -b + vite build (also type-checks)
+bun run build   # tsc -b + vite build
 ```
 
 Output goes to `dist/`.

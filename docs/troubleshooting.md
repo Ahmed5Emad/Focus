@@ -4,9 +4,9 @@
 
 ### OAuth callback redirects to a blank page
 
-**Cause**: HashRouter stores the auth code in the URL hash (`#/auth/callback?code=xxx`). The `AuthCallback` component needs to extract the code from the hash fragment.
+**Cause**: HashRouter stores the auth code in the URL hash (`#/auth/callback?code=xxx`).
 
-**Fix**: Make sure OAuth calls use `redirectTo` with the correct format:
+**Fix**: OAuth calls must use `redirectTo` with the correct format:
 ```typescript
 signInWithOAuth({
   provider: 'google',
@@ -14,34 +14,20 @@ signInWithOAuth({
 })
 ```
 
-### "Invalid JWT token" from Hocuspocus server
+### Document collaboration not syncing between clients
 
-**Cause**: The Hocuspocus server calls `supabase.auth.getUser(token)` with the Supabase access token. If the token is expired or malformed, authentication fails.
-
-**Fix**: Ensure the client passes a valid Supabase session token. The Hocuspocus provider should use:
-```typescript
-token: session.access_token
-```
-
-### Hocuspocus connection refused (`ws://` error)
-
-**Cause**: The Hocuspocus server isn't running or the `VITE_HOCUSPOCUS_URL` is wrong.
+**Cause**: Supabase Realtime Broadcast is not enabled on the project, or the broadcast channel isn't connecting.
 
 **Fix**:
-- Local dev: Run `bun run server` and check it's on port 1234
-- Production: Ensure the Railway URL is correct with `wss://` prefix (not `ws://`)
+1. Go to Supabase Dashboard → Realtime → make sure "Broadcast" is enabled
+2. Check browser console for Realtime connection errors
+3. Verify both clients are authenticated and on the same workspace
 
-### Yjs document state not persisting
+### "Failed to create task" toast
 
-**Cause**: The `yjs_snapshot` column in the `documents` table uses `bytea` format. The server stores as `\\x<hex>` and reads it back.
+**Cause**: Missing or invalid workspace ID, or RLS policy blocking the insert.
 
-**Fix**: Check the Supabase RLS policy on the `documents` table — the Hocuspocus server needs update permission. If using an anon key, it needs RLS to allow updates by document ownership.
-
-### "Corrupted snapshot, starting fresh" warning
-
-**Cause**: The `yjs_snapshot` bytea data is in an unexpected format or corrupted.
-
-**Fix**: The server handles this gracefully (starts a fresh document), but if it happens persistently, delete the `yjs_snapshot` value for that document in the database.
+**Fix**: Check that `currentWorkspaceId` is set in the AuthContext. Verify the user has the correct role in `workspace_members`.
 
 ### TypeScript build errors after pull
 
@@ -53,25 +39,8 @@ bun install
 bun run build
 ```
 
-### "Failed to create task" toast
+### Document content not saving
 
-**Cause**: Missing or invalid workspace ID, or RLS policy blocking the insert.
+**Cause**: The Yjs snapshot (`yjs_snapshot`) column or `content` column in the `documents` table is not writable.
 
-**Fix**: Check that `currentWorkspaceId` is set in the AuthContext. Verify the user has the correct role in `workspace_members`.
-
-## Belmo-specific
-
-### Hocuspocus server won't start
-
-**Cause**: The `server/` directory might not have a `package.json` with dependencies, or the run command is wrong.
-
-**Fix**: Make sure `server/package.json` exists with `tsx`, `@hocuspocus/server`, `@supabase/supabase-js`, and `yjs`. Set the run command to `npx tsx hocuspocus.ts` and root directory to `server`.
-
-### Can't connect to Belmo-hosted Hocuspocus
-
-**Cause**: URL format is wrong or the port isn't configured.
-
-**Fix**:
-1. Go to Belmo dashboard → your app → copy the URL
-2. Use `wss://your-app.belmo.app` as `VITE_HOCUSPOCUS_URL` (note `wss://` not `ws://`)
-3. Make sure the app status shows as running before testing
+**Fix**: Check the RLS policy on the `documents` table — the user must have update permission on documents they own or collaborate on.

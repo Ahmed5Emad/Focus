@@ -1,74 +1,63 @@
 # Architecture Overview
 
-Focus is a **React + Vite** SPA with a **Supabase** backend and a standalone **Hocuspocus** server for real-time collaborative editing.
+Focus is a **React + Vite** SPA with a **Supabase** backend. All real-time collaboration uses Supabase Realtime — no separate WebSocket server.
 
 ## High-Level Architecture
 
 ```
 Browser (React SPA)
   │
-  ├── Supabase Client ── HTTPS ───► Supabase (PostgreSQL, Auth, Realtime, Storage)
-  │
-  ├── Hocuspocus Client ── WebSocket ──► Hocuspocus Server (Node.js, port 1234)
-  │                                         │
-  │                                         └──► Supabase (persist Yjs documents)
-  │
-  └── Vite Dev Server (port 5174)
+  └── Supabase Client ── HTTPS/WebSocket ──► Supabase (PostgreSQL, Auth, Realtime, Storage)
+                                              │
+                                              ├── Auth (email/password, Google, Apple)
+                                              ├── Database (PostgreSQL with RLS)
+                                              ├── Realtime (broadcast, presence, postgres changes)
+                                              └── Storage (file uploads)
 ```
+
+No Hocuspocus server. No separate deployment. Everything runs on Supabase.
 
 ## Frontend Architecture
 
 - **React 19** with TypeScript
-- **react-router-dom v7** with HashRouter (all routes in URL hash)
-- **Tailwind CSS v4** with custom OKLCH color palette
+- **react-router-dom v7** with HashRouter
+- **Tailwind CSS v4**
 - **Radix UI** primitives + **shadcn/ui** components
-- **Supabase SSR** for cookie-based session management
+- **Supabase SSR** for session management
 
 ### Key Features
 
 | Feature | Implementation |
 |---------|---------------|
-| **Auth** | Supabase Auth (email/password, Google, Apple) with PKCE OAuth flow |
-| **Search** | Universal CommandPalette (Cmd+K) searches across tasks/goals/projects/documents |
+| **Auth** | Supabase Auth (email/password, Google, Apple) with PKCE OAuth |
+| **Search** | Universal CommandPalette (Cmd+K) across tasks/goals/projects/documents |
 | **Notifications** | `useNotifications` hook with real-time subscription, Popover UI |
 | **Chat** | Realtime Presence for typing indicators, Storage for file uploads, message status tracking |
-| **Documents** | TipTap editor + Hocuspocus + Yjs for real-time collaborative editing |
+| **Documents** | TipTap editor + Yjs + Supabase Realtime Broadcast for collaborative editing |
 | **Tasks** | Priority (none/low/medium/high/urgent), due dates, assignments, subtasks |
-| **Dashboard** | Real stats from `get_dashboard_stats` RPC (flow score, deep work time, task counts) |
-| **Settings** | Preferences persisted to localStorage, integration placeholders |
+| **Dashboard** | Real stats from `get_dashboard_stats` RPC |
+| **Settings** | Preferences persisted to localStorage |
 
 ### State Management
 
-React Context providers:
-- `AuthContext` — Session, user, workspaces, workspace selection
+- `AuthContext` — Session, user, workspaces
 - `FocusContext` — Timer/focus session state
-
-Custom hooks for feature-level state:
-- `useDocuments`, `useTasks`, `useChat`, `useDirectMessages`, `useNotifications`, `usePreferences`
+- Custom hooks: `useDocuments`, `useTasks`, `useChat`, `useDirectMessages`, `useNotifications`, `usePreferences`
 
 ### Routing
 
-- Public routes: `/`, `/login`, `/signup`, `/pricing`, `/about`, `/features`, `/auth/callback`
-- Protected routes: `/dashboard`, `/tasks`, `/projects`, `/goals`, `/documents`, `/chat`, `/focus-timer`, `/settings`, `/archive`, `/management`, `/support`
-- Onboarding: `/onboarding`, `/onboarding/deep-work`, `/onboarding/power-tools`, `/onboarding/final-setup`
-- 404 catch-all: `*` renders `NotFound` component
+- Public: `/`, `/login`, `/signup`, `/pricing`, `/about`, `/features`, `/auth/callback`
+- Protected: `/dashboard`, `/tasks`, `/projects`, `/goals`, `/documents`, `/chat`, `/focus-timer`, `/settings`, `/archive`, `/management`, `/support`
+- Onboarding: `/onboarding` (4 steps)
+- 404: `*` → `NotFound`
 
 ## Backend (Supabase)
 
-- **PostgreSQL** database with Row-Level Security (RLS)
-- **Supabase Auth** — email/password, Google OAuth, Apple OAuth (PKCE flow)
-- **Supabase Realtime** — broadcast updates (chat messages, notifications)
-- **Supabase Storage** — `chat-attachments` bucket for file uploads
-- **Custom RPC** — `get_dashboard_stats` returns aggregated metrics
-- **Migrations** in `supabase/migrations/` — versioned SQL files
-
-## Collaborative Editing (Hocuspocus)
-
-Standalone Node.js server (`server/hocuspocus.ts`):
-- WebSocket using **Hocuspocus** (port 1234)
-- JWT authentication via Supabase `getUser`
-- Yjs document persistence via `@hocuspocus/extension-database` with custom Supabase callbacks
-- Deployed separately on Railway (see [Deployment](deployment.md))
+- **PostgreSQL** with Row-Level Security (RLS)
+- **Supabase Auth** — email/password, Google OAuth, Apple OAuth (PKCE)
+- **Supabase Realtime** — broadcast for Yjs document sync, presence for chat typing indicators, postgres_changes for live UI updates
+- **Supabase Storage** — `chat-attachments` bucket
+- **Custom RPC** — `get_dashboard_stats`
 
 ## Data Flow
 
