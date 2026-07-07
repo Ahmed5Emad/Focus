@@ -57,7 +57,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     };
 
     fetchItems();
-  }, [open, currentWorkspaceId, supabase]);
+  }, [open, currentWorkspaceId, user, supabase]);
 
   const handleSelect = (item: SearchItem) => {
     onOpenChange(false);
