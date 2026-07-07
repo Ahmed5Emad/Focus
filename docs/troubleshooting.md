@@ -59,25 +59,19 @@ bun run build
 
 **Fix**: Check that `currentWorkspaceId` is set in the AuthContext. Verify the user has the correct role in `workspace_members`.
 
-## Koyeb-specific
+## Belmo-specific
 
 ### Hocuspocus server won't start
 
-**Cause**: The `server/` directory might not have a `package.json` with dependencies.
+**Cause**: The `server/` directory might not have a `package.json` with dependencies, or the run command is wrong.
 
-**Fix**: Koyeb installs deps from `server/package.json` when root directory is set to `server`. Make sure it exists with `tsx`, `@hocuspocus/server`, `@supabase/supabase-js`, and `yjs`.
+**Fix**: Make sure `server/package.json` exists with `tsx`, `@hocuspocus/server`, `@supabase/supabase-js`, and `yjs`. Set the run command to `npx tsx hocuspocus.ts` and root directory to `server`.
 
-### WebSocket port not exposed
+### Can't connect to Belmo-hosted Hocuspocus
 
-**Cause**: Koyeb doesn't know which port your app listens on.
-
-**Fix**: Set the **Port** to `1234` in the Koyeb app configuration (under the service settings). Also set `HOCUSPOCUS_PORT=1234` in environment variables.
-
-### Can't connect to Koyeb-hosted Hocuspocus
-
-**Cause**: URL format is wrong or the service hasn't finished deploying.
+**Cause**: URL format is wrong or the port isn't configured.
 
 **Fix**:
-1. Go to Koyeb dashboard → your app → Domains tab
-2. Use `wss://your-app.koyeb.app` as `VITE_HOCUSPOCUS_URL` (note `wss://` not `ws://`)
-3. Make sure the app status shows "Healthy" before testing
+1. Go to Belmo dashboard → your app → copy the URL
+2. Use `wss://your-app.belmo.app` as `VITE_HOCUSPOCUS_URL` (note `wss://` not `ws://`)
+3. Make sure the app status shows as running before testing

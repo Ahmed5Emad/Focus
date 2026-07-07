@@ -5,7 +5,7 @@ Focus has two deployable units:
 | Unit | Platform | Type | Cost |
 |------|----------|------|------|
 | **Frontend** (React SPA) | Vercel | Static site + API | Free |
-| **Hocuspocus Server** (WebSocket) | Koyeb | Node.js service | Free (always-on) |
+| **Hocuspocus Server** (WebSocket) | Belmo | Node.js service | Free (always-on, no CC) |
 
 ---
 
@@ -42,33 +42,31 @@ Add it in Vercel project → Settings → Domains. Vercel provisions SSL automat
 
 ---
 
-## Hocuspocus Server — Koyeb (Free, Always-On)
+## Hocuspocus Server — Belmo (Free, Always-On, No CC)
 
-The collaborative editing server (`server/hocuspocus.ts`) needs a persistent Node.js process. [Koyeb](https://koyeb.com) provides this on a free tier with **no credit card**, **always-on** (no sleeping), and WebSocket support.
+The collaborative editing server (`server/hocuspocus.ts`) needs a persistent Node.js process. [Belmo](https://belmo.io) provides this on a free tier with **no credit card**, **never sleeps**, WebSocket support, and HTTPS.
 
 ### Step 1: Push to GitHub
 
 Make sure your repo is pushed with the `server/` directory including `server/package.json`.
 
-### Step 2: Create a Koyeb app
+### Step 2: Deploy to Belmo
 
-1. Go to [koyeb.com](https://koyeb.com) and sign in with GitHub
-2. Click **Create App**
-3. Select **GitHub** as the deployment method
-4. Select your repo (`Ahmed5Emad/Focus`)
+1. Go to [belmo.io](https://belmo.io) and sign in with GitHub
+2. Click **New App** → select your repo (`Ahmed5Emad/Focus`)
+3. Set **Root Directory** to `server`
+4. Set **Build Command** to `npm install` (it auto-detects)
 
 ### Step 3: Configure the service
 
 | Setting | Value |
 |---------|-------|
-| **Root Directory** | `server` |
-| **Build Command** | *(leave empty)* |
 | **Run Command** | `npx tsx hocuspocus.ts` |
 | **Port** | `1234` |
 
 ### Step 4: Set environment variables
 
-Add these under **Environment Variables**:
+Add these in the Belmo dashboard:
 
 | Variable | Value |
 |----------|-------|
@@ -78,25 +76,24 @@ Add these under **Environment Variables**:
 
 ### Step 5: Deploy
 
-Click **Create App**. Koyeb will build and deploy. After deployment:
+Click **Deploy**. Belmo builds and deploys. After deployment:
 
-1. Go to your app's page → **Domains** tab
-2. Copy the Koyeb domain (e.g. `my-app.koyeb.app`)
-3. Use this URL with `wss://` prefix as `VITE_HOCUSPOCUS_URL` in your **Vercel** environment variables
-4. Redeploy the Vercel frontend to pick up the change
+1. Copy your app URL from the Belmo dashboard (e.g. `https://my-app.belmo.app`)
+2. Use this URL with `wss://` prefix as `VITE_HOCUSPOCUS_URL` in your **Vercel** environment variables
+3. Redeploy the Vercel frontend
 
-### Koyeb free tier limits
+### Belmo free tier limits
 
 | Resource | Limit |
 |----------|-------|
-| RAM | 512 MB |
-| CPU | Shared |
-| Storage | 1 GB |
-| Bandwidth | 100 GB/month |
-| Sleep | **Never** (always-on) |
+| Services | 1 always-on Node.js service |
+| Sleep | **Never** |
+| HTTPS | ✅ Included |
+| WebSocket | ✅ Supported |
+| Custom domain | ✅ Available |
 | Credit card | **Not required** |
 
-> Unlike Railway/Render, Koyeb does **not** sleep your service on the free tier. The WebSocket server stays connected continuously.
+> Belmo is the only free Node.js host that stays awake 24/7 with no credit card and no time limit.
 
 ---
 
@@ -118,11 +115,11 @@ Or manually run migration SQL files in the Supabase dashboard SQL editor.
 
 Make sure these env vars are set on the correct platforms:
 
-| Variable | Vercel | Koyeb |
+| Variable | Vercel | Belmo |
 |----------|--------|-------|
 | `VITE_SUPABASE_URL` | ✅ | ✅ |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | ✅ | ✅ |
 | `VITE_HOCUSPOCUS_URL` | ✅ | ❌ |
 | `HOCUSPOCUS_PORT` | ❌ | ✅ |
 
-> `VITE_HOCUSPOCUS_URL` on Vercel should point to `wss://your-app.koyeb.app`
+> `VITE_HOCUSPOCUS_URL` on Vercel should point to `wss://your-app.belmo.app`
