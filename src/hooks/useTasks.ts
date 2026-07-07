@@ -2,12 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
+export type Priority = "none" | "low" | "medium" | "high" | "urgent";
+
 export interface Task {
   id: string;
   title: string;
   description?: string;
   status: string;
   created_at: string;
+  due_date?: string | null;
+  priority?: Priority;
   project_id?: string;
   goal_id?: string;
   assignee_id?: string;
@@ -100,7 +104,7 @@ export function useTasks() {
       try {
         const { data: tasksData, error: tasksError } = await supabase
           .from('tasks')
-          .select('*, projects(title), goals(title)')
+          .select('*, projects(title), goals!tasks_goal_id_fkey(title)')
           .eq('workspace_id', currentWorkspaceId)
           .order('created_at', { ascending: false });
 
@@ -168,7 +172,7 @@ export function useTasks() {
     }
   };
 
-  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null }>) => {
+  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority }>) => {
     try {
       const { error } = await supabase
         .from('tasks')

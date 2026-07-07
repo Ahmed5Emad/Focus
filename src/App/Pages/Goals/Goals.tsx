@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { GoalCard } from "./components/GoalCard";
 import type { Goal } from "./components/GoalCard";
 import { CreateGoalModal } from "./components/CreateGoalModal";
 import { EmptyGoalsState } from "./components/EmptyGoalsState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Goals() {
   const { user, currentWorkspaceId } = useAuth();
@@ -80,9 +82,11 @@ export default function Goals() {
       if (error) throw error;
       if (data) {
         setGoals([data, ...goals]);
+        toast.success("Goal created");
       }
     } catch (error) {
       console.error("Error creating goal:", error);
+      toast.error("Failed to create goal");
     }
   };
 
@@ -155,13 +159,41 @@ export default function Goals() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          <div className="col-span-1 md:col-span-12 flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b38d4]"></div>
-          </div>
+          <>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1 min-w-0">
+                      <Skeleton className="h-7 w-3/4 mb-3" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </div>
+                    <Skeleton className="h-6 w-6 shrink-0 ml-2" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-10" />
+                  </div>
+                  <Skeleton className="h-2 w-full rounded-full mb-4" />
+                  <Skeleton className="h-6 w-24 rounded-lg" />
+                </div>
+              </div>
+            ))}
+            <div className="rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center">
+              <Skeleton className="h-12 w-12 rounded-full mb-4" />
+              <Skeleton className="h-7 w-56 mb-2" />
+              <Skeleton className="h-5 w-44 mb-6" />
+              <Skeleton className="h-10 w-28 rounded-lg" />
+            </div>
+          </>
         ) : goals.length === 0 ? (
-          <EmptyGoalsState onCreateGoal={handleCreateGoal} tasks={tasks} />
+          <div className="col-span-full">
+            <EmptyGoalsState onCreateGoal={handleCreateGoal} tasks={tasks} />
+          </div>
         ) : (
           <>
             {filteredGoals.map((goal) => (
@@ -173,7 +205,7 @@ export default function Goals() {
               />
             ))}
 
-            <div className="col-span-1 md:col-span-6 rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group">
+            <div className="rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-[#6b38d4] via-transparent to-transparent"></div>
               <Trophy className="w-12 h-12 text-[#6b38d4] mb-4" />
               <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-[#0b1c30] mb-2">

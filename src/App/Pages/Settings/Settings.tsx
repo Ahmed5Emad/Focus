@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
+import { usePreferences } from '@/hooks/usePreferences';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,6 +70,9 @@ export default function Settings() {
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [applyBrandingToEmail, setApplyBrandingToEmail] = useState(true);
+
+  const { preferences, updatePreference } = usePreferences();
 
   useEffect(() => {
     if (currentWorkspaceId) {
@@ -436,8 +441,8 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Tasks created without explicit status will use this.</p>
                   </div>
                   <Dropdown
-                    value="todo"
-                    onValueChange={() => {}}
+                    value={preferences.defaultTaskStatus}
+                    onValueChange={(val) => val && updatePreference('defaultTaskStatus', val)}
                     options={[{ value: "todo", label: "To Do" }, { value: "in_progress", label: "In Progress" }]}
                     showSearch={false}
                     triggerClassName="w-40 h-9 text-sm"
@@ -450,7 +455,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">New tasks are automatically assigned to you.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoAssignToSelf} onChange={(e) => updatePreference('autoAssignToSelf', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
                   </div>
                 </div>
 
@@ -460,7 +465,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Hide completed tasks after 7 days.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoArchiveCompleted} onChange={(e) => updatePreference('autoArchiveCompleted', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
                   </div>
                 </div>
 
@@ -470,7 +475,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Display completed tasks in the task list.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.showCompletedTasks} onChange={(e) => updatePreference('showCompletedTasks', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
                   </div>
                 </div>
               </div>
@@ -494,8 +499,8 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Choose the default layout for projects.</p>
                   </div>
                   <Dropdown
-                    value="list"
-                    onValueChange={() => {}}
+                    value={preferences.defaultProjectView}
+                    onValueChange={(val) => val && updatePreference('defaultProjectView', val)}
                     options={[{ value: "list", label: "List" }, { value: "board", label: "Board" }]}
                     showSearch={false}
                     triggerClassName="w-40 h-9 text-sm"
@@ -508,12 +513,13 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Mark projects as completed when all tasks are done.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoCloseCompletedProjects} onChange={(e) => updatePreference('autoCloseCompletedProjects', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
         </TabsContent>
 
         <TabsContent value="workspace" className="space-y-6">
@@ -622,7 +628,7 @@ export default function Settings() {
                     <span className="text-sm font-mono text-muted-foreground uppercase">#00687a</span>
                   </div>
                   <div className="flex items-center gap-3 px-1">
-                    <input type="checkbox" defaultChecked className="rounded border-input text-primary focus:ring-primary" />
+                    <input type="checkbox" checked={applyBrandingToEmail} onChange={(e) => setApplyBrandingToEmail(e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
                     <span className="text-sm text-muted-foreground">Apply branding to email templates</span>
                   </div>
                 </div>
@@ -909,6 +915,7 @@ export default function Settings() {
                       ? ""
                       : "bg-[#7b68ee] hover:opacity-90 text-white"
                   }
+                  onClick={() => toast.info(integration.connected ? "Disconnect coming soon" : "Integration coming soon")}
                 >
                   {integration.connected ? "Disconnect" : "Connect"}
                 </Button>
@@ -927,7 +934,7 @@ export default function Settings() {
               Build custom integrations using our REST API. Generate an API key
               to get started.
             </p>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast.info("API key generation coming soon")}>
               Generate API Key
             </Button>
           </div>
@@ -936,3 +943,4 @@ export default function Settings() {
     </div>
   );
 }
+

@@ -1,6 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+export interface FileAttachment {
+  url: string;
+  name: string;
+  size: number;
+  mimeType: string;
+}
 
 export interface DirectMessage {
   id: string;
@@ -10,6 +17,8 @@ export interface DirectMessage {
   content: string;
   created_at: string;
   updated_at: string;
+  status: string;
+  file_attachment: FileAttachment | null;
 }
 
 export function useDirectMessages(otherUserId: string | null) {
@@ -17,6 +26,9 @@ export function useDirectMessages(otherUserId: string | null) {
   const [supabase] = useState(() => createClient());
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<{ userId: string; displayName: string }[]>([]);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const presenceChannelRef = useRef<ReturnType<ReturnType<typeof supabase.channel>['on']> | null>(null);
 
   const fetchMessages = useCallback(async () => {
     if (!currentWorkspaceId || !user || !otherUserId) {
@@ -37,7 +49,17 @@ export function useDirectMessages(otherUserId: string | null) {
         .limit(50);
 
       if (error) throw error;
-      setMessages(data ? data.reverse() : []);
+      const msgs = data ? data.reverse() : [];
+
+      const unreadIds = msgs
+        .filter((m) => m.sender_id !== user.id && m.status === "sent")
+        .map((m) => m.id);
+      if (unreadIds.length > 0) {
+        await supabase.from("direct_messages").update({ status: "delivered" }).in("id", unreadIds);
+        msgs.filter((m) => unreadIds.includes(m.id)).forEach((m) => (m.status = "delivered"));
+      }
+
+      setMessages(msgs);
     } catch (error) {
       console.error("Error fetching DMs:", error);
     } finally {
@@ -72,6 +94,9 @@ export function useDirectMessages(otherUserId: string | null) {
 
           if (payload.eventType === "INSERT" && msg && involvesConversation(msg)) {
             setMessages((prev) => [...prev, msg]);
+            if (msg.sender_id !== user.id) {
+              supabase.from("direct_messages").update({ status: "delivered" }).eq("id", msg.id);
+            }
           } else if (payload.eventType === "UPDATE" && msg && involvesConversation(msg)) {
             setMessages((prev) =>
               prev.map((m) => (m.id === msg.id ? { ...m, ...msg } : m))
@@ -83,13 +108,32 @@ export function useDirectMessages(otherUserId: string | null) {
       )
       .subscribe();
 
+    const presenceChannel = supabase.channel(`dm-presence-${currentWorkspaceId}`);
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        const state = presenceChannel.presenceState();
+        const typing: { userId: string; displayName: string }[] = [];
+        Object.values(state).forEach((presences) => {
+          (presences as unknown as { userId: string; displayName: string }[]).forEach((p) => {
+            if (p.userId !== user.id) {
+              typing.push(p);
+            }
+          });
+        });
+        setTypingUsers(typing);
+      })
+      .subscribe();
+
+    presenceChannelRef.current = presenceChannel;
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [currentWorkspaceId, user, otherUserId, supabase]);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || !currentWorkspaceId || !user || !otherUserId) return false;
+  const sendMessage = async (content: string, file?: FileAttachment) => {
+    if ((!content.trim() && !file) || !currentWorkspaceId || !user || !otherUserId) return false;
 
     try {
       const { error } = await supabase.from("direct_messages").insert({
@@ -97,6 +141,7 @@ export function useDirectMessages(otherUserId: string | null) {
         sender_id: user.id,
         receiver_id: otherUserId,
         content: content.trim(),
+        file_attachment: file ?? null,
       });
 
       if (error) throw error;
@@ -106,6 +151,22 @@ export function useDirectMessages(otherUserId: string | null) {
       return false;
     }
   };
+
+  const startTyping = useCallback(() => {
+    if (!presenceChannelRef.current || !user || !otherUserId) return;
+    presenceChannelRef.current.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User" });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      presenceChannelRef.current?.untrack();
+    }, 2000);
+  }, [user, otherUserId]);
+
+  const stopTyping = useCallback(() => {
+    if (!presenceChannelRef.current || !user) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    presenceChannelRef.current.untrack();
+  }, [user]);
 
   const editMessage = async (messageId: string, newContent: string) => {
     if (!newContent.trim()) return false;
@@ -163,9 +224,12 @@ export function useDirectMessages(otherUserId: string | null) {
   return {
     messages,
     isLoading,
+    typingUsers,
     sendMessage,
     editMessage,
     deleteMessage,
     clearMessages,
+    startTyping,
+    stopTyping,
   };
 }

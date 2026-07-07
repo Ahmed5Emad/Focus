@@ -15,7 +15,7 @@ import {
 import { Loader2, User, Folder, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/shared/Dropdown";
-import type { Task, MemberProfile, Project } from "@/hooks/useTasks";
+import type { Task, MemberProfile, Project, Priority } from "@/hooks/useTasks";
 
 const STATUS_OPTIONS = [
   { value: "todo", label: "To Do" },
@@ -38,7 +38,7 @@ interface TaskEditDialogProps {
   members: MemberProfile[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null }>) => Promise<boolean>;
+  onSave: (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority }>) => Promise<boolean>;
 }
 
 export function TaskEditDialog({ task, projects, members, open, onOpenChange, onSave }: TaskEditDialogProps) {
@@ -46,6 +46,8 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
   const [status, setStatus] = useState(task?.status ?? "todo");
   const [projectId, setProjectId] = useState<string | null>(task?.project_id ?? null);
   const [assigneeId, setAssigneeId] = useState<string | null>(task?.assignee_id ?? null);
+  const [priority, setPriority] = useState<Priority>(task?.priority ?? "none");
+  const [dueDate, setDueDate] = useState(task?.due_date ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -56,6 +58,8 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
       status,
       project_id: projectId,
       assignee_id: assigneeId,
+      priority,
+      due_date: dueDate || null,
     });
     setIsSaving(false);
     if (success) onOpenChange(false);
@@ -165,6 +169,48 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
                 );
               }}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Priority</label>
+              <Dropdown
+                value={priority}
+                onValueChange={(val) => setPriority((val ?? "none") as Priority)}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "low", label: "Low" },
+                  { value: "medium", label: "Medium" },
+                  { value: "high", label: "High" },
+                  { value: "urgent", label: "Urgent" },
+                ]}
+                showSearch={false}
+                renderTrigger={(selected) => (
+                  <div className="flex items-center gap-2">
+                    {selected && selected.value !== "none" && (
+                      <span className={cn(
+                        "w-2 h-2 rounded-full",
+                        selected.value === "urgent" && "bg-red-500",
+                        selected.value === "high" && "bg-orange-500",
+                        selected.value === "medium" && "bg-blue-500",
+                        selected.value === "low" && "bg-gray-400",
+                      )} />
+                    )}
+                    <span className="text-sm">{selected?.label ?? "None"}</span>
+                  </div>
+                )}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Due Date</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7b68ee] focus:ring-2 focus:ring-[#7b68ee]/20 outline-none transition-all text-[#0b1c30]"
+              />
+            </div>
           </div>
         </div>
 

@@ -255,6 +255,17 @@ export default function Tasks() {
 
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2">
+                    {task.priority && task.priority !== "none" && (
+                      <span
+                        className={cn(
+                          "w-2 h-2 rounded-full shrink-0",
+                          task.priority === "urgent" && "bg-red-500",
+                          task.priority === "high" && "bg-orange-500",
+                          task.priority === "medium" && "bg-blue-500",
+                          task.priority === "low" && "bg-gray-400",
+                        )}
+                      />
+                    )}
                     <h4
                       className={cn(
                         "font-['Spline_Sans',sans-serif] text-[16px] leading-[1.3] font-semibold truncate",
@@ -292,6 +303,21 @@ export default function Tasks() {
                       <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">
                         <Target className="w-3.5 h-3.5 text-[#7b68ee]" />
                         <span>{task.goals.title}</span>
+                      </div>
+                    )}
+                    {task.due_date && (
+                      <div className={cn(
+                        "flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal",
+                        task.status !== "done" && new Date(task.due_date) < new Date(new Date().toDateString())
+                          ? "text-red-500"
+                          : "text-[#494454]",
+                      )}>
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>
+                          {new Date(task.due_date).toDateString() === new Date().toDateString()
+                            ? "Today"
+                            : new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-[#494454]">

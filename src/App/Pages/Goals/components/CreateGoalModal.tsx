@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Target, Tag, Calendar, Plus, Sparkles, CheckSquare } from "lucide-react";
 import { Dropdown } from "@/components/shared/Dropdown";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface CreateGoalModalProps {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export function CreateGoalModal({ children, onCreate, tasks }: CreateGoalModalPr
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [taskId, setTaskId] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,13 +34,13 @@ export function CreateGoalModal({ children, onCreate, tasks }: CreateGoalModalPr
     onCreate({
       title,
       category: category || "General",
-      due_date: dueDate ? new Date(dueDate).toISOString() : null,
+      due_date: dueDate ? dueDate.toISOString() : null,
       task_id: taskId,
     });
     
     setTitle("");
     setCategory("");
-    setDueDate("");
+    setDueDate(undefined);
     setTaskId(null);
     setOpen(false);
   };
@@ -103,16 +104,14 @@ export function CreateGoalModal({ children, onCreate, tasks }: CreateGoalModalPr
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dueDate" className="font-['Space_Grotesk',sans-serif] text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <Label className="font-['Space_Grotesk',sans-serif] text-sm font-semibold text-slate-700 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#7c3aed]" />
                 Due Date
               </Label>
-              <Input
-                id="dueDate"
-                type="date"
+              <DatePicker
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="h-12 rounded-xl border-slate-200 focus:border-[#7c3aed] focus:ring-[#7c3aed]/20 font-['Inter',sans-serif] text-slate-900 transition-all"
+                onChange={setDueDate}
+                placeholder="Pick a due date..."
               />
             </div>
           </div>

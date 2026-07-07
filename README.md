@@ -65,3 +65,16 @@ bun run build
 ```bash
 bun run lint
 ```
+
+## Documentation
+
+Detailed documentation is available in the [`docs/`](docs/) folder:
+
+- [Getting Started](docs/getting-started.md) — setup and development
+- [Architecture Overview](docs/architecture.md) — app structure and data flow
+- [Database Schema](docs/backend/database.md) — tables, RLS, relationships
+- [Authentication Flow](docs/backend/authentication.md) — session management, PKCE
+- [Real-time Collaboration](docs/backend/realtime-collaboration.md) — Hocuspocus + TipTap
+- [Design System](resources/DESIGN_SYSTEM.md) — components, colors, typography
+- [Project Structure](docs/frontend/project-structure.md) — codebase layout
+- [Roadmap](TODO.md) — development phases and progress

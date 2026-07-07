@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Layout, Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { ProjectCard } from "./components/ProjectCard";
 import type { Project } from "./components/ProjectCard";
 import { CreateProjectModal } from "./components/CreateProjectModal";
@@ -65,9 +67,11 @@ export default function Projects() {
       if (error) throw error;
       if (data) {
         setProjects([data, ...projects]);
+        toast.success("Project created");
       }
     } catch (error) {
       console.error("Error creating project:", error);
+      toast.error("Failed to create project");
     }
   };
 
@@ -133,8 +137,26 @@ export default function Projects() {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {isLoading ? (
-          <div className="col-span-1 md:col-span-12 flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7b68ee]"></div>
+          <div className="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Skeleton className="h-7 w-40" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                  <Skeleton className="h-4 w-full mt-3" />
+                  <Skeleton className="h-4 w-3/4 mt-1.5" />
+                  <Skeleton className="h-6 w-20 rounded-full mt-3" />
+                </div>
+                <div className="mt-auto pt-4 border-t border-slate-50">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : projects.length === 0 ? (
           <EmptyProjectsState onCreateProject={handleCreateProject} />

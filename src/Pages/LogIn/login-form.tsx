@@ -42,7 +42,12 @@ export function LoginForm({
         return;
       }
 
-      navigate('/dashboard');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/dashboard');
+      } else {
+        setError('Session could not be established. Please try again.');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during login");
     } finally {
@@ -99,6 +104,37 @@ export function LoginForm({
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
               />
+              <div className="flex justify-end mt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email) {
+                      setError("Please enter your email address first.");
+                      return;
+                    }
+                    setError(null);
+                    setIsLoading(true);
+                    try {
+                      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/#/auth/callback',
+                      });
+                      if (error) {
+                        setError(error.message);
+                      } else {
+                        setError(null);
+                        alert("Password reset link sent to your email.");
+                      }
+                    } catch {
+                      setError("Failed to send reset email.");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  className="text-sm text-cu-purple hover:underline font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
             </Field>
             {error && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
@@ -112,11 +148,11 @@ export function LoginForm({
             </Field>
             <FieldSeparator className="my-4 text-gray-400">Or continue with</FieldSeparator>
             <Field className="grid gap-4 sm:grid-cols-2">
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple' }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
                 <img src={appleIcon} alt="" className="w-5 h-5 mr-2" />
                 Apple
               </Button>
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google' }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
                 <img src={googleIcon} alt="" className="w-5 h-5 mr-2" />
                 Google
               </Button>

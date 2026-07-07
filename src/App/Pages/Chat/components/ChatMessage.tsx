@@ -13,8 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MoreHorizontal, Pencil, Trash2, Check, X } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Check, X, FileIcon, Download } from "lucide-react";
 import type { ChatMessage } from "@/hooks/useChat";
+
+const statusLabels: Record<string, string> = {
+  sent: "Sent",
+  delivered: "Delivered",
+  read: "Read",
+};
 
 interface ChatMessageProps {
   message: ChatMessage;
@@ -24,6 +30,16 @@ interface ChatMessageProps {
   senderAvatar?: string;
   onEdit: (id: string, newContent: string) => Promise<boolean>;
   onDelete: (id: string) => Promise<boolean>;
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes}B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)}KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+function isImage(mimeType: string) {
+  return mimeType.startsWith("image/");
 }
 
 export function ChatMessage({
@@ -73,6 +89,8 @@ export function ChatMessage({
     }
   };
 
+  const fileAttach = message.file_attachment;
+
   return (
     <div
       className={cn(
@@ -100,6 +118,44 @@ export function ChatMessage({
           )}
         </div>
 
+        {fileAttach && (
+          <div className={cn("mb-1.5", isOwn && "self-end")}>
+            {isImage(fileAttach.mimeType) ? (
+              <a
+                href={fileAttach.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg border border-slate-200 hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src={fileAttach.url}
+                  alt={fileAttach.name}
+                  className="max-w-[240px] max-h-[180px] object-cover"
+                />
+              </a>
+            ) : (
+              <a
+                href={fileAttach.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg border text-sm transition-colors",
+                  isOwn
+                    ? "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    : "bg-slate-50 border-slate-200 text-[#0b1c30] hover:bg-slate-100"
+                )}
+              >
+                <FileIcon className="w-5 h-5 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="truncate font-medium">{fileAttach.name}</p>
+                  <p className="text-[11px] opacity-60">{formatFileSize(fileAttach.size)}</p>
+                </div>
+                <Download className="w-4 h-4 shrink-0 opacity-60" />
+              </a>
+            )}
+          </div>
+        )}
+
         {isEditing ? (
           <div className="flex items-center gap-2 w-full">
             <input
@@ -126,16 +182,30 @@ export function ChatMessage({
             </button>
           </div>
         ) : (
-          <div
-            className={cn(
-              "px-3 py-2 text-sm leading-relaxed rounded-lg",
-              isOwn
-                ? "bg-[#7b68ee] text-white"
-                : "bg-white border border-slate-100 shadow-sm text-[#0b1c30]",
+          <>
+            {message.content && (
+              <div
+                className={cn(
+                  "px-3 py-2 text-sm leading-relaxed rounded-lg",
+                  isOwn
+                    ? "bg-[#7b68ee] text-white"
+                    : "bg-white border border-slate-100 shadow-sm text-[#0b1c30]",
+                )}
+              >
+                {message.content}
+              </div>
             )}
-          >
-            {message.content}
-          </div>
+            {isOwn && (
+              <span className="text-[10px] text-[#94a3b8] mt-0.5 flex items-center gap-1">
+                <span className={cn(
+                  message.status === "read" && "text-[#7b68ee]",
+                  message.status === "delivered" && "text-[#7b68ee]",
+                )}>
+                  {statusLabels[message.status] ?? "Sent"}
+                </span>
+              </span>
+            )}
+          </>
         )}
       </div>
 

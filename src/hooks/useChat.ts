@@ -1,6 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+export interface FileAttachment {
+  url: string;
+  name: string;
+  size: number;
+  mimeType: string;
+}
 
 export interface ChatMessage {
   id: string;
@@ -9,6 +16,8 @@ export interface ChatMessage {
   content: string;
   created_at: string;
   updated_at: string;
+  status: string;
+  file_attachment: FileAttachment | null;
 }
 
 export function useChat() {
@@ -16,9 +25,20 @@ export function useChat() {
   const [supabase] = useState(() => createClient());
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [typingUsers, setTypingUsers] = useState<{ userId: string; displayName: string }[]>([]);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const presenceChannelRef = useRef<ReturnType<ReturnType<typeof supabase.channel>['on']> | null>(null);
+
+  const markAsDelivered = useCallback(async (msgId: string) => {
+    await supabase.from("chat_messages").update({ status: "delivered" }).eq("id", msgId).eq("status", "sent");
+  }, [supabase]);
+
+  const markAsRead = useCallback(async (msgId: string) => {
+    await supabase.from("chat_messages").update({ status: "read" }).eq("id", msgId).neq("user_id", user?.id);
+  }, [supabase, user]);
 
   useEffect(() => {
-    if (!currentWorkspaceId) {
+    if (!currentWorkspaceId || !user) {
       setIsLoading(false);
       return;
     }
@@ -34,7 +54,17 @@ export function useChat() {
           .limit(50);
 
         if (error) throw error;
-        setMessages(data ? data.reverse() : []);
+        const msgs = data ? data.reverse() : [];
+
+        const unreadIds = msgs
+          .filter((m) => m.user_id !== user.id && m.status === "sent")
+          .map((m) => m.id);
+        if (unreadIds.length > 0) {
+          await supabase.from("chat_messages").update({ status: "delivered" }).in("id", unreadIds);
+          msgs.filter((m) => unreadIds.includes(m.id)).forEach((m) => (m.status = "delivered"));
+        }
+
+        setMessages(msgs);
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
@@ -56,7 +86,11 @@ export function useChat() {
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setMessages((prev) => [...prev, payload.new as ChatMessage]);
+            const msg = payload.new as ChatMessage;
+            setMessages((prev) => [...prev, msg]);
+            if (msg.user_id !== user.id) {
+              markAsDelivered(msg.id);
+            }
           } else if (payload.eventType === "UPDATE") {
             setMessages((prev) =>
               prev.map((m) =>
@@ -72,19 +106,39 @@ export function useChat() {
       )
       .subscribe();
 
+    const presenceChannel = supabase.channel(`chat-presence-${currentWorkspaceId}`);
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        const state = presenceChannel.presenceState();
+        const typing: { userId: string; displayName: string }[] = [];
+        Object.values(state).forEach((presences) => {
+          (presences as unknown as { userId: string; displayName: string }[]).forEach((p) => {
+            if (p.userId !== user.id) {
+              typing.push(p);
+            }
+          });
+        });
+        setTypingUsers(typing);
+      })
+      .subscribe();
+
+    presenceChannelRef.current = presenceChannel;
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(presenceChannel);
     };
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId, supabase, user, markAsDelivered]);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || !currentWorkspaceId || !user) return false;
+  const sendMessage = async (content: string, file?: FileAttachment) => {
+    if ((!content.trim() && !file) || !currentWorkspaceId || !user) return false;
 
     try {
       const { error } = await supabase.from("chat_messages").insert({
         workspace_id: currentWorkspaceId,
         user_id: user.id,
         content: content.trim(),
+        file_attachment: file ?? null,
       });
 
       if (error) throw error;
@@ -94,6 +148,22 @@ export function useChat() {
       return false;
     }
   };
+
+  const startTyping = useCallback(() => {
+    if (!presenceChannelRef.current || !user) return;
+    presenceChannelRef.current.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User" });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      presenceChannelRef.current?.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User", is_typing: false });
+    }, 2000);
+  }, [user]);
+
+  const stopTyping = useCallback(() => {
+    if (!presenceChannelRef.current || !user) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    presenceChannelRef.current.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User", is_typing: false });
+  }, [user]);
 
   const editMessage = async (messageId: string, newContent: string) => {
     if (!newContent.trim()) return false;
@@ -147,9 +217,13 @@ export function useChat() {
   return {
     messages,
     isLoading,
+    typingUsers,
     sendMessage,
     editMessage,
     deleteMessage,
     clearMessages,
+    startTyping,
+    stopTyping,
+    markAsRead,
   };
 }

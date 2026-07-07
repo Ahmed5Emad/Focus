@@ -4,9 +4,10 @@ import Hero from './components/Hero';
 import Visuals from './components/Visuals';
 import Header from './components/Header';
 import { Slider } from '../../components/ui/slider';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const OnboardingWelcome: React.FC = () => {
+  const navigate = useNavigate();
   console.log("Rendering OnboardingWelcome");
   return (
     <div className="h-screen bg-background text-foreground flex flex-col">
@@ -20,7 +21,7 @@ const OnboardingWelcome: React.FC = () => {
             <Slider totalSteps={4} currentStep={0} />
             <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-slate-500">STEP 1 OF 4</span>
-                <button className="text-slate-900 font-bold">Back</button>
+                <button onClick={() => navigate('/')} className="text-slate-900 font-bold">Back</button>
                 <Link to="/onboarding/deep-work" className="bg-cu-purple hover:bg-cu-purple/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2">
                     Next <ArrowRight className="w-4 h-4" />
                 </Link>

@@ -5,6 +5,7 @@ import { ErrorBoundaryFallback } from "./components/ErrorBoundaryFallback";
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from "@vercel/analytics/react"
 import { AppLayout } from "./App/AppLayout";
+import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FocusProvider } from "./contexts/FocusContext";
 
@@ -31,6 +32,9 @@ const FocusTimer = lazy(() => import("./App/Pages/FocusTimer/FocusTimer"));
 const ArchivePage = lazy(() => import("./App/Pages/Archive/Archive"));
 const Support = lazy(() => import("./App/Pages/Support/Support"));
 const Chat = lazy(() => import("./App/Pages/Chat/Chat"));
+const Documents = lazy(() => import("./App/Pages/Documents/Documents"));
+const DocumentEditor = lazy(() => import("./App/Pages/Documents/DocumentEditor"));
+const NotFound = lazy(() => import("./Pages/NotFound/NotFound").then(m => ({ default: m.NotFound })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuth();
@@ -52,6 +56,7 @@ function App() {
       <FocusProvider>
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
           <HashRouter>
+            <Toaster />
             <SpeedInsights />
             <Analytics />
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
@@ -76,11 +81,15 @@ function App() {
                   <Route path="/tasks/new" element={<ProtectedRoute><TaskCreation /></ProtectedRoute>} />
                   <Route path="/management" element={<ProtectedRoute><Management /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+                  <Route path="/documents/:id" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />
                   <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                   <Route path="/focus-timer" element={<ProtectedRoute><FocusTimer /></ProtectedRoute>} />
                   <Route path="/archive" element={<ProtectedRoute><ArchivePage /></ProtectedRoute>} />
                   <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+                  <Route path="*" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
                 </Route>
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </HashRouter>

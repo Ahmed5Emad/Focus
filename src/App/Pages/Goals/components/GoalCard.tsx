@@ -1,4 +1,6 @@
-import { MoreHorizontal, CheckSquare, Calendar, Trash2 } from "lucide-react";
+import { MoreHorizontal, CheckSquare, Calendar, Trash2, Pencil } from "lucide-react";
+import { useState } from "react";
+import { EditGoalModal } from "./EditGoalModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +27,8 @@ interface GoalCardProps {
 }
 
 export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
+  const [editOpen, setEditOpen] = useState(false);
+
   const handleProgressUpdate = () => {
     const newProgress = Math.min(goal.progress + 10, 100);
     onUpdate(goal.id, { progress: newProgress, is_complete: newProgress === 100 });
@@ -35,34 +39,45 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
     : "No due date";
 
   return (
-    <div className="col-span-1 md:col-span-8 bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between hover:-translate-y-0.5 transition-transform duration-300">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-[#0b1c30]">
-            {goal.title}
-          </h2>
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#57dffe] text-[#006172] font-['Space_Grotesk',sans-serif] text-[12px] font-bold leading-none tracking-[0.05em] mt-2">
-            {goal.category || "General"}
-          </span>
+    <>
+      <EditGoalModal
+        goal={goal}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onUpdate={onUpdate}
+      />
+      <div className="bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between hover:-translate-y-0.5 transition-transform duration-300">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-[#0b1c30]">
+              {goal.title}
+            </h2>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#57dffe] text-[#006172] font-['Space_Grotesk',sans-serif] text-[12px] font-bold leading-none tracking-[0.05em] mt-2">
+              {goal.category || "General"}
+            </span>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-[#7b7486] hover:text-[#6b38d4] transition-colors">
+                <MoreHorizontal className="w-6 h-6" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onUpdate(goal.id, { is_complete: !goal.is_complete, progress: !goal.is_complete ? 100 : 0 })}>
+                <CheckSquare className="w-4 h-4 mr-2" />
+                {goal.is_complete ? "Mark Incomplete" : "Mark Complete"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(goal.id)} className="text-red-600">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="text-[#7b7486] hover:text-[#6b38d4] transition-colors">
-              <MoreHorizontal className="w-6 h-6" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onUpdate(goal.id, { is_complete: !goal.is_complete, progress: !goal.is_complete ? 100 : 0 })}>
-              <CheckSquare className="w-4 h-4 mr-2" />
-              {goal.is_complete ? "Mark Incomplete" : "Mark Complete"}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(goal.id)} className="text-red-600">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
 
       <div className="mt-auto">
         <div className="flex justify-between font-['Inter',sans-serif] text-[14px] leading-[1.4] text-[#494454] mb-2">
@@ -83,5 +98,6 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

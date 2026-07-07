@@ -9,6 +9,7 @@ import {
   Folder,
   Plus,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -154,8 +155,50 @@ export default function Management() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-5">
+                <Skeleton className="h-10 w-10 rounded-lg" />
+                <Skeleton className="h-8 w-16 mt-3" />
+                <Skeleton className="h-4 w-20 mt-1" />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white border border-[#f1f5f9] rounded-xl shadow-sm p-6">
+              <Skeleton className="h-4 w-48 mb-6" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="mb-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <Skeleton className="h-2 w-full rounded-full" />
+                </div>
+              ))}
+            </div>
+            <div className="bg-white border border-[#f1f5f9] rounded-xl shadow-sm">
+              <div className="px-6 py-4 border-b border-[#f1f5f9]">
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <div className="divide-y divide-[#f1f5f9]">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-5 py-4">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="flex-1">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-36 mt-1" />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-4 w-10" />
+                      <Skeleton className="h-4 w-10" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       ) : taskCounts.total === 0 ? (
         <div className="content-card flex flex-col items-center justify-center py-24 px-6">

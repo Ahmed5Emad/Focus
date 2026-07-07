@@ -4,12 +4,29 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFocus } from "@/contexts/FocusContext";
 import { createClient } from "@/lib/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function formatDuration(seconds: number | null | undefined): string {
+  if (!seconds || seconds <= 0) return "0h 0m";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${h}h ${m}m`;
+}
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 interface DashboardStats {
   avg_flow_score: number;
   today_deep_work_seconds: number;
   tasks_completed: number;
   tasks_total: number;
+  flow_score_change: number;
+  today_total_seconds: number;
 }
 
 interface Task {
@@ -24,13 +41,14 @@ export default function Dashboard() {
   const { startSession } = useFocus();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [supabase] = useState(() => createClient());
 
   useEffect(() => {
     if (!currentWorkspaceId) return;
 
     const fetchData = async () => {
-      // Fetch stats
+      setIsLoading(true);
       const { data: statsData, error: statsError } = await supabase.rpc(
         "get_dashboard_stats",
         { p_workspace_id: currentWorkspaceId },
@@ -39,28 +57,30 @@ export default function Dashboard() {
       if (statsError) console.error("Error fetching stats:", statsError);
       else setStats(statsData);
 
-      // Fetch only top priority tasks for preview
       const { data: tasksData, error: tasksError } = await supabase
         .from("tasks")
         .select("*")
         .eq("workspace_id", currentWorkspaceId)
         .eq("status", "todo")
         .order("created_at", { ascending: false })
-        .limit(3); // Show fewer for dashboard preview
+        .limit(3);
 
       if (tasksError) console.error("Error fetching tasks:", tasksError);
       else setTasks(tasksData || []);
+      setIsLoading(false);
     };
 
     fetchData();
   }, [currentWorkspaceId, supabase]);
+
+  const greeting = getGreeting();
 
   return (
     <div className="page-container">
       <div className="flex items-start justify-between w-full pt-6 px-4 md:px-0">
         <div className="flex flex-col gap-0.5">
           <h1 className="page-title">
-            Good morning.
+            {greeting}.
           </h1>
           <p className="page-description">
             You have {tasks.length} task{tasks.length !== 1 ? 's' : ''} for today's focus block.
@@ -92,121 +112,170 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {/* Flow Score Card */}
         <div className="bg-white border border-[#f1f5f9] flex flex-col gap-3 items-start overflow-hidden p-6.25 relative rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] w-full">
-          <div className="absolute bg-[rgba(139,92,246,0.05)] blur-[32px] right-[-39.66px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
-
-          <div className="flex items-start justify-between pb-5 w-full relative z-10">
-            <div className="flex flex-col gap-1 items-start">
-              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
-                Flow Score
-              </h3>
-              <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
-                <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
-                  {stats?.avg_flow_score ?? 0}
-                </span>
-                <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
-                  /100
-                </span>
+          {isLoading ? (
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex items-start justify-between w-full">
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-9 w-24" />
+                </div>
+                <Skeleton className="h-9 w-9 rounded-full" />
               </div>
+              <Skeleton className="h-1.5 w-full rounded-2xl" />
+              <Skeleton className="h-5 w-40" />
             </div>
-            <div className="w-9 h-9 bg-[#f5f3ff] rounded-full flex items-center justify-center text-[#8b5cf6]">
-              <BrainCircuit className="w-4.5 h-4.5" />
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="absolute bg-[rgba(139,92,246,0.05)] blur-[32px] right-[-39.66px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
 
-          <div className="bg-[#f1f5f9] h-1.5 relative rounded-2xl w-full overflow-hidden z-10">
-            <div
-              className="absolute bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 left-0 rounded-2xl top-0"
-              style={{ width: `${stats?.avg_flow_score ?? 0}%` }}
-            />
-          </div>
+              <div className="flex items-start justify-between pb-5 w-full relative z-10">
+                <div className="flex flex-col gap-1 items-start">
+                  <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
+                    Flow Score
+                  </h3>
+                  <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
+                    <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
+                      {Math.round(stats?.avg_flow_score ?? 0)}
+                    </span>
+                    <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
+                      /100
+                    </span>
+                  </div>
+                </div>
+                <div className="w-9 h-9 bg-[#f5f3ff] rounded-full flex items-center justify-center text-[#8b5cf6]">
+                  <BrainCircuit className="w-4.5 h-4.5" />
+                </div>
+              </div>
 
-          <div className="flex flex-col items-start w-full relative z-10">
-            <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0">
-              +12pts from yesterday
-            </p>
-          </div>
+              <div className="bg-[#f1f5f9] h-1.5 relative rounded-2xl w-full overflow-hidden z-10">
+                <div
+                  className="absolute bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 left-0 rounded-2xl top-0"
+                  style={{ width: `${stats?.avg_flow_score ?? 0}%` }}
+                />
+              </div>
+
+              <div className="flex flex-col items-start w-full relative z-10">
+                <p className="font-['Spline_Sans',sans-serif] font-normal text-[#64748b] text-[14px] leading-5.25 m-0">
+                  {stats?.flow_score_change != null && stats.flow_score_change >= 0 ? '+' : ''}{stats?.flow_score_change ?? 0}pts from yesterday
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Deep Work Card */}
         <div className="bg-white border border-[#f1f5f9] flex flex-col gap-4 items-start overflow-hidden pb-8.25 pt-6.25 px-6.25 relative rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] w-full">
-          <div className="absolute bg-[rgba(16,185,129,0.05)] blur-[32px] right-[-39.67px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
-
-          <div className="flex items-start justify-between w-full relative z-10">
-            <div className="flex flex-col gap-1 items-start">
-              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
-                Deep Work
-              </h3>
-              <div className="flex flex-col items-start">
-                <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] tracking-[-0.6px] leading-9">
-                  {stats
-                    ? `${Math.floor(stats.today_deep_work_seconds / 3600)}h ${Math.floor((stats.today_deep_work_seconds % 3600) / 60)}m`
-                    : "0h 0m"}
-                </span>
+          {isLoading ? (
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex items-start justify-between w-full">
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-9 w-28" />
+                </div>
+                <Skeleton className="h-9 w-9 rounded-full" />
               </div>
+              <Skeleton className="h-12 w-full" />
             </div>
-            <div className="w-9 h-9 bg-[#ecfdf5] rounded-full flex items-center justify-center text-[#10b981]">
-              <Hourglass className="w-4.5 h-4.5" />
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="absolute bg-[rgba(16,185,129,0.05)] blur-[32px] right-[-39.67px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
 
-          <div className="h-12 w-full relative z-10">
-            <div className="flex gap-2 items-end w-full h-full">
-              <div className="bg-[#f1f5f9] flex-1 h-[30%] rounded-t-[2px]" />
-              <div className="bg-[#f1f5f9] flex-1 h-[50%] rounded-t-[2px]" />
-              <div className="bg-[#f1f5f9] flex-1 h-[80%] rounded-t-[2px]" />
-              <div className="bg-[#f1f5f9] flex-1 h-[40%] rounded-t-[2px]" />
-              <div className="bg-[#f1f5f9] flex-1 h-[60%] rounded-t-[2px]" />
-              <div className="bg-[#10b981] flex-1 h-full rounded-t-[2px] shadow-[0px_2px_10px_0px_rgba(16,185,129,0.2)]" />
-            </div>
-          </div>
+              <div className="flex items-start justify-between w-full relative z-10">
+                <div className="flex flex-col gap-1 items-start">
+                  <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
+                    Deep Work
+                  </h3>
+                  <div className="flex flex-col items-start">
+                    <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] tracking-[-0.6px] leading-9">
+                      {formatDuration(stats?.today_deep_work_seconds)}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-9 h-9 bg-[#ecfdf5] rounded-full flex items-center justify-center text-[#10b981]">
+                  <Hourglass className="w-4.5 h-4.5" />
+                </div>
+              </div>
+
+              <div className="h-12 w-full relative z-10">
+                <div className="flex gap-2 items-end w-full h-full">
+                  <div className="bg-[#f1f5f9] flex-1 h-[30%] rounded-t-[2px]" />
+                  <div className="bg-[#f1f5f9] flex-1 h-[50%] rounded-t-[2px]" />
+                  <div className="bg-[#f1f5f9] flex-1 h-[80%] rounded-t-[2px]" />
+                  <div className="bg-[#f1f5f9] flex-1 h-[40%] rounded-t-[2px]" />
+                  <div className="bg-[#f1f5f9] flex-1 h-[60%] rounded-t-[2px]" />
+                  <div className="bg-[#10b981] flex-1 h-full rounded-t-[2px] shadow-[0px_2px_10px_0px_rgba(16,185,129,0.2)]" />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="bg-white border border-[#f1f5f9] flex flex-col gap-8 items-start overflow-hidden pb-8 pt-6.25 px-6.25 relative rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] w-full">
-          <div className="absolute bg-[rgba(59,130,246,0.05)] blur-[32px] right-[-39.65px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
+          {isLoading ? (
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex items-start justify-between w-full">
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-9 w-20" />
+                </div>
+                <Skeleton className="h-9 w-9 rounded-full" />
+              </div>
+              <div className="flex items-start">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-8 w-8 rounded-full -ml-2" />
+                <Skeleton className="h-8 w-8 rounded-full -ml-2" />
+                <Skeleton className="h-8 w-8 rounded-full -ml-2" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="absolute bg-[rgba(59,130,246,0.05)] blur-[32px] right-[-39.65px] rounded-2xl w-40 h-40 -top-10 pointer-events-none" />
 
-          <div className="flex items-start justify-between w-full relative z-10">
-            <div className="flex flex-col gap-1 items-start">
-              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
-                Tasks Done
-              </h3>
-              <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
-                <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
-                  {stats?.tasks_completed ?? 0}
-                </span>
-                <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
-                  /{stats?.tasks_total ?? 0}
-                </span>
+              <div className="flex items-start justify-between w-full relative z-10">
+                <div className="flex flex-col gap-1 items-start">
+                  <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-[#64748b] text-[12px] tracking-[1.2px] uppercase leading-3 m-0">
+                    Tasks Done
+                  </h3>
+                  <div className="flex items-end leading-0 pb-px tracking-[-0.6px]">
+                    <span className="font-['Spline_Sans',sans-serif] font-semibold text-[#0f172a] text-[30px] leading-9">
+                      {stats?.tasks_completed ?? 0}
+                    </span>
+                    <span className="font-['Spline_Sans',sans-serif] font-normal text-[#94a3b8] text-[18px] leading-7">
+                      /{stats?.tasks_total ?? 0}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-9 h-9 bg-[#eff6ff] rounded-full flex items-center justify-center text-[#3b82f6]">
+                  <CheckCircle2 className="w-4.5 h-4.5" />
+                </div>
               </div>
-            </div>
-            <div className="w-9 h-9 bg-[#eff6ff] rounded-full flex items-center justify-center text-[#3b82f6]">
-              <CheckCircle2 className="w-4.5 h-4.5" />
-            </div>
-          </div>
 
-          <div className="w-full relative z-10">
-            <div className="flex items-start pr-2">
-              <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 z-4">
-                <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
-                  A
-                </span>
+              <div className="w-full relative z-10">
+                <div className="flex items-start pr-2">
+                  <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 z-4">
+                    <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
+                      A
+                    </span>
+                  </div>
+                  <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-3">
+                    <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
+                      B
+                    </span>
+                  </div>
+                  <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-2">
+                    <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
+                      C
+                    </span>
+                  </div>
+                  <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-1">
+                    <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
+                      +9
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-3">
-                <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
-                  B
-                </span>
-              </div>
-              <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-2">
-                <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
-                  C
-                </span>
-              </div>
-              <div className="bg-[#f1f5f9] border-2 border-white flex items-center justify-center rounded-full w-8 h-8 -ml-2 z-1">
-                <span className="font-['Spline_Sans',sans-serif] font-medium text-[#475569] text-[12px]">
-                  +9
-                </span>
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
 

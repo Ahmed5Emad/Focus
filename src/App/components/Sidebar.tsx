@@ -11,16 +11,25 @@ import {
   Building2,
   Layout,
   MessageCircle,
+  FileText,
+  Menu,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Dropdown } from "@/components/shared/Dropdown";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Tasks", icon: CheckSquare, path: "/tasks" },
   { name: "Projects", icon: Layout, path: "/projects" },
   { name: "Goals", icon: Target, path: "/goals" },
+  { name: "Documents", icon: FileText, path: "/documents" },
   { name: "Chat", icon: MessageCircle, path: "/chat" },
   { name: "Focus Timer", icon: Timer, path: "/focus-timer" },
   { name: "Archive", icon: Archive, path: "/archive" },
@@ -31,12 +40,17 @@ const bottomNavItems = [
   { name: "Support", icon: HelpCircle, path: "/support" },
 ];
 
-export function Sidebar() {
+function SidebarContent() {
   const location = useLocation();
   const { workspaces, currentWorkspaceId, setCurrentWorkspaceId } = useAuth();
 
+  const isActive = (path: string) => {
+    if (path === "/dashboard") return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(path + "/");
+  };
+
   return (
-    <aside className="bg-white border-[#e2e8f0] border-r border-solid flex flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
+    <>
       <div className="w-full flex flex-col gap-6">
         <div className="flex flex-col gap-[16px] items-start px-[24px] w-full">
           <div className="flex flex-col gap-[4px] w-full">
@@ -72,19 +86,19 @@ export function Sidebar() {
 
         <nav className="flex flex-col gap-[4px] px-[8px] w-full">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname.startsWith('/dashboard'));
+            const active = isActive(item.path);
             return (
               <Link
                 key={item.name}
                 to={item.path}
                 className={cn(
                   "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
-                  isActive
+                  active
                     ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
                     : "text-[#475569] hover:bg-slate-50"
                 )}
               >
-                <item.icon className={cn("w-[18px] h-[18px]", isActive ? "text-[#6d28d9]" : "text-[#475569]")} />
+                <item.icon className={cn("w-[18px] h-[18px]", active ? "text-[#6d28d9]" : "text-[#475569]")} />
                 <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">
                   {item.name}
                 </span>
@@ -95,19 +109,52 @@ export function Sidebar() {
       </div>
 
       <div className="border-[#f1f5f9] border-t w-full pb-[16px] pt-[17px] px-[16px] flex flex-col gap-[4px]">
-        {bottomNavItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            className="flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full text-[#475569] hover:bg-slate-50 transition-colors"
-          >
-            <item.icon className="w-[20px] h-[20px] text-[#475569]" />
-            <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">
-              {item.name}
-            </span>
-          </Link>
-        ))}
+        {bottomNavItems.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={cn(
+                "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
+                active
+                  ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
+                  : "text-[#475569] hover:bg-slate-50"
+              )}
+            >
+              <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-[#475569]")} />
+              <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">{item.name}</span>
+            </Link>
+          );
+        })}
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <>
+      <aside className="hidden lg:flex bg-white border-[#e2e8f0] border-r border-solid flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
+        <SidebarContent />
+      </aside>
+
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm hover:bg-white"
+          >
+            <Menu className="w-5 h-5 text-slate-600" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[256px] p-0">
+          <div className="flex flex-col pt-[32px] h-full">
+            <SidebarContent />
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

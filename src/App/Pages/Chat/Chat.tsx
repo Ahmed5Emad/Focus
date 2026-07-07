@@ -6,14 +6,17 @@ import {
   Trash2,
   MoreHorizontal,
   Shield,
+  Paperclip,
+  X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
-import { useDirectMessages, type DirectMessage } from "@/hooks/useDirectMessages";
+import { useDirectMessages, type DirectMessage, type FileAttachment } from "@/hooks/useDirectMessages";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChat";
 import { ChatMessage } from "./components/ChatMessage";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +29,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface MemberProfile {
   id: string;
@@ -49,11 +53,17 @@ export default function Chat() {
   const [supabase] = useState(() => createClient());
 
   const [mode, setMode] = useState<ChatMode>("channel");
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [members, setMembers] = useState<MemberProfile[]>([]);
   const [membersLoading, setMembersLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<{ file: File; preview?: string } | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const groupChat = useChat();
   const dmChat = useDirectMessages(
@@ -150,21 +160,78 @@ export default function Chat() {
       : `Direct message with ${selectedMember?.display_name ?? "this user"}`;
 
   const handleSend = async () => {
-    if (!inputValue.trim()) return;
-    const success = await active.sendMessage(inputValue);
+    if (!inputValue.trim() && !pendingFile) return;
+
+    let fileAttachment: FileAttachment | undefined;
+
+    if (pendingFile) {
+      setUploading(true);
+      try {
+        const ext = pendingFile.file.name.split(".").pop();
+        const filePath = `${currentWorkspaceId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("chat-attachments")
+          .upload(filePath, pendingFile.file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = await supabase.storage
+          .from("chat-attachments")
+          .getPublicUrl(filePath);
+
+        fileAttachment = {
+          url: urlData.publicUrl,
+          name: pendingFile.file.name,
+          size: pendingFile.file.size,
+          mimeType: pendingFile.file.type,
+        };
+      } catch (err) {
+        console.error("Upload error:", err);
+        toast.error("Failed to upload file");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
+    const success = await active.sendMessage(inputValue, fileAttachment);
     if (success) {
       setInputValue("");
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  const handleClear = async () => {
-    const label =
-      mode === "channel"
-        ? "Clear the entire workspace chat?"
-        : `Clear your conversation with ${selectedMember?.display_name ?? "this user"}?`;
-    if (!confirm(`${label} This cannot be undone.`)) return;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-    await active.clearMessages();
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+    if (e.target.value) {
+      active.startTyping?.();
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be under 10MB");
+      return;
+    }
+
+    const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined;
+    setPendingFile({ file, preview });
+  };
+
+  const handleClear = () => {
+    setClearConfirmOpen(true);
   };
 
   const getSenderProfile = (msg: ChatMessageType | DirectMessage) => {
@@ -184,8 +251,28 @@ export default function Chat() {
     return (msg as DirectMessage).sender_id === user?.id;
   };
 
+  const clearLabel = mode === "channel"
+    ? "Clear the entire workspace chat?"
+    : `Clear your conversation with ${selectedMember?.display_name ?? "this user"}?`;
+
+  const typingText = active.typingUsers?.length === 1
+    ? `${active.typingUsers[0].displayName} is typing...`
+    : active.typingUsers && active.typingUsers.length > 1
+      ? `${active.typingUsers[0].displayName} and ${active.typingUsers.length - 1} others are typing...`
+      : null;
+
   return (
-    <div className="page-container h-full flex flex-col">
+    <>
+      <ConfirmDialog
+        open={clearConfirmOpen}
+        onOpenChange={setClearConfirmOpen}
+        onConfirm={() => { setClearConfirmOpen(false); active.clearMessages(); }}
+        title="Clear Messages"
+        description={`${clearLabel} This cannot be undone.`}
+        confirmLabel="Clear"
+        destructive
+      />
+      <div className="page-container h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6 pb-4">
         <div>
           <h1 className="page-title mb-2">Chat</h1>
@@ -295,6 +382,11 @@ export default function Chat() {
               <p className="text-[11px] text-slate-400 mt-0.5">
                 {headerDescription}
               </p>
+              {typingText && (
+                <p className="text-[11px] text-[#7b68ee] italic mt-0.5 animate-pulse">
+                  {typingText}
+                </p>
+              )}
             </div>
 
             <DropdownMenu>
@@ -365,34 +457,75 @@ export default function Chat() {
 
           {/* Input area */}
           <div className="border-t border-slate-100 px-4 py-3">
-            <div className="flex items-center gap-2 bg-[#f8f7fc] border border-slate-200 rounded-xl focus-within:border-[#7b68ee] focus-within:ring-2 focus-within:ring-[#7b68ee]/20 transition-all p-1.5">
+            {pendingFile && (
+              <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-slate-50 rounded-lg border border-slate-200">
+                {pendingFile.preview ? (
+                  <img src={pendingFile.preview} alt="" className="w-10 h-10 object-cover rounded" />
+                ) : (
+                  <Paperclip className="w-5 h-5 text-slate-400" />
+                )}
+                <span className="text-sm text-slate-600 flex-1 truncate">{pendingFile.file.name}</span>
+                <button
+                  onClick={() => {
+                    setPendingFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                  className="p-1 hover:bg-slate-200 rounded transition-colors"
+                >
+                  <X className="w-4 h-4 text-slate-400" />
+                </button>
+              </div>
+            )}
+            <div className="flex items-end gap-2 bg-[#f8f7fc] border border-slate-200 rounded-xl focus-within:border-[#7b68ee] focus-within:ring-2 focus-within:ring-[#7b68ee]/20 transition-all p-1.5">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="p-2 text-slate-400 hover:text-[#7b68ee] hover:bg-white rounded-lg transition-colors shrink-0 disabled:opacity-50"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
               <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              <textarea
+                ref={inputRef}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder={
                   mode === "channel"
                     ? "Message #general"
                     : `Message @ ${selectedMember?.display_name ?? "user"}`
                 }
-                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-[#0b1c30] placeholder:text-[#94a3b8]"
+                rows={1}
+                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-[#0b1c30] placeholder:text-[#94a3b8] resize-none max-h-[120px]"
+                style={{ minHeight: "36px" }}
+                onInput={(e) => {
+                  const el = e.currentTarget;
+                  el.style.height = "auto";
+                  el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+                }}
               />
               <button
                 onClick={handleSend}
-                disabled={!inputValue.trim()}
+                disabled={(!inputValue.trim() && !pendingFile) || uploading}
                 className="p-2 bg-[#7b68ee] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               >
-                <Send className="w-4 h-4" />
+                {uploading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 }

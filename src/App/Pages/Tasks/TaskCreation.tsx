@@ -3,6 +3,8 @@ import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, Arr
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { type Priority } from "@/hooks/useTasks";
+import { toast } from "sonner";
 import {
   Avatar,
   AvatarFallback,
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Dropdown } from "@/components/shared/Dropdown"
+import { cn } from "@/lib/utils"
 
 interface Project {
   id: string;
@@ -41,6 +44,8 @@ export default function TaskCreation() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedParentTaskId, setSelectedParentTaskId] = useState<string | null>(null);
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
+  const [selectedPriority, setSelectedPriority] = useState<Priority>("none");
+  const [dueDate, setDueDate] = useState("");
 
   const navigate = useNavigate();
   const { user, currentWorkspaceId } = useAuth();
@@ -105,13 +110,28 @@ export default function TaskCreation() {
           project_id: selectedProjectId,
           parent_task_id: selectedParentTaskId,
           assignee_id: selectedAssigneeId,
+          priority: selectedPriority,
+          due_date: dueDate || null,
         }]);
 
       if (error) throw error;
+
+      if (selectedAssigneeId && selectedAssigneeId !== user?.id) {
+        await supabase.from('notifications').insert({
+          user_id: selectedAssigneeId,
+          workspace_id: currentWorkspaceId,
+          type: 'assignment',
+          title: 'You were assigned a task',
+          body: inputValue.trim(),
+          link: '/tasks',
+        });
+      }
+
+      toast.success("Task created");
       navigate('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
-      alert('Failed to create task. Please try again.');
+      toast.error("Failed to create task");
       setIsSubmitting(false);
     }
   };
@@ -270,6 +290,50 @@ export default function TaskCreation() {
                         emptyText="No task found."
                         noneLabel="No Parent Task"
                         icon={<ListChecks className="w-4 h-4 text-slate-400" />}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Priority</label>
+                      <Dropdown
+                        value={selectedPriority}
+                        onValueChange={(val) => setSelectedPriority((val ?? "none") as Priority)}
+                        options={[
+                          { value: "none", label: "None" },
+                          { value: "low", label: "Low" },
+                          { value: "medium", label: "Medium" },
+                          { value: "high", label: "High" },
+                          { value: "urgent", label: "Urgent" },
+                        ]}
+                        showSearch={false}
+                        renderTrigger={(selected) => (
+                          <div className="flex items-center gap-2">
+                            {selected && selected.value !== "none" && (
+                              <span className={cn(
+                                "w-2 h-2 rounded-full",
+                                selected.value === "urgent" && "bg-red-500",
+                                selected.value === "high" && "bg-orange-500",
+                                selected.value === "medium" && "bg-blue-500",
+                                selected.value === "low" && "bg-gray-400",
+                              )} />
+                            )}
+                            <span className={selected && selected.value !== "none" ? "text-slate-700" : "text-slate-500"}>
+                              {selected?.label ?? "No Priority"}
+                            </span>
+                          </div>
+                        )}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Due Date</label>
+                      <input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 outline-none transition-all text-slate-700"
                       />
                     </div>
                   </div>

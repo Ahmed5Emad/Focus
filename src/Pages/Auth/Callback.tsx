@@ -8,9 +8,20 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      const { searchParams } = new URL(window.location.href);
-      const code = searchParams.get('code');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/onboarding', { replace: true });
+        return;
+      }
 
+      const url = new URL(window.location.href);
+      let code = url.searchParams.get('code');
+      if (!code) {
+        const hash = url.hash;
+        const qs = hash.includes('?') ? hash.split('?')[1] : '';
+        const hashParams = new URLSearchParams(qs);
+        code = hashParams.get('code');
+      }
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {

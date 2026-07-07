@@ -1,4 +1,7 @@
-import { MoreHorizontal, CheckSquare, Calendar, Trash2, Clock } from "lucide-react";
+import { MoreHorizontal, CheckSquare, Calendar, Trash2, Clock, FileText, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { createClient } from "@/lib/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +27,33 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
+  const navigate = useNavigate();
+  const [docCount, setDocCount] = useState(0);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("documents")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", project.id)
+      .then(({ count }) => setDocCount(count ?? 0));
+  }, [project.id]);
+
+  const handleCreateDoc = async () => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("documents")
+      .insert({
+        workspace_id: project.workspace_id,
+        project_id: project.id,
+        title: "Untitled Document",
+        created_by: project.user_id,
+      })
+      .select()
+      .single();
+    if (data) navigate(`/documents/${data.id}`);
+  };
+
   const formattedDate = new Intl.DateTimeFormat("en-US", { 
     month: "short", 
     day: "numeric",
@@ -37,9 +67,11 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
   };
 
   return (
-    <div className="col-span-1 md:col-span-6 bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between hover:-translate-y-0.5 transition-transform duration-300">
+    <div className="col-span-1 md:col-span-6 bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between hover:-translate-y-0.5 transition-transform duration-300 cursor-pointer"
+      onClick={() => navigate(`/documents?project=${project.id}`)}
+    >
       <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
+        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2 mb-1">
             <h2 className="font-['Spline_Sans',sans-serif] text-[22px] leading-[1.3] font-semibold text-[#0b1c30] truncate">
               {project.title}
@@ -56,21 +88,25 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
           </span>
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
             <button className="text-[#7b7486] hover:text-[#7b68ee] transition-colors ml-2">
               <MoreHorizontal className="w-6 h-6" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onUpdate(project.id, { status: project.status === "completed" ? "active" : "completed" })}>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCreateDoc(); }}>
+              <FileText className="w-4 h-4 mr-2" />
+              New Document
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onUpdate(project.id, { status: project.status === "completed" ? "active" : "completed" }); }}>
               <CheckSquare className="w-4 h-4 mr-2" />
               {project.status === "completed" ? "Mark Active" : "Mark Completed"}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onUpdate(project.id, { status: "on_hold" })}>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onUpdate(project.id, { status: "on_hold" }); }}>
               <Clock className="w-4 h-4 mr-2" />
               Put on Hold
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(project.id)} className="text-red-600">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(project.id); }} className="text-red-600">
               <Trash2 className="w-4 h-4 mr-2" />
               Delete
             </DropdownMenuItem>
@@ -79,15 +115,23 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
       </div>
 
       <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[#64748b] font-['Inter',sans-serif] text-[13px]">
-          <Calendar className="w-4 h-4" />
-          <span>Created {formattedDate}</span>
-        </div>
-        <div className="flex -space-x-2">
-          <div className="w-7 h-7 rounded-full bg-[#7b68ee] border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">
-            {project.title.charAt(0)}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-[#64748b] font-['Inter',sans-serif] text-[13px]">
+            <Calendar className="w-4 h-4" />
+            <span>Created {formattedDate}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[#64748b] font-['Inter',sans-serif] text-[13px]">
+            <FileText className="w-4 h-4" />
+            <span>{docCount} {docCount === 1 ? "doc" : "docs"}</span>
           </div>
         </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); handleCreateDoc(); }}
+          className="p-2 rounded-lg text-[#64748b] hover:text-[#7b68ee] hover:bg-[#f5f3ff] transition-colors"
+          title="Create document in this project"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );

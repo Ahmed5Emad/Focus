@@ -126,11 +126,11 @@ export function SignupForm({
           </Field>
           <FieldSeparator className="my-4 text-gray-400">Or continue with</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple' }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
                 <img src={appleIcon} alt="" className="w-5 h-5 mr-2" />
                 Apple
               </Button>
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google' }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
                 <img src={googleIcon} alt="" className="w-5 h-5 mr-2" />
                 Google
               </Button>

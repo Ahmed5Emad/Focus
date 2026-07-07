@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
@@ -17,7 +17,6 @@ const formatTime = (seconds: number) => {
 };
 
 export function AppLayout() {
-  const navigate = useNavigate();
   const { isActive, isPaused, activeSession, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
   const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
 
@@ -25,7 +24,7 @@ export function AppLayout() {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        navigate('/tasks/new');
+        document.querySelector<HTMLButtonElement>('[data-search-trigger]')?.click();
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'd' && isActive) {
         e.preventDefault();
@@ -38,7 +37,7 @@ export function AppLayout() {
     
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [navigate, isActive, isDistractionModalOpen]);
+  }, [isActive, isDistractionModalOpen]);
 
   return (
     <div 
