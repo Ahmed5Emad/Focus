@@ -14,7 +14,6 @@ import { Table, TableRow, TableCell, TableHeader } from "@tiptap/extension-table
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { CollaborationCursor } from "./CollaborationCursor";
-import { HocuspocusProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
 import { useAuth } from "@/contexts/AuthContext";
 import { Toolbar } from "./Toolbar";
@@ -36,6 +35,44 @@ function hashUserId(id: string): number {
   return Math.abs(hash);
 }
 
+function uint8ToBase64(uint8: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < uint8.length; i++) {
+    binary += String.fromCharCode(uint8[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToUint8(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function uint8ToHex(uint8: Uint8Array): string {
+  return Array.from(uint8)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function hexToUint8(hex: string): Uint8Array {
+  const clean = hex.startsWith("\\x") ? hex.slice(2) : hex;
+  const bytes = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < clean.length; i += 2) {
+    bytes[i / 2] = parseInt(clean.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+interface AwarenessState {
+  user: { name: string; color: string };
+  cursor: { anchor: number; head: number | null } | null;
+  lastSeen: number;
+}
+
 interface EditorProps {
   documentId: string;
   documentTitle: string;
@@ -43,28 +80,87 @@ interface EditorProps {
 }
 
 export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps) {
-  const { user, session } = useAuth();
+  const { user } = useAuth();
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Anonymous";
   const userColorIndex = user ? hashUserId(user.id) % USER_COLORS.length : 0;
   const userColor = USER_COLORS[userColorIndex];
 
-  const token = session?.access_token || "";
-
   const ydoc = useMemo(() => new Y.Doc(), [documentId]);
-
-  const provider = useMemo(() => {
-    if (!token) return null;
-    return new HocuspocusProvider({
-      url: import.meta.env.VITE_HOCUSPOCUS_URL || "ws://localhost:1234",
-      name: documentId,
-      document: ydoc,
-      token,
-    });
-  }, [token, documentId, ydoc]);
-
-  const supabaseRef = useRef(createClient());
   const dirtyRef = useRef(false);
+  const channelRef = useRef<ReturnType<typeof supabase.channel>>(null!);
+  const awarenessRef = useRef<Map<number, AwarenessState>>(new Map());
+
+  useEffect(() => {
+    let destroyed = false;
+
+    supabase
+      .from("documents")
+      .select("yjs_snapshot")
+      .eq("id", documentId)
+      .single()
+      .then(({ data }) => {
+        if (destroyed || !data?.yjs_snapshot) return;
+        try {
+          Y.applyUpdate(ydoc, hexToUint8(data.yjs_snapshot as string));
+        } catch {
+          ydoc.destroy();
+        }
+      });
+
+    const channel = supabase.channel(`document-${documentId}`);
+
+    channel.on("broadcast", { event: "yjs-update" }, ({ payload }) => {
+      if (destroyed) return;
+      try {
+        Y.applyUpdate(ydoc, base64ToUint8(payload.data));
+      } catch (e) {
+        console.error("Remote sync error:", e);
+      }
+    });
+
+    channel.on("broadcast", { event: "awareness" }, ({ payload }) => {
+      if (destroyed || payload.clientId === ydoc.clientID) return;
+      awarenessRef.current.set(payload.clientId, { ...payload.state, lastSeen: Date.now() });
+    });
+
+    channel.subscribe();
+    channelRef.current = channel;
+
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      awarenessRef.current.forEach((state, id) => {
+        if (now - state.lastSeen > 10000) {
+          awarenessRef.current.delete(id);
+        }
+      });
+    }, 10000);
+
+    return () => {
+      destroyed = true;
+      clearInterval(cleanup);
+      supabase.removeChannel(channel);
+    };
+  }, [documentId, ydoc, supabase]);
+
+  const broadcastAwareness = useCallback(
+    (cursor: { anchor: number; head: number | null } | null) => {
+      channelRef.current?.send({
+        type: "broadcast",
+        event: "awareness",
+        payload: {
+          clientId: ydoc.clientID,
+          state: {
+            user: { name: userName, color: userColor },
+            cursor,
+          },
+        },
+      });
+    },
+    [ydoc, userName, userColor]
+  );
 
   const editor = useEditor({
     extensions: [
@@ -76,13 +172,12 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
       }),
       Collaboration.configure({
         document: ydoc,
+        field: "default",
       }),
-      provider && CollaborationCursor.configure({
-        provider,
-        user: {
-          name: userName,
-          color: userColor,
-        },
+      CollaborationCursor.configure({
+        awarenessStates: awarenessRef.current,
+        localClientId: ydoc.clientID,
+        user: { name: userName, color: userColor },
       }),
       Placeholder.configure({
         placeholder: "Start writing...",
@@ -102,7 +197,7 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
       TableCell,
       TableHeader,
       CodeBlockLowlight.configure({ lowlight }),
-    ].filter((e): e is NonNullable<typeof e> => e != null),
+    ],
     editorProps: {
       attributes: {
         class: "prose prose-sm max-w-none focus:outline-none min-h-[500px] px-8 py-6",
@@ -112,55 +207,61 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
 
   useEffect(() => {
     if (!editor) return;
-    const fragment = ydoc.getXmlFragment("default");
-    if (fragment.length > 0) return;
-    supabaseRef.current
-      .from("documents")
-      .select("content")
-      .eq("id", documentId)
-      .single()
-      .then(({ data }) => {
-        if (fragment.length > 0) return;
-        if (data?.content && typeof data.content === "object" && Object.keys(data.content).length > 0) {
-          editor.commands.setContent(data.content);
-        }
-      });
-  }, [editor, ydoc, documentId]);
+    const onUpdate = () => { dirtyRef.current = true; };
+    const onSelectionUpdate = () => {
+      const { from, to } = editor.state.selection;
+      broadcastAwareness(
+        from === to ? { anchor: from, head: null } : { anchor: from, head: to }
+      );
+    };
+    editor.on("update", onUpdate);
+    editor.on("selectionUpdate", onSelectionUpdate);
+    return () => {
+      editor.off("update", onUpdate);
+      editor.off("selectionUpdate", onSelectionUpdate);
+    };
+  }, [editor, broadcastAwareness]);
 
   useEffect(() => {
-    const onUpdate = () => { dirtyRef.current = true; };
+    const onUpdate = (_update: Uint8Array, origin: unknown) => {
+      if (origin === "remote") return;
+      channelRef.current?.send({
+        type: "broadcast",
+        event: "yjs-update",
+        payload: { data: uint8ToBase64(_update) },
+      });
+    };
     ydoc.on("update", onUpdate);
-    return () => { ydoc.off("update", onUpdate); };
+    return () => ydoc.off("update", onUpdate);
   }, [ydoc]);
 
   useEffect(() => {
-    if (!token || !editor) return;
+    if (!editor) return;
     const interval = setInterval(async () => {
       if (!dirtyRef.current) return;
       dirtyRef.current = false;
       try {
-        await supabaseRef.current
+        const yjsSnapshot = `\\x${uint8ToHex(Y.encodeStateAsUpdate(ydoc))}`;
+        await supabase
           .from("documents")
           .update({
             content: editor.getJSON(),
+            yjs_snapshot: yjsSnapshot,
             updated_at: new Date().toISOString(),
           })
           .eq("id", documentId);
-      } catch (err) {
-        console.error("Auto-save failed:", err);
+      } catch {
         dirtyRef.current = true;
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [token, editor, documentId]);
+  }, [editor, ydoc, documentId, supabase]);
 
   useEffect(() => {
     return () => {
-      provider?.disconnect();
-      provider?.destroy();
       ydoc.destroy();
     };
-  }, [provider, ydoc]);
+  }, [ydoc]);
 
   const exportAsMarkdown = useCallback(async () => {
     if (!editor) return;
