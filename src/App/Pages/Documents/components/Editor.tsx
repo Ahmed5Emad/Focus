@@ -88,6 +88,7 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
   const userColorIndex = user ? hashUserId(user.id) % USER_COLORS.length : 0;
   const userColor = USER_COLORS[userColorIndex];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const ydoc = useMemo(() => new Y.Doc(), [documentId]);
   const dirtyRef = useRef(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel>>(null!);

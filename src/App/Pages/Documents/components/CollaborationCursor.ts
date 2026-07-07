@@ -98,7 +98,9 @@ function buildDecorations(
           return el;
         })
       );
-    } catch {}
+    } catch {
+      /* empty — skip malformed cursor state */
+    }
   });
 
   return DecorationSet.create(state.doc, decorations);

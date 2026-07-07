@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, ListChecks, Layout, Trophy, Search } from "lucide-react";
 import { Command as CommandPrimitive } from "cmdk";
@@ -37,29 +37,27 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<SearchItem[]>([]);
 
-  const fetchItems = useCallback(async () => {
-    if (!currentWorkspaceId) return;
-
-    const [tasksRes, goalsRes, projectsRes, docsRes] = await Promise.all([
-      supabase.from("tasks").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
-      supabase.from("goals").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
-      supabase.from("projects").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
-      supabase.from("documents").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
-    ]);
-
-    const results: SearchItem[] = [
-      ...(tasksRes.data?.map((t) => ({ id: t.id, title: t.title, type: "task" as const, url: "/tasks" })) ?? []),
-      ...(goalsRes.data?.map((g) => ({ id: g.id, title: g.title, type: "goal" as const, url: "/goals" })) ?? []),
-      ...(projectsRes.data?.map((p) => ({ id: p.id, title: p.title, type: "project" as const, url: "/projects" })) ?? []),
-      ...(docsRes.data?.map((d) => ({ id: d.id, title: d.title, type: "document" as const, url: `/documents/${d.id}` })) ?? []),
-    ];
-
-    setItems(results);
-  }, [currentWorkspaceId, supabase]);
-
   useEffect(() => {
-    if (open) fetchItems();
-  }, [open, fetchItems]);
+    if (!open || !currentWorkspaceId) return;
+
+    const fetchItems = async () => {
+      const [tasksRes, goalsRes, projectsRes, docsRes] = await Promise.all([
+        supabase.from("tasks").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
+        supabase.from("goals").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
+        supabase.from("projects").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
+        supabase.from("documents").select("id, title").eq("workspace_id", currentWorkspaceId).limit(20),
+      ]);
+
+      setItems([
+        ...(tasksRes.data?.map((t) => ({ id: t.id, title: t.title, type: "task" as const, url: "/tasks" })) ?? []),
+        ...(goalsRes.data?.map((g) => ({ id: g.id, title: g.title, type: "goal" as const, url: "/goals" })) ?? []),
+        ...(projectsRes.data?.map((p) => ({ id: p.id, title: p.title, type: "project" as const, url: "/projects" })) ?? []),
+        ...(docsRes.data?.map((d) => ({ id: d.id, title: d.title, type: "document" as const, url: `/documents/${d.id}` })) ?? []),
+      ]);
+    };
+
+    fetchItems();
+  }, [open, currentWorkspaceId, supabase]);
 
   const handleSelect = (item: SearchItem) => {
     onOpenChange(false);

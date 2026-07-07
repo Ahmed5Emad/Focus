@@ -48,10 +48,7 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
   }, [currentWorkspaceId, open, supabase]);
 
   useEffect(() => {
-    if (!currentTaskId || !currentWorkspaceId) {
-      setCurrentTask(null);
-      return;
-    }
+    if (!currentTaskId || !currentWorkspaceId) return;
     supabase
       .from("tasks")
       .select("id, title, status, projects(title)")

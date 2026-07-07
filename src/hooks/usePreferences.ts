@@ -28,7 +28,9 @@ function loadPreferences(): Preferences {
       const parsed = JSON.parse(stored);
       return { ...defaults, ...parsed };
     }
-  } catch {}
+  } catch {
+    /* empty — invalid stored preferences */
+  }
   return defaults;
 }
 

@@ -48,6 +48,7 @@ export default function ArchivePage() {
   useEffect(() => {
     if (!currentWorkspaceId) return;
     fetchArchived();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);
 
   const fetchArchived = async () => {

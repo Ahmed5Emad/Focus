@@ -46,6 +46,7 @@ export default function Management() {
   useEffect(() => {
     if (!currentWorkspaceId) return;
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);
 
   const fetchData = async () => {
