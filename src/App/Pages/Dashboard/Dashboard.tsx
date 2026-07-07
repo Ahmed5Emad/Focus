@@ -8,7 +8,7 @@ import {
   CheckCircle2,
   Check,
   ArrowRight,
-  AlertCircle,
+
   Target,
   ListTodo,
 } from "lucide-react";
@@ -122,7 +122,7 @@ export default function Dashboard() {
             .select("id, title, status, priority, due_date")
             .eq("workspace_id", currentWorkspaceId)
             .in("status", ["todo", "in_progress"])
-            .order("due_date", { ascending: true, nullsLast: true })
+            .order("due_date", { ascending: true, nullsFirst: false })
             .limit(7),
           supabase
             .from("goals")
