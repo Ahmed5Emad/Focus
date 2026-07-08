@@ -160,13 +160,19 @@ export function useTasks() {
   const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'todo' ? 'in_progress' : currentStatus === 'in_progress' ? 'done' : 'todo';
     try {
+      const updates: Record<string, string | null> = { status: newStatus };
+      if (newStatus === 'done') {
+        updates.completed_at = new Date().toISOString();
+      } else if (currentStatus === 'done') {
+        updates.completed_at = null;
+      }
       const { error } = await supabase
         .from('tasks')
-        .update({ status: newStatus })
+        .update(updates)
         .eq('id', taskId);
 
       if (error) throw error;
-      setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+      setTasks(tasks.map(t => t.id === taskId ? { ...t, ...updates } : t));
     } catch (error) {
       console.error('Error updating task status:', error);
     }
@@ -174,9 +180,18 @@ export function useTasks() {
 
   const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority }>) => {
     try {
+      const dbUpdates: Record<string, string | null> = { ...updates };
+      if (updates.status === 'done') {
+        dbUpdates.completed_at = new Date().toISOString();
+      } else if (updates.status && updates.status !== 'done') {
+        const currentTask = tasks.find(t => t.id === taskId);
+        if (currentTask?.status === 'done') {
+          dbUpdates.completed_at = null;
+        }
+      }
       const { error } = await supabase
         .from('tasks')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', taskId);
 
       if (error) throw error;
@@ -196,7 +211,7 @@ export function useTasks() {
         if (t.id !== taskId) return t;
         return {
           ...t,
-          ...updates,
+          ...dbUpdates,
           project_id: updates.project_id !== undefined ? updates.project_id : t.project_id,
           assignee: updates.assignee_id !== undefined ? newAssignee : t.assignee,
         } as Task;

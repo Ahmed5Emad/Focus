@@ -37,7 +37,6 @@ interface DashboardStats {
   tasks_completed: number;
   tasks_total: number;
   flow_score_change: number;
-  today_total_seconds: number;
 }
 
 interface PriorityTask {
@@ -141,10 +140,26 @@ export default function Dashboard() {
             .in("status", ["completed", "abandoned"]),
         ]);
 
-      if (!statsResult.error) setStats(statsResult.data);
-      if (!tasksResult.error) setPriorityTasks(tasksResult.data || []);
-      if (!goalsResult.error) setActiveGoals(goalsResult.data || []);
-      if (!weeklyResult.error) setWeeklySessions(weeklyResult.data || []);
+      if (statsResult.error) {
+        console.error("Error fetching dashboard stats:", statsResult.error);
+      } else {
+        setStats(statsResult.data);
+      }
+      if (tasksResult.error) {
+        console.error("Error fetching priority tasks:", tasksResult.error);
+      } else {
+        setPriorityTasks(tasksResult.data || []);
+      }
+      if (goalsResult.error) {
+        console.error("Error fetching active goals:", goalsResult.error);
+      } else {
+        setActiveGoals(goalsResult.data || []);
+      }
+      if (weeklyResult.error) {
+        console.error("Error fetching weekly sessions:", weeklyResult.error);
+      } else {
+        setWeeklySessions(weeklyResult.data || []);
+      }
 
       setIsLoading(false);
     };
@@ -173,7 +188,7 @@ export default function Dashboard() {
   const completeTask = async (taskId: string) => {
     const { error } = await supabase
       .from("tasks")
-      .update({ status: "done" })
+      .update({ status: "done", completed_at: new Date().toISOString() })
       .eq("id", taskId);
     if (!error) {
       setPriorityTasks((prev) => prev.filter((t) => t.id !== taskId));
@@ -188,7 +203,7 @@ export default function Dashboard() {
         <div>
           <h1 className="page-title mb-1">
             {greeting}
-            {user?.user_metadata?.display_name
+            {typeof user?.user_metadata?.display_name === "string"
               ? `, ${user.user_metadata.display_name.split(" ")[0]}`
               : ""}
             .
@@ -313,7 +328,7 @@ export default function Dashboard() {
                   <Hourglass className="w-4.5 h-4.5" />
                 </div>
               </div>
-              <div className="flex gap-1.5 items-end h-8">
+              <div className="flex gap-1.5 items-end h-12">
                 {weeklyChart.map((day, i) => {
                   const pct = (day.seconds / maxWeeklySeconds) * 100;
                   const isToday = i === weeklyChart.length - 1;
@@ -324,7 +339,7 @@ export default function Dashboard() {
                     >
                       <div
                         className={`w-full rounded-t-[2px] transition-all duration-500 ${isToday ? "bg-[#10b981] shadow-[0px_2px_10px_0px_rgba(16,185,129,0.2)]" : "bg-slate-100"}`}
-                        style={{ height: `${Math.max(pct, 4)}%` }}
+                        style={{ height: `${Math.max(pct, 8)}%` }}
                       />
                       <span
                         className={`text-[9px] font-medium ${isToday ? "text-[#10b981]" : "text-slate-400"}`}

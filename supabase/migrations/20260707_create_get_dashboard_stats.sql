@@ -15,14 +15,14 @@ BEGIN
   FROM focus_sessions
   WHERE workspace_id = p_workspace_id
     AND user_id = v_user_id
-    AND status = 'completed'
+    AND status IN ('completed', 'abandoned')
     AND start_time::date = CURRENT_DATE;
 
   SELECT COALESCE(AVG(flow_score), 0) INTO yesterday_flow
   FROM focus_sessions
   WHERE workspace_id = p_workspace_id
     AND user_id = v_user_id
-    AND status = 'completed'
+    AND status IN ('completed', 'abandoned')
     AND start_time::date = CURRENT_DATE - INTERVAL '1 day';
 
   SELECT json_build_object(
@@ -42,19 +42,10 @@ BEGIN
          AND start_time::date = CURRENT_DATE),
       0
     ),
-    'today_total_seconds', COALESCE(
-      (SELECT SUM(actual_duration_seconds) FROM focus_sessions
-       WHERE workspace_id = p_workspace_id
-         AND user_id = v_user_id
-         AND status IN ('completed', 'abandoned', 'active')
-         AND start_time::date = CURRENT_DATE),
-      0
-    ),
     'tasks_completed', (
       SELECT COUNT(*) FROM tasks
       WHERE workspace_id = p_workspace_id
         AND status = 'done'
-        AND created_at::date = CURRENT_DATE
     ),
     'tasks_total', (
       SELECT COUNT(*) FROM tasks
