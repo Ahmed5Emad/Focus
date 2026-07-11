@@ -96,6 +96,16 @@ export function useDirectMessages(otherUserId: string | null) {
             setMessages((prev) => [...prev, msg]);
             if (msg.sender_id !== user.id) {
               supabase.from("direct_messages").update({ status: "delivered" }).eq("id", msg.id);
+              supabase.from("notifications").insert({
+                user_id: user.id,
+                workspace_id: currentWorkspaceId,
+                type: "comment",
+                title: "New direct message",
+                body: msg.content.slice(0, 120),
+                link: "/chat",
+              }).then(({ error }) => {
+                if (error) console.error("Error creating notification:", error);
+              });
             }
           } else if (payload.eventType === "UPDATE" && msg && involvesConversation(msg)) {
             setMessages((prev) =>

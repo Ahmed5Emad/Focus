@@ -19,6 +19,7 @@ export interface Task {
   projects?: { title: string };
   goals?: { title: string };
   assignee?: { display_name: string | null; avatar_url: string | null } | null;
+  is_archived?: boolean;
 }
 
 export interface Project {
@@ -106,6 +107,7 @@ export function useTasks() {
           .from('tasks')
           .select('*, projects(title), goals!tasks_goal_id_fkey(title)')
           .eq('workspace_id', currentWorkspaceId)
+          .is('is_archived', false)
           .order('created_at', { ascending: false });
 
         if (tasksError) throw tasksError;
@@ -245,8 +247,9 @@ export function useTasks() {
       const matchesProject = projectFilter === "all" || task.project_id === projectFilter;
       const matchesGoal = goalFilter === "all" || task.goal_id === goalFilter;
       const matchesAssignee = assigneeFilter === "all" || task.assignee_id === assigneeFilter;
+      const notArchived = !task.is_archived;
 
-      return matchesSearch && matchesStatus && matchesProject && matchesGoal && matchesAssignee;
+      return matchesSearch && matchesStatus && matchesProject && matchesGoal && matchesAssignee && notArchived;
     })
     .sort((a, b) => {
       if (sortBy === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();

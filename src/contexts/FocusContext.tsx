@@ -36,6 +36,8 @@ interface FocusContextType {
   resumeSession: () => Promise<void>;
   stopSession: () => Promise<void>;
   logDistraction: (type: 'internal' | 'external', severity: 'minor' | 'major') => Promise<void>;
+  deleteSession: (sessionId: string) => Promise<boolean>;
+  updateSession: (sessionId: string, updates: Partial<{ task_id: string | null; status: string; actual_duration_seconds: number; flow_score: number | null }>) => Promise<boolean>;
 }
 
 const FocusContext = createContext<FocusContextType | undefined>(undefined);
@@ -57,7 +59,9 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       .from('focus_sessions')
       .select('*')
       .eq('user_id', user.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'paused'])
+      .order('start_time', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (error) {
@@ -69,14 +73,19 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       const session = data as FocusSession;
       setActiveSession(session);
       
-      const startTime = new Date(session.start_time).getTime();
-      const now = new Date().getTime();
-      setSecondsElapsed(Math.floor((now - startTime) / 1000));
+      if (session.status === 'paused') {
+        setIsPaused(true);
+        setSecondsElapsed(session.actual_duration_seconds || 0);
+      } else {
+        setIsPaused(false);
+        const startTime = new Date(session.start_time).getTime();
+        const now = new Date().getTime();
+        setSecondsElapsed(Math.floor((now - startTime) / 1000));
+      }
     }
   }, [user, supabase]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchActiveSession();
   }, [fetchActiveSession]);
 
@@ -87,7 +96,6 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       }, 1000);
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (!activeSession) setSecondsElapsed(0);
     }
 
@@ -148,7 +156,10 @@ export function FocusProvider({ children }: { children: ReactNode }) {
 
     const { error } = await supabase
       .from('focus_sessions')
-      .update({ status: 'paused' })
+      .update({ 
+        status: 'paused',
+        actual_duration_seconds: secondsElapsed
+      })
       .eq('id', activeSession.id);
 
     if (error) {
@@ -163,9 +174,15 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   const resumeSession = async () => {
     if (!activeSession || activeSession.status !== 'paused') return;
 
+    const newStartTime = new Date(Date.now() - secondsElapsed * 1000).toISOString();
+
     const { error } = await supabase
       .from('focus_sessions')
-      .update({ status: 'active', heartbeat_at: new Date().toISOString() })
+      .update({ 
+        status: 'active', 
+        heartbeat_at: new Date().toISOString(),
+        start_time: newStartTime
+      })
       .eq('id', activeSession.id);
 
     if (error) {
@@ -173,7 +190,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setActiveSession(prev => prev ? { ...prev, status: 'active' } : null);
+    setActiveSession(prev => prev ? { ...prev, status: 'active', start_time: newStartTime } : null);
     setIsPaused(false);
   };
 
@@ -231,6 +248,50 @@ export function FocusProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteSession = async (sessionId: string) => {
+    try {
+      const { error: logsError } = await supabase
+        .from('distraction_logs')
+        .delete()
+        .eq('session_id', sessionId);
+
+      if (logsError) throw logsError;
+
+      const { error } = await supabase
+        .from('focus_sessions')
+        .delete()
+        .eq('id', sessionId);
+
+      if (error) throw error;
+
+      if (activeSession?.id === sessionId) {
+        setActiveSession(null);
+        setIsPaused(false);
+        setSecondsElapsed(0);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      return false;
+    }
+  };
+
+  const updateSession = async (sessionId: string, updates: Partial<{ task_id: string | null; status: string; actual_duration_seconds: number; flow_score: number | null }>) => {
+    try {
+      const { error } = await supabase
+        .from('focus_sessions')
+        .update(updates)
+        .eq('id', sessionId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error updating session:', error);
+      return false;
+    }
+  };
+
   const value = {
     activeSession,
     isActive: !!activeSession,
@@ -241,6 +302,8 @@ export function FocusProvider({ children }: { children: ReactNode }) {
     resumeSession,
     stopSession,
     logDistraction,
+    deleteSession,
+    updateSession,
   };
 
   return <FocusContext.Provider value={value}>{children}</FocusContext.Provider>;

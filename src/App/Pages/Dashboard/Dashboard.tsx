@@ -111,55 +111,67 @@ export default function Dashboard() {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const [statsResult, tasksResult, goalsResult, weeklyResult] =
-        await Promise.all([
-          supabase.rpc("get_dashboard_stats", {
-            p_workspace_id: currentWorkspaceId,
-          }),
-          supabase
-            .from("tasks")
-            .select("id, title, status, priority, due_date")
-            .eq("workspace_id", currentWorkspaceId)
-            .in("status", ["todo", "in_progress"])
-            .order("due_date", { ascending: true, nullsFirst: false })
-            .limit(7),
-          supabase
-            .from("goals")
-            .select("*")
-            .eq("workspace_id", currentWorkspaceId)
-            .eq("user_id", user.id)
-            .eq("is_complete", false)
-            .order("progress", { ascending: true })
-            .limit(4),
-          supabase
-            .from("focus_sessions")
-            .select("actual_duration_seconds, start_time")
-            .eq("workspace_id", currentWorkspaceId)
-            .eq("user_id", user.id)
-            .gte("start_time", sevenDaysAgo.toISOString())
-            .in("status", ["completed", "abandoned"]),
-        ]);
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
 
-      if (statsResult.error) {
-        console.error("Error fetching dashboard stats:", statsResult.error);
-      } else {
-        setStats(statsResult.data);
+      const [
+        statsResult,
+        tasksResult,
+        goalsResult,
+        weeklyResult,
+        totalTasksCountResult,
+        completedTasksCountResult,
+      ] = await Promise.all([
+        supabase.rpc("get_dashboard_stats", {
+          p_workspace_id: currentWorkspaceId,
+        }),
+        supabase
+          .from("tasks")
+          .select("id, title, status, priority, due_date")
+          .eq("workspace_id", currentWorkspaceId)
+          .is("is_archived", false)
+          .in("status", ["todo", "in_progress"])
+          .order("due_date", { ascending: true, nullsFirst: false })
+          .limit(7),
+        supabase
+          .from("goals")
+          .select("*")
+          .eq("workspace_id", currentWorkspaceId)
+          .eq("user_id", user.id)
+          .eq("is_complete", false)
+          .order("progress", { ascending: true })
+          .limit(4),
+        supabase
+          .from("focus_sessions")
+          .select("actual_duration_seconds, start_time")
+          .eq("workspace_id", currentWorkspaceId)
+          .eq("user_id", user.id)
+          .gte("start_time", sevenDaysAgo.toISOString())
+          .in("status", ["completed", "abandoned"]),
+        supabase
+          .from("tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("workspace_id", currentWorkspaceId)
+          .is("is_archived", false),
+        supabase
+          .from("tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("workspace_id", currentWorkspaceId)
+          .eq("status", "done")
+          .is("is_archived", false)
+          .gte("created_at", todayStart.toISOString())
+      ]);
+
+      if (!statsResult.error) {
+        setStats({
+          ...statsResult.data,
+          tasks_total: totalTasksCountResult.count ?? statsResult.data.tasks_total,
+          tasks_completed: completedTasksCountResult.count ?? statsResult.data.tasks_completed,
+        });
       }
-      if (tasksResult.error) {
-        console.error("Error fetching priority tasks:", tasksResult.error);
-      } else {
-        setPriorityTasks(tasksResult.data || []);
-      }
-      if (goalsResult.error) {
-        console.error("Error fetching active goals:", goalsResult.error);
-      } else {
-        setActiveGoals(goalsResult.data || []);
-      }
-      if (weeklyResult.error) {
-        console.error("Error fetching weekly sessions:", weeklyResult.error);
-      } else {
-        setWeeklySessions(weeklyResult.data || []);
-      }
+      if (!tasksResult.error) setPriorityTasks(tasksResult.data || []);
+      if (!goalsResult.error) setActiveGoals(goalsResult.data || []);
+      if (!weeklyResult.error) setWeeklySessions(weeklyResult.data || []);
 
       setIsLoading(false);
     };

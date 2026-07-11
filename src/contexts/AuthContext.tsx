@@ -74,8 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!currentWorkspaceId || !isValid) {
         setCurrentWorkspaceId(workspaces[0].id);
       }
+    } else if (!isLoading && currentWorkspaceId) {
+      setCurrentWorkspaceId(null);
     }
-  }, [workspaces, currentWorkspaceId, setCurrentWorkspaceId]);
+  }, [workspaces, currentWorkspaceId, setCurrentWorkspaceId, isLoading]);
 
   useEffect(() => {
     const initializeAuth = async () => {

@@ -369,8 +369,12 @@ export default function Tasks() {
                       <DropdownMenuItem
                         className="text-slate-600 cursor-pointer"
                         onClick={async () => {
-                          await supabase.from("tasks").update({ is_archived: true, archived_at: new Date().toISOString() }).eq("id", task.id);
-                          toast.success("Task archived");
+                          const success = await updateTask(task.id, { is_archived: true, archived_at: new Date().toISOString() } as any);
+                          if (success) {
+                            toast.success("Task archived");
+                          } else {
+                            toast.error("Failed to archive task");
+                          }
                         }}
                       >
                         <Archive className="w-4 h-4 mr-2" />

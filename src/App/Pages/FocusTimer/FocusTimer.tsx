@@ -2,13 +2,23 @@ import { useEffect, useState } from 'react';
 import { useFocus } from '@/contexts/FocusContext';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
+import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2, MoreHorizontal, Pencil, Trash2, Folder } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Dropdown } from "@/components/shared/Dropdown";
+import { toast } from "sonner";
+import { SessionEditDialog } from "./components/SessionEditDialog";
 
 interface SessionHistory {
   id: string;
@@ -40,8 +50,8 @@ const formatTime = (seconds: number) => {
 };
 
 export default function FocusTimer() {
-  const { activeSession, isActive, isPaused, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
-  const { user } = useAuth();
+  const { activeSession, isActive, isPaused, secondsElapsed, startSession, pauseSession, resumeSession, stopSession, logDistraction, deleteSession, updateSession } = useFocus();
+  const { user, currentWorkspaceId } = useAuth();
   const [supabase] = useState(() => createClient());
   
   const [history, setHistory] = useState<SessionHistory[]>([]);
@@ -116,6 +126,81 @@ export default function FocusTimer() {
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  const [editSession, setEditSession] = useState<SessionHistory | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [allTasks, setAllTasks] = useState<{ id: string; title: string }[]>([]);
+  const [startTaskId, setStartTaskId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!currentWorkspaceId) return;
+    const fetchTasks = async () => {
+      const { data } = await supabase
+        .from("tasks")
+        .select("id, title")
+        .eq("workspace_id", currentWorkspaceId)
+        .order("created_at", { ascending: false });
+      setAllTasks(data ?? []);
+    };
+    fetchTasks();
+  }, [currentWorkspaceId, supabase]);
+
+  const handleEdit = (session: SessionHistory) => {
+    setEditSession(session);
+    setEditOpen(true);
+  };
+
+  const handleDeleteClick = (sessionId: string) => {
+    setDeleteTargetId(sessionId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetId) return;
+    const success = await deleteSession(deleteTargetId);
+    if (success) {
+      setHistory((prev) => prev.filter((s) => s.id !== deleteTargetId));
+      toast.success("Session deleted");
+    } else {
+      toast.error("Failed to delete session");
+    }
+    setDeleteConfirmOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const handleSaveEdit = async (sessionId: string, updates: { task_id: string | null; status: string; actual_duration_seconds: number }) => {
+    const success = await updateSession(sessionId, updates);
+    if (success) {
+      const task = updates.task_id ? allTasks.find((t) => t.id === updates.task_id) : null;
+      setHistory((prev) =>
+        prev.map((s) =>
+          s.id === sessionId
+            ? { ...s, ...updates, tasks: task ? { title: task.title } : null }
+            : s
+        )
+      );
+    }
+    return success;
+  };
+
+  const handleAssignTask = async (sessionId: string, taskId: string | null) => {
+    const success = await updateSession(sessionId, { task_id: taskId });
+    if (success) {
+      const task = taskId ? allTasks.find((t) => t.id === taskId) : null;
+      setHistory((prev) =>
+        prev.map((s) =>
+          s.id === sessionId
+            ? { ...s, task_id: taskId, tasks: task ? { title: task.title } : null }
+            : s
+        )
+      );
+      toast.success(task ? "Task assigned" : "Task unassigned");
+    } else {
+      toast.error("Failed to assign task");
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="flex flex-col gap-2 pt-6">
@@ -172,9 +257,33 @@ export default function FocusTimer() {
               00:00
             </div>
             
-            <p className="text-slate-500 text-center max-w-md mb-8">
-              Start a session from your Tasks or Dashboard to begin tracking your deep work.
-            </p>
+            <div className="flex flex-col items-center gap-4 mb-8 w-full max-w-xs">
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Select Task</label>
+                <Dropdown
+                  value={startTaskId}
+                  onValueChange={setStartTaskId}
+                  options={allTasks.map((t) => ({ value: t.id, label: t.title }))}
+                  placeholder="Choose a task to focus on..."
+                  searchPlaceholder="Search tasks..."
+                  emptyText="No task found."
+                  noneLabel="No Task (Free Focus)"
+                  icon={<Folder className="w-4 h-4 text-slate-400" />}
+                />
+              </div>
+              <Button
+                onClick={async () => {
+                  if (!currentWorkspaceId) return;
+                  await startSession(startTaskId, currentWorkspaceId);
+                }}
+                className="btn-primary w-full"
+              >
+                <Play className="w-4 h-4" />
+                <span className="font-semibold tracking-wide uppercase text-[12px]">
+                  {startTaskId ? "Start Focus Session" : "Start Free Focus"}
+                </span>
+              </Button>
+            </div>
           </>
         )}
       </div>
@@ -294,9 +403,21 @@ export default function FocusTimer() {
                     </thead>
                     <tbody>
                       {history.map(session => (
-                        <tr key={session.id} className="border-b border-slate-100 last:border-0">
+                        <tr key={session.id} className="border-b border-slate-100 last:border-0 group">
                           <td className="py-4 text-sm font-medium text-slate-900">
-                            {session.tasks?.title ?? (session.task_id ? 'Task session' : 'Unassigned Task')}
+                            <div className="flex items-center gap-2">
+                              <Dropdown
+                                value={session.task_id}
+                                onValueChange={(val) => handleAssignTask(session.id, val)}
+                                options={allTasks.map((t) => ({ value: t.id, label: t.title }))}
+                                placeholder="Unassigned"
+                                searchPlaceholder="Search tasks..."
+                                emptyText="No task found."
+                                noneLabel="Unassigned"
+                                icon={<Folder className="w-3.5 h-3.5 text-slate-400" />}
+                                triggerClassName="border-0 bg-transparent hover:bg-slate-50 px-1 py-0 h-auto text-sm font-medium text-slate-900"
+                              />
+                            </div>
                           </td>
                           <td className="py-4 text-sm text-slate-500">
                             {new Date(session.start_time).toLocaleDateString()}
@@ -315,13 +436,42 @@ export default function FocusTimer() {
                             )}
                           </td>
                           <td className="py-4">
-                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${
-                              session.status === 'completed' ? 'bg-[#f0fdf4] text-cu-green' :
-                              session.status === 'active' ? 'bg-[#f5f3ff] text-cu-purple' :
-                              'bg-slate-100 text-slate-500'
-                            }`}>
-                              {session.status}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${
+                                session.status === 'completed' ? 'bg-[#f0fdf4] text-cu-green' :
+                                session.status === 'active' ? 'bg-[#f5f3ff] text-cu-purple' :
+                                'bg-slate-100 text-slate-500'
+                              }`}>
+                                {session.status}
+                              </span>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <MoreHorizontal className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44 rounded-xl">
+                                  <DropdownMenuItem
+                                    className="text-slate-600 cursor-pointer"
+                                    onClick={() => handleEdit(session)}
+                                  >
+                                    <Pencil className="w-4 h-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-600 cursor-pointer"
+                                    onClick={() => handleDeleteClick(session.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -333,6 +483,26 @@ export default function FocusTimer() {
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      <SessionEditDialog
+        key={editSession?.id}
+        session={editSession}
+        open={editOpen}
+        onOpenChange={(open) => {
+          setEditOpen(open);
+          if (!open) setEditSession(null);
+        }}
+        onSave={handleSaveEdit}
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Session"
+        description="Are you sure you want to delete this session? This cannot be undone."
+        confirmLabel="Delete"
+      />
     </div>
   );
 }

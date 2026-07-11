@@ -397,26 +397,28 @@ export default function Chat() {
               )}
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-600"
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-lg">
-                <DropdownMenuItem
-                  className="cursor-pointer text-sm text-red-600 focus:text-red-600"
-                  onClick={handleClear}
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-2" />
-                  Clear conversation
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {(mode === "dm" || isAdmin) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-600"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 rounded-lg">
+                  <DropdownMenuItem
+                    className="cursor-pointer text-sm text-red-600 focus:text-red-600"
+                    onClick={handleClear}
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-2" />
+                    Clear conversation
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
 
           {/* Messages area */}
