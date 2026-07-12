@@ -180,9 +180,9 @@ export function useTasks() {
     }
   };
 
-  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority }>) => {
+  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority; is_archived: boolean; archived_at: string | null }>) => {
     try {
-      const dbUpdates: Record<string, string | null> = { ...updates };
+      const dbUpdates: Record<string, string | boolean | null> = { ...updates };
       if (updates.status === 'done') {
         dbUpdates.completed_at = new Date().toISOString();
       } else if (updates.status && updates.status !== 'done') {

@@ -366,7 +366,7 @@ export default function Tasks() {
                       <DropdownMenuItem
                         className="text-slate-600 cursor-pointer"
                         onClick={async () => {
-                          const success = await updateTask(task.id, { is_archived: true, archived_at: new Date().toISOString() } as any);
+                          const success = await updateTask(task.id, { is_archived: true, archived_at: new Date().toISOString() });
                           if (success) {
                             toast.success("Task archived");
                           } else {
