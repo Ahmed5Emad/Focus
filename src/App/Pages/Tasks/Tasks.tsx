@@ -14,7 +14,6 @@ import {
   User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -72,8 +71,6 @@ export default function Tasks() {
     updateTask,
     deleteTask,
   } = useTasks();
-
-  const supabase = createClient();
 
   const [editTask, setEditTask] = useState<(typeof tasks)[number] | null>(null);
   const [editOpen, setEditOpen] = useState(false);
