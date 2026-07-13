@@ -24,9 +24,12 @@ export function useChat() {
   const { user, currentWorkspaceId } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [typingUsers, setTypingUsers] = useState<{ userId: string; displayName: string }[]>([]);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const presenceChannelRef = useRef<ReturnType<ReturnType<typeof supabase.channel>['on']> | null>(null);
+  const oldestMessageDateRef = useRef<string | null>(null);
 
   const markAsDelivered = useCallback(async (msgId: string) => {
     await supabase.from("chat_messages").update({ status: "delivered" }).eq("id", msgId).eq("status", "sent");
@@ -44,6 +47,8 @@ export function useChat() {
 
     const fetchMessages = async () => {
       setIsLoading(true);
+      setHasMore(true);
+      oldestMessageDateRef.current = null;
       try {
         const { data, error } = await supabase
           .from("chat_messages")
@@ -54,6 +59,11 @@ export function useChat() {
 
         if (error) throw error;
         const msgs = data ? data.reverse() : [];
+
+        if (data && data.length > 0) {
+          oldestMessageDateRef.current = data[data.length - 1].created_at;
+        }
+        setHasMore(data ? data.length >= 50 : false);
 
         const unreadIds = msgs
           .filter((m) => m.user_id !== user.id && m.status === "sent")
@@ -206,6 +216,35 @@ export function useChat() {
     }
   };
 
+  const loadMoreMessages = useCallback(async () => {
+    if (!currentWorkspaceId || !user || !oldestMessageDateRef.current) return;
+
+    setIsLoadingMore(true);
+    try {
+      const { data, error } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("workspace_id", currentWorkspaceId)
+        .lt("created_at", oldestMessageDateRef.current)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        oldestMessageDateRef.current = data[data.length - 1].created_at;
+      }
+      setHasMore(data ? data.length >= 50 : false);
+
+      const olderMsgs = data ? data.reverse() : [];
+      setMessages((prev) => [...olderMsgs, ...prev]);
+    } catch (error) {
+      console.error("Error loading more messages:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [currentWorkspaceId, user]);
+
   const clearMessages = async () => {
     if (!currentWorkspaceId) return false;
 
@@ -226,11 +265,14 @@ export function useChat() {
   return {
     messages,
     isLoading,
+    isLoadingMore,
+    hasMore,
     typingUsers,
     sendMessage,
     editMessage,
     deleteMessage,
     clearMessages,
+    loadMoreMessages,
     startTyping,
     stopTyping,
     markAsRead,

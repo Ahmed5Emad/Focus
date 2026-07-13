@@ -82,7 +82,7 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
           className={cn(
             "flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors",
             currentTaskId
-              ? "text-[#7b68ee] bg-[#ede9fe] hover:bg-slate-100"
+              ? "text-primary bg-[#ede9fe] hover:bg-slate-100"
               : "text-slate-400 hover:text-slate-500 hover:bg-slate-100"
           )}
         >

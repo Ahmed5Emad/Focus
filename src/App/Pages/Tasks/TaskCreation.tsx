@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, ArrowRight } from 'lucide-react';
+import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, ArrowRight, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Dropdown } from "@/components/shared/Dropdown"
 import { cn } from "@/lib/utils"
 import { DatePicker } from "@/components/ui/date-picker"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Project {
   id: string;
@@ -51,6 +52,7 @@ export default function TaskCreation() {
 
   const [selectedPriority, setSelectedPriority] = useState<Priority>("none");
   const [dueDate, setDueDate] = useState<Date>();
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
 
   const navigate = useNavigate();
   const [supabase] = useState(() => createClient());
@@ -138,6 +140,23 @@ export default function TaskCreation() {
         });
       }
 
+      if (saveAsTemplate && user) {
+        const { error: templateError } = await supabase
+          .from('task_templates')
+          .insert([{
+            workspace_id: currentWorkspaceId,
+            name: inputValue.trim(),
+            task_title: inputValue.trim(),
+            task_priority: selectedPriority,
+            created_by: user.id,
+          }]);
+        if (templateError) {
+          console.error('Error creating template:', templateError);
+        } else {
+          toast.success("Template saved");
+        }
+      }
+
       toast.success("Task created");
       setIsSubmitting(false);
       navigate('/tasks');
@@ -213,12 +232,40 @@ export default function TaskCreation() {
           {inputValue.length === 0 ? (
             <>
               <div className="mb-4 pt-4">
-                <div className="px-1 py-2 mb-1 flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Actions</span>
-                  {isLoadingData && <span className="text-[10px] text-slate-400 animate-pulse">Loading data...</span>}
-                </div>
+                  <div className="px-1 py-2 mb-1">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Actions</span>
+                  </div>
 
-                <div className="space-y-3">
+                  {isLoadingData ? (
+                    <div className="space-y-3">
+                      <Skeleton className="h-12 w-full rounded-lg" />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-10 w-full rounded-lg" />
+                        </div>
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-10 w-full rounded-lg" />
+                        </div>
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-10 w-full rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-10 w-full rounded-lg" />
+                        </div>
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-10 w-full rounded-lg" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                  <div className="space-y-3">
                   <button
                     onClick={() => setIsScheduledForToday(!isScheduledForToday)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-slate-50'}`}>
@@ -348,10 +395,41 @@ export default function TaskCreation() {
                       />
                     </div>
                   </div>
+
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setSaveAsTemplate(!saveAsTemplate)}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-3 rounded-lg border transition-colors",
+                        saveAsTemplate
+                          ? "border-[#7c3aed] bg-[#f5f3ff] dark:bg-[#7c3aed]/10"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-transparent hover:border-[#7c3aed]/50",
+                      )}
+                    >
+                      <div className={cn(
+                        "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors",
+                        saveAsTemplate
+                          ? "bg-[#7c3aed] border-[#7c3aed] text-white"
+                          : "border-slate-300 dark:border-slate-600",
+                      )}>
+                        {saveAsTemplate && (
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-slate-400" />
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Save as template</span>
+                      </div>
+                    </button>
+                  </div>
+                  </div>
+                  )}
                 </div>
-              </div>
-            </>
-          ) : (
+              </>
+            ) : (
             <div className="py-8 flex flex-col items-center justify-center text-center">
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                 <ArrowRight className="w-6 h-6 text-slate-400" />

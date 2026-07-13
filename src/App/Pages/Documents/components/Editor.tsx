@@ -322,7 +322,7 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
   if (!editor) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-primary rounded-full animate-spin" />
       </div>
     );
   }

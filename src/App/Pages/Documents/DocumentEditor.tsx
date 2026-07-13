@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Cloud, CloudOff } from "lucide-react";
+import { ArrowLeft, Cloud, CloudOff, MessageSquare } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Editor } from "./components/Editor";
 import { TaskLinkSelector } from "./components/TaskLinkSelector";
+import { CommentSidebar } from "./components/CommentSidebar";
 
 export default function DocumentEditor() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function DocumentEditor() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "unsaved">("saved");
+  const [showComments, setShowComments] = useState(false);
   const mountedRef = useRef(true);
   const titleSaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -89,7 +91,7 @@ export default function DocumentEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -126,14 +128,26 @@ export default function DocumentEditor() {
             currentTaskId={taskId}
             onTaskChange={setTaskId}
           />
+          <Button
+            variant="ghost"
+            onClick={() => setShowComments(!showComments)}
+            className={`flex items-center gap-2 ${
+              showComments
+                ? "text-primary bg-[#ede9fe]"
+                : "text-slate-500 hover:text-slate-900"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Comments
+          </Button>
           <span className="text-xs text-slate-400 italic">
             Collaborators will see changes in real-time
           </span>
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
             {saveState === "saving" ? (
               <>
-                <Cloud className="w-3.5 h-3.5 animate-pulse text-[#7b68ee]" />
-                <span className="text-[#7b68ee] font-medium">Saving...</span>
+                <Cloud className="w-3.5 h-3.5 animate-pulse text-primary" />
+                <span className="text-primary font-medium">Saving...</span>
               </>
             ) : saveState === "unsaved" ? (
               <>
@@ -150,12 +164,21 @@ export default function DocumentEditor() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0">
-        <Editor
-          documentId={id!}
-          documentTitle={title}
-          onTitleChange={setTitle}
-        />
+      <div className="flex-1 flex min-h-0">
+        <div className="flex-1 flex flex-col min-h-0">
+          <Editor
+            documentId={id!}
+            documentTitle={title}
+            onTitleChange={setTitle}
+          />
+        </div>
+        {showComments && (
+          <CommentSidebar
+            documentId={id!}
+            open={showComments}
+            onOpenChange={setShowComments}
+          />
+        )}
       </div>
     </div>
   );

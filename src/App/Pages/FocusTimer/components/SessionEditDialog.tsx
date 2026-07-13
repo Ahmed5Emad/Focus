@@ -147,7 +147,7 @@ export function SessionEditDialog({ session, open, onOpenChange, onSave }: Sessi
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="h-9 px-5 rounded-lg bg-[#7b68ee] hover:opacity-90 text-white"
+            className="h-9 px-5 rounded-lg bg-primary hover:opacity-90 text-white"
           >
             {isSaving ? (
               <>

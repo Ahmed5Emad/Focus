@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
   MessageCircle,
+  MessageSquare,
   Hash,
   Send,
   Trash2,
@@ -8,6 +9,7 @@ import {
   Shield,
   Paperclip,
   X,
+  Loader2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +17,8 @@ import { useChat } from "@/hooks/useChat";
 import { useDirectMessages, type DirectMessage, type FileAttachment } from "@/hooks/useDirectMessages";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChat";
 import { ChatMessage } from "./components/ChatMessage";
+import { MentionInput } from "./components/MentionInput";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -30,6 +34,7 @@ import {
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MemberProfile {
   id: string;
@@ -69,6 +74,7 @@ export default function Chat() {
   );
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const currentWorkspace = workspaces.find(
     (w) => w.id === currentWorkspaceId
@@ -151,6 +157,44 @@ export default function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, groupChat.messages, groupChat.markAsRead, user]);
 
+  const hasMore = mode === "channel" ? groupChat.hasMore ?? false : false;
+  const isLoadingMore = mode === "channel" ? groupChat.isLoadingMore ?? false : false;
+  const loadMoreMessages = mode === "channel" ? groupChat.loadMoreMessages ?? (() => {}) : () => {};
+
+  const scrollPosRef = useRef(0);
+  const loadingMoreRef = useRef(false);
+  const prevLoadingMoreRef = useRef(isLoadingMore);
+
+  if (!isLoadingMore && prevLoadingMoreRef.current) {
+    loadingMoreRef.current = false;
+  }
+  prevLoadingMoreRef.current = isLoadingMore;
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container || !hasMore) return;
+
+    const handleScroll = () => {
+      if (container.scrollTop < 100 && hasMore && !loadingMoreRef.current) {
+        loadingMoreRef.current = true;
+        scrollPosRef.current = container.scrollHeight;
+        loadMoreMessages();
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [hasMore, loadMoreMessages]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!isLoadingMore && scrollPosRef.current > 0 && container) {
+      const newScrollHeight = container.scrollHeight;
+      container.scrollTop = newScrollHeight - scrollPosRef.current;
+      scrollPosRef.current = 0;
+    }
+  }, [isLoadingMore]);
+
   const active = mode === "channel" ? groupChat : dmChat;
   const selectedMember = useMemo(
     () => members.find((m) => m.id === selectedUserId),
@@ -208,23 +252,30 @@ export default function Chat() {
       toast.error("Failed to send message");
       return;
     }
+
+    if (inputValue.includes("@")) {
+      for (const member of members) {
+        if (!member.display_name || member.id === user?.id) continue;
+        const escaped = member.display_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`@${escaped}\\b`);
+        if (regex.test(inputValue)) {
+          supabase.from("notifications").insert({
+            user_id: member.id,
+            workspace_id: currentWorkspaceId,
+            type: "mention",
+            title: `You were mentioned in #general`,
+            body: inputValue.slice(0, 120),
+            link: "/chat",
+          }).then(({ error }) => {
+            if (error) console.error("Error creating mention notification:", error);
+          });
+        }
+      }
+    }
+
     setInputValue("");
     setPendingFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(e.target.value);
-    if (e.target.value) {
-      active.startTyping?.();
-    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,9 +344,9 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex-1 flex rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-0">
+      <div className="flex-1 flex flex-col md:flex-row rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-0">
         {/* Sidebar */}
-        <div className="w-56 shrink-0 border-r border-slate-100 flex flex-col bg-[#fafafa]">
+        <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col bg-[#fafafa] max-h-48 md:max-h-none overflow-y-auto">
           <div className="p-3">
             <div className="px-2 py-1.5 mb-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -309,11 +360,12 @@ export default function Chat() {
                 setInputValue("");
               }}
               className={cn(
-                "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors",
+                "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 mode === "channel"
                   ? "bg-[#ede9fe] text-[#6d28d9] font-semibold"
                   : "text-slate-600 hover:bg-slate-100"
               )}
+              aria-label="Switch to general channel"
             >
               <Hash className="w-4 h-4 shrink-0" />
               <span className="truncate">general</span>
@@ -328,8 +380,13 @@ export default function Chat() {
             </div>
 
             {membersLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="w-5 h-5 border-2 border-slate-200 border-t-cu-purple rounded-full animate-spin" />
+              <div className="space-y-2 px-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2 py-1.5">
+                    <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                ))}
               </div>
             ) : members.length === 0 ? (
               <p className="text-xs text-slate-400 text-center py-4 px-2">
@@ -346,11 +403,12 @@ export default function Chat() {
                       setInputValue("");
                     }}
                     className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors",
+                      "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       mode === "dm" && selectedUserId === member.id
                         ? "bg-[#ede9fe] text-[#6d28d9] font-semibold"
                         : "text-slate-600 hover:bg-slate-100"
                     )}
+                    aria-label={`Direct message ${member.display_name ?? "user"}`}
                   >
                     <Avatar className="w-5 h-5 shrink-0">
                       <AvatarImage
@@ -406,7 +464,8 @@ export default function Chat() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-600"
+                    className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label="Chat options"
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
@@ -425,29 +484,37 @@ export default function Chat() {
           </div>
 
           {/* Messages area */}
-          <div className="flex-1 overflow-y-auto">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
             {active.isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-cu-purple rounded-full animate-spin" />
+              <div className="space-y-4 py-4 px-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className={`flex items-start gap-3 ${i % 2 === 0 ? '' : 'flex-row-reverse'}`}>
+                    <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+                    <div className={`space-y-1.5 ${i % 2 === 0 ? '' : 'items-end flex flex-col'}`}>
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className={`h-16 ${i % 2 === 0 ? 'w-64' : 'w-48'} rounded-xl`} />
+                      <Skeleton className={`h-3 ${i % 2 === 0 ? 'w-20' : 'w-16'}`} />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : active.messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div className="w-16 h-16 bg-[#f5f3ff] rounded-2xl flex items-center justify-center mb-6">
-                  <MessageCircle className="w-8 h-8 text-cu-purple" />
-                </div>
-                <h3 className="font-['Spline_Sans',sans-serif] text-xl font-bold text-slate-900 mb-2">
-                  {mode === "channel"
-                    ? "No messages in #general"
-                    : `No messages with ${selectedMember?.display_name ?? "this user"} yet`}
-                </h3>
-                <p className="font-['Inter',sans-serif] text-sm text-slate-600 max-w-sm">
-                  {mode === "channel"
-                    ? "Send the first message to your workspace team."
-                    : `Send the first message to ${selectedMember?.display_name ?? "them"}.`}
-                </p>
-              </div>
+              <EmptyState
+                icon={MessageSquare}
+                title="No messages yet"
+                description={mode === "channel" ? "Start a conversation in this channel." : "Start a conversation."}
+                action={{ label: "Send a message", onClick: () => inputRef.current?.focus() }}
+              />
             ) : (
               <div className="py-4">
+                {mode === "channel" && isLoadingMore && (
+                  <div className="flex justify-center py-2">
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Loading older messages...
+                    </div>
+                  </div>
+                )}
                 {active.messages.map((msg) => {
                   const profile = getSenderProfile(msg);
                   return (
@@ -483,7 +550,8 @@ export default function Chat() {
                     setPendingFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = "";
                   }}
-                  className="p-1 hover:bg-slate-200 rounded transition-colors"
+                  className="p-1 hover:bg-slate-200 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label="Remove file attachment"
                 >
                   <X className="w-4 h-4 text-slate-400" />
                 </button>
@@ -493,7 +561,8 @@ export default function Chat() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="p-2 text-slate-400 hover:text-cu-purple rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                className="p-2 text-slate-400 hover:text-cu-purple rounded-lg transition-colors shrink-0 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Attach file"
               >
                 <Paperclip className="w-4 h-4" />
               </button>
@@ -504,29 +573,24 @@ export default function Chat() {
                 className="hidden"
                 onChange={handleFileSelect}
               />
-              <textarea
+              <MentionInput
                 ref={inputRef}
+                members={members}
                 value={inputValue}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
+                onChange={setInputValue}
+                onSend={handleSend}
                 placeholder={
                   mode === "channel"
                     ? "Message #general"
                     : `Message @ ${selectedMember?.display_name ?? "user"}`
                 }
-                rows={1}
-                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-slate-900 placeholder:text-slate-400 resize-none max-h-30"
-                style={{ minHeight: "36px" }}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.style.height = "auto";
-                  el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-                }}
+                onTyping={() => active.startTyping?.()}
               />
               <button
                 onClick={handleSend}
                 disabled={(!inputValue.trim() && !pendingFile) || uploading}
-                className="p-2 bg-cu-purple text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                className="p-2 bg-cu-purple text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Send message"
               >
                 {uploading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

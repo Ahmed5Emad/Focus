@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorBoundaryFallback } from "./components/ErrorBoundaryFallback";
+import { AppLoadingFallback } from "./components/shared/AppLoadingFallback";
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from "@vercel/analytics/react"
 import { AppLayout } from "./App/AppLayout";
@@ -59,7 +60,7 @@ function App() {
             <Toaster />
             <SpeedInsights />
             <Analytics />
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <Suspense fallback={<AppLoadingFallback />}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/pricing" element={<Pricing />} />

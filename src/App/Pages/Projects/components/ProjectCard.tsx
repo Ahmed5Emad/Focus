@@ -88,7 +88,7 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <button className="text-[#7b7486] hover:text-[#7b68ee] transition-colors ml-2">
+            <button className="text-[#7b7486] hover:text-primary transition-colors ml-2">
               <MoreHorizontal className="w-6 h-6" />
             </button>
           </DropdownMenuTrigger>
@@ -130,7 +130,7 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); handleCreateDoc(); }}
-          className="p-2 rounded-lg text-slate-500 hover:text-[#7b68ee] hover:bg-slate-50 transition-colors"
+          className="p-2 rounded-lg text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors"
           title="Create document in this project"
         >
           <Plus className="w-4 h-4" />

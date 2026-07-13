@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
+import * as Sentry from "@sentry/react";
 
 interface Workspace {
   id: string;
@@ -86,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         const currentUser = session?.user ?? null;
         setUser(currentUser);
+        Sentry.setUser(currentUser ? { id: currentUser.id, email: currentUser.email } : null);
 
         if (currentUser) {
           await fetchWorkspaces();
@@ -103,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+      Sentry.setUser(currentUser ? { id: currentUser.id, email: currentUser.email } : null);
       
       if (currentUser) {
         await fetchWorkspaces();

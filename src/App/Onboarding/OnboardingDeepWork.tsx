@@ -21,6 +21,7 @@ const OnboardingDeepWork: React.FC = () => {
             <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-slate-500">STEP 2 OF 4</span>
                 <Link to="/onboarding" className="text-slate-900 font-bold">Back</Link>
+                <Link to="/dashboard" className="text-sm font-medium text-slate-500 hover:text-slate-900">Skip onboarding</Link>
                 <Link to="/onboarding/power-tools" className="bg-cu-purple hover:bg-cu-purple/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2">
                     {OnboardingData.deepWork.primaryButton} <ArrowRight className="w-4 h-4" />
                 </Link>

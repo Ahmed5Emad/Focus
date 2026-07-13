@@ -76,7 +76,7 @@ function SidebarContent() {
         </div>
 
         <div className="px-[16px] w-full">
-          <Link to="/tasks/new" className="bg-gradient-to-r from-[#7c3aed] to-[#4f46e5] drop-shadow-[0px_4px_6px_rgba(139,92,246,0.2)] flex gap-[8px] items-center justify-center px-[16px] py-[12px] rounded-[4px] w-full hover:opacity-90 transition-opacity cursor-pointer border-none no-underline">
+          <Link to="/tasks/new" className="bg-gradient-to-r from-[#7c3aed] to-[#4f46e5] drop-shadow-[0px_4px_6px_rgba(139,92,246,0.2)] flex gap-[8px] items-center justify-center px-[16px] py-[12px] rounded-[4px] w-full hover:opacity-90 transition-opacity cursor-pointer border-none no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
             <Plus className="w-[14px] h-[14px] text-white" />
             <span className="font-['Spline_Sans',sans-serif] font-semibold text-[12px] text-white tracking-[1.2px]">
               New Task
@@ -92,9 +92,9 @@ function SidebarContent() {
                 key={item.name}
                 to={item.path}
                 className={cn(
-                  "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
+                  "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   active
-                    ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
+                    ? "bg-[#f5f3ff] border-primary border-l-2 text-[#6d28d9]"
                     : "text-slate-600 hover:bg-slate-50"
                 )}
               >
@@ -116,9 +116,9 @@ function SidebarContent() {
               key={item.name}
               to={item.path}
               className={cn(
-                "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors",
+                "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 active
-                  ? "bg-[#f5f3ff] border-[#7b68ee] border-l-2 text-[#6d28d9]"
+                  ? "bg-[#f5f3ff] border-primary border-l-2 text-[#6d28d9]"
                   : "text-slate-600 hover:bg-slate-50"
               )}
             >
@@ -144,7 +144,8 @@ export function Sidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm"
+            aria-label="Toggle sidebar"
+            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <Menu className="w-5 h-5 text-slate-600" />
           </Button>

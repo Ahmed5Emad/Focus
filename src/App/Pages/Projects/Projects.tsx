@@ -171,8 +171,8 @@ export default function Projects() {
             ))}
 
             <div className="col-span-1 md:col-span-6 rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group min-h-[200px]">
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-[#7b68ee] via-transparent to-transparent"></div>
-              <Layout className="w-12 h-12 text-[#7b68ee] mb-4" />
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-primary via-transparent to-transparent"></div>
+              <Layout className="w-12 h-12 text-primary mb-4" />
               <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-slate-900 mb-2">
                 Start a new project
               </h3>

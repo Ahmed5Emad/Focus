@@ -1,53 +1,83 @@
 import React, { useState } from "react";
-import { Sparkles, Rocket, Loader2 } from "lucide-react";
+import { Sparkles, Rocket, Loader2, Database } from "lucide-react";
 import { OnboardingData } from "../../../data/mockData";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export const FinalSetupForm: React.FC = () => {
   const { finalSetup } = OnboardingData;
   const navigate = useNavigate();
-  const { refreshWorkspaces } = useAuth();
+  const { user, refreshWorkspaces } = useAuth();
   const supabase = createClient();
 
   const [workspaceName, setWorkspaceName] = useState("");
   const [goal, setGoal] = useState(finalSetup.goals[0].value);
   const [enableAi, setEnableAi] = useState(true);
+  const [addSampleData, setAddSampleData] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  const createSampleData = async (workspaceId: string) => {
+    if (!user) return;
+
+    const { data: project } = await supabase
+      .from("projects")
+      .insert({
+        title: "Getting Started",
+        workspace_id: workspaceId,
+        created_by: user.id,
+      })
+      .select()
+      .single();
+
+    await supabase.from("goals").insert({
+      title: "Establish a deep work routine",
+      workspace_id: workspaceId,
+      created_by: user.id,
+    });
+
+    await supabase.from("tasks").insert([
+      { title: "Set up your workspace", workspace_id: workspaceId, status: "todo", created_by: user.id, project_id: project?.id },
+      { title: "Create your first goal", workspace_id: workspaceId, status: "todo", created_by: user.id, project_id: project?.id },
+      { title: "Complete a focus session", workspace_id: workspaceId, status: "todo", created_by: user.id, project_id: project?.id },
+    ]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 1. Insert workspace
-      const { error: workspaceError } = await supabase
+      const { data: workspace, error: workspaceError } = await supabase
         .from("workspaces")
-        .insert({ name: workspaceName });
+        .insert({ name: workspaceName, created_by: user?.id })
+        .select()
+        .single();
 
       if (workspaceError) throw workspaceError;
 
-      // 2. Update user metadata
       const { error: userError } = await supabase.auth.updateUser({
         data: { primary_goal: goal, enable_ai: enableAi },
       });
 
       if (userError) throw userError;
 
-      // 3. Refresh workspaces
-      await refreshWorkspaces();
+      if (addSampleData && workspace) {
+        await createSampleData(workspace.id);
+      }
 
-      // 4. Navigate
+      await refreshWorkspaces();
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during setup:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to complete setup");
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100 h-[600px] flex flex-col">
+    <div className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100 min-h-[600px] flex flex-col">
       <form className="space-y-8 flex-grow flex flex-col" onSubmit={handleSubmit}>
         <div className="pb-4">
           <label className="font-bold text-xs text-slate-500 pb-2 uppercase tracking-widest">
@@ -88,8 +118,8 @@ export const FinalSetupForm: React.FC = () => {
             ))}
           </div>
         </div>
-        <div className="flex items-center p-4 bg-cu-purple/10 border border-cu-purple/20 rounded-xl gap-4 mt-auto">
-          <Sparkles className="text-cu-purple w-6 h-6" />
+        <div className="flex items-center p-4 bg-cu-purple/10 border border-cu-purple/20 rounded-xl gap-4">
+          <Sparkles className="text-cu-purple w-6 h-6 shrink-0" />
           <div className="flex-1">
             <p className="font-bold text-slate-900">
               {finalSetup.aiToggle.label}
@@ -103,6 +133,21 @@ export const FinalSetupForm: React.FC = () => {
             className="toggle"
             checked={enableAi}
             onChange={(e) => setEnableAi(e.target.checked)}
+          />
+        </div>
+        <div className="flex items-center p-4 bg-slate-50 border border-slate-200 rounded-xl gap-4">
+          <Database className="text-slate-600 w-6 h-6 shrink-0" />
+          <div className="flex-1">
+            <p className="font-bold text-slate-900">Populate with sample data</p>
+            <p className="text-xs text-slate-600">
+              Create a sample project, tasks, and goal to get started faster
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            className="toggle"
+            checked={addSampleData}
+            onChange={(e) => setAddSampleData(e.target.checked)}
           />
         </div>
         <button
