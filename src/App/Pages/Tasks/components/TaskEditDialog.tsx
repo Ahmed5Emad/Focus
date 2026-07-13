@@ -15,7 +15,7 @@ import {
 import { Loader2, User, Folder, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/shared/Dropdown";
-import type { Task, MemberProfile, Project, Priority } from "@/hooks/useTasks";
+import type { Task, MemberProfile, Project, Priority, WorkflowStatus } from "@/hooks/useTasks";
 import { DatePicker } from "@/components/ui/date-picker";
 
 const STATUS_OPTIONS = [
@@ -24,7 +24,7 @@ const STATUS_OPTIONS = [
   { value: "done", label: "Done" },
 ];
 
-const statusColor = (s: string) => {
+const defaultStatusColor = (s: string) => {
   switch (s) {
     case "todo": return "bg-slate-100 text-slate-600";
     case "in_progress": return "bg-blue-50 text-blue-600";
@@ -40,9 +40,22 @@ interface TaskEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority }>) => Promise<boolean>;
+  workflowStatuses?: WorkflowStatus[];
 }
 
-export function TaskEditDialog({ task, projects, members, open, onOpenChange, onSave }: TaskEditDialogProps) {
+export function TaskEditDialog({ task, projects, members, open, onOpenChange, onSave, workflowStatuses }: TaskEditDialogProps) {
+  const statusOptions = workflowStatuses && workflowStatuses.length > 0
+    ? workflowStatuses.map(s => ({ value: s.name, label: s.name }))
+    : STATUS_OPTIONS;
+
+  const getStatusColor = (statusName: string) => {
+    if (workflowStatuses && workflowStatuses.length > 0) {
+      const ws = workflowStatuses.find(s => s.name === statusName);
+      if (ws) return { className: '', style: { backgroundColor: ws.color + '20', color: ws.color } };
+    }
+    const cls = defaultStatusColor(statusName);
+    return { className: cls, style: {} };
+  };
   const [title, setTitle] = useState(task?.title ?? "");
   const [status, setStatus] = useState(task?.status ?? "todo");
   const [projectId, setProjectId] = useState<string | null>(task?.project_id ?? null);
@@ -92,24 +105,30 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Status</label>
               <Dropdown
                 value={status}
-                onValueChange={(val) => setStatus(val ?? "todo")}
-                options={STATUS_OPTIONS}
+                onValueChange={(val) => setStatus(val ?? statusOptions[0]?.value ?? "todo")}
+                options={statusOptions}
                 showSearch={false}
-                renderTrigger={(selected) => (
-                  <div className="flex items-center gap-2">
-                    <ListChecks className="w-4 h-4 text-slate-400" />
-                    <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", statusColor(selected?.value ?? status))}>
-                      {selected?.label ?? "To Do"}
-                    </span>
-                  </div>
-                )}
-                renderOption={(option) => (
-                  <div className="flex items-center gap-2">
-                    <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", statusColor(option.value))}>
-                      {option.label}
-                    </span>
-                  </div>
-                )}
+                renderTrigger={(selected) => {
+                  const sc = getStatusColor(selected?.value ?? status);
+                  return (
+                    <div className="flex items-center gap-2">
+                      <ListChecks className="w-4 h-4 text-slate-400" />
+                      <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", sc.className)} style={sc.style}>
+                        {selected?.label ?? "To Do"}
+                      </span>
+                    </div>
+                  );
+                }}
+                renderOption={(option) => {
+                  const sc = getStatusColor(option.value);
+                  return (
+                    <div className="flex items-center gap-2">
+                      <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", sc.className)} style={sc.style}>
+                        {option.label}
+                      </span>
+                    </div>
+                  );
+                }}
               />
             </div>
 
@@ -227,7 +246,7 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
           <Button
             onClick={handleSave}
             disabled={!title.trim() || isSaving}
-            className="h-9 px-5 rounded-lg bg-[#7b68ee] hover:opacity-90 text-white"
+            className="h-9 px-5 rounded-lg bg-primary hover:opacity-90 text-white"
           >
             {isSaving ? (
               <>

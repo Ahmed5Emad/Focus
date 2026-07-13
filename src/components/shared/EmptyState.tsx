@@ -26,8 +26,8 @@ export function EmptyState({
   action,
   iconGradientFrom = "#f5f3ff",
   iconGradientTo = "#ede9fe",
-  blurColor = "#7b68ee",
-  iconColor = "#7b68ee",
+  blurColor = "var(--primary)",
+  iconColor = "var(--primary)",
   children,
 }: EmptyStateProps) {
   return (

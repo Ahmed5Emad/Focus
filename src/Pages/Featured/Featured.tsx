@@ -265,15 +265,15 @@ export default function Featured() {
                 <line x1="50%" y1="50%" x2="71.21%" y2="28.79%" stroke="url(#grad3)" strokeWidth="3" strokeDasharray="6 6" />
                 <defs>
                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#7b68ee" />
+                    <stop offset="0%" stopColor="var(--primary)" />
                     <stop offset="100%" stopColor="#ff5cba" />
                   </linearGradient>
                   <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#7b68ee" />
+                    <stop offset="0%" stopColor="var(--primary)" />
                     <stop offset="100%" stopColor="#ff8d36" />
                   </linearGradient>
                     <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#7b68ee" />
+                    <stop offset="0%" stopColor="var(--primary)" />
                     <stop offset="100%" stopColor="#00a843" />
                   </linearGradient>
                 </defs>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, ListChecks, Layout, Trophy, Search } from "lucide-react";
+import { FileText, ListChecks, Layout, Trophy, Search, Loader2 } from "lucide-react";
 import { Command as CommandPrimitive } from "cmdk";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGlobalSearch } from "@/hooks/useGlobalSearch";
 import {
   CommandDialog,
   CommandList,
@@ -25,7 +26,7 @@ interface SearchItem {
 }
 
 const typeConfig = {
-  task: { icon: ListChecks, color: "text-[#7b68ee]", bg: "bg-[#7b68ee]/10", label: "Task" },
+  task: { icon: ListChecks, color: "text-primary", bg: "bg-primary/10", label: "Task" },
   goal: { icon: Trophy, color: "text-amber-600", bg: "bg-amber-50", label: "Goal" },
   project: { icon: Layout, color: "text-emerald-600", bg: "bg-emerald-50", label: "Project" },
   document: { icon: FileText, color: "text-sky-600", bg: "bg-sky-50", label: "Document" },
@@ -36,6 +37,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const { user, currentWorkspaceId } = useAuth();
   const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<SearchItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { results, isSearching, search } = useGlobalSearch();
 
   useEffect(() => {
     if (!open || !currentWorkspaceId) return;
@@ -81,83 +84,125 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         <CommandPrimitive.Input
           placeholder="Search anything..."
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 py-3"
-        />
+          value={searchQuery}
+          onValueChange={(val) => { setSearchQuery(val); search(val); }} />
       </div>
 
       <CommandList className="max-h-[300px] px-2 py-1">
-        <CommandEmpty>
-          <div className="flex flex-col items-center py-12">
-            <Search className="w-8 h-8 text-slate-300 mb-2" />
-            <p className="text-sm text-slate-500">No results found</p>
-          </div>
-        </CommandEmpty>
+        {searchQuery.trim() ? (
+          <>
+            {isSearching && results.length === 0 && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+              </div>
+            )}
+            {!isSearching && results.length === 0 && (
+              <CommandEmpty>
+                <div className="flex flex-col items-center py-12">
+                  <Search className="w-8 h-8 text-slate-300 mb-2" />
+                  <p className="text-sm text-slate-500">No results found</p>
+                </div>
+              </CommandEmpty>
+            )}
+            {results.length > 0 && (
+              <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Search Results</span>}>
+                {results.map((result) => {
+                  const c = typeConfig[result.result_type];
+                  return (
+                    <CommandItem key={`${result.result_type}-${result.result_id}`} value={searchQuery} onSelect={() => { onOpenChange(false); navigate(result.url); }} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
+                        <c.icon className={`w-5 h-5 ${c.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium text-slate-700 truncate block">{result.title}</span>
+                        {result.description && (
+                          <span className="text-xs text-slate-400 truncate block">{result.description}</span>
+                        )}
+                      </div>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
+          </>
+        ) : (
+          <>
+            <CommandEmpty>
+              <div className="flex flex-col items-center py-12">
+                <Search className="w-8 h-8 text-slate-300 mb-2" />
+                <p className="text-sm text-slate-500">No results found</p>
+              </div>
+            </CommandEmpty>
 
-        {taskItems.length > 0 && (
-          <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Tasks</span>}>
-            {taskItems.map((item) => {
-              const c = typeConfig.task;
-              return (
-                <CommandItem key={`task-${item.id}`} value={`task-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
-                  <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
-                    <c.icon className={`w-5 h-5 ${c.color}`} />
-                  </div>
-                  <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
-        )}
+            {taskItems.length > 0 && (
+              <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Tasks</span>}>
+                {taskItems.map((item) => {
+                  const c = typeConfig.task;
+                  return (
+                    <CommandItem key={`task-${item.id}`} value={`task-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
+                        <c.icon className={`w-5 h-5 ${c.color}`} />
+                      </div>
+                      <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
 
-        {goalItems.length > 0 && (
-          <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Goals</span>}>
-            {goalItems.map((item) => {
-              const c = typeConfig.goal;
-              return (
-                <CommandItem key={`goal-${item.id}`} value={`goal-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
-                  <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
-                    <c.icon className={`w-5 h-5 ${c.color}`} />
-                  </div>
-                  <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
-        )}
+            {goalItems.length > 0 && (
+              <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Goals</span>}>
+                {goalItems.map((item) => {
+                  const c = typeConfig.goal;
+                  return (
+                    <CommandItem key={`goal-${item.id}`} value={`goal-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
+                        <c.icon className={`w-5 h-5 ${c.color}`} />
+                      </div>
+                      <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
 
-        {projectItems.length > 0 && (
-          <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Projects</span>}>
-            {projectItems.map((item) => {
-              const c = typeConfig.project;
-              return (
-                <CommandItem key={`project-${item.id}`} value={`project-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
-                  <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
-                    <c.icon className={`w-5 h-5 ${c.color}`} />
-                  </div>
-                  <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
-        )}
+            {projectItems.length > 0 && (
+              <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Projects</span>}>
+                {projectItems.map((item) => {
+                  const c = typeConfig.project;
+                  return (
+                    <CommandItem key={`project-${item.id}`} value={`project-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
+                        <c.icon className={`w-5 h-5 ${c.color}`} />
+                      </div>
+                      <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
 
-        {documentItems.length > 0 && (
-          <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Documents</span>}>
-            {documentItems.map((item) => {
-              const c = typeConfig.document;
-              return (
-                <CommandItem key={`document-${item.id}`} value={`document-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
-                  <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
-                    <c.icon className={`w-5 h-5 ${c.color}`} />
-                  </div>
-                  <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
+            {documentItems.length > 0 && (
+              <CommandGroup heading={<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 py-1.5">Documents</span>}>
+                {documentItems.map((item) => {
+                  const c = typeConfig.document;
+                  return (
+                    <CommandItem key={`document-${item.id}`} value={`document-${item.id}`} onSelect={() => handleSelect(item)} className="flex items-center gap-3 py-3 px-3 rounded-xl cursor-pointer aria-selected:bg-slate-100 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center shrink-0`}>
+                        <c.icon className={`w-5 h-5 ${c.color}`} />
+                      </div>
+                      <span className="flex-1 text-sm font-medium text-slate-700 truncate">{item.title}</span>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${c.color} opacity-60`}>{c.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
+          </>
         )}
       </CommandList>
 
@@ -176,7 +221,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             <span className="ml-1">close</span>
           </span>
         </div>
-        <span className="text-[11px] font-medium text-slate-400">{items.length} results</span>
+        <span className="text-[11px] font-medium text-slate-400">{searchQuery.trim() ? results.length : items.length} results</span>
       </div>
     </CommandDialog>
   );

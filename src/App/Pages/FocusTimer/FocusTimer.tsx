@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useFocus } from '@/contexts/FocusContext';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2, MoreHorizontal, Pencil, Trash2, Folder } from 'lucide-react';
+import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2, MoreHorizontal, Pencil, Trash2, Folder, Timer } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dropdown } from "@/components/shared/Dropdown";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
 import { SessionEditDialog } from "./components/SessionEditDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SessionHistory {
   id: string;
@@ -227,7 +229,8 @@ export default function FocusTimer() {
             <div className="flex gap-4">
               <button 
                 onClick={() => isPaused ? resumeSession() : pauseSession()}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={isPaused ? "Resume focus session" : "Pause focus session"}
               >
                 {isPaused ? (
                   <Play className="w-5 h-5" />
@@ -238,7 +241,8 @@ export default function FocusTimer() {
               </button>
               <button 
                 onClick={() => stopSession()}
-                className="bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-md"
+                className="bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Stop focus session"
               >
                 <Square className="w-5 h-5" />
                 Stop Session
@@ -289,13 +293,14 @@ export default function FocusTimer() {
       <Collapsible
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
-        className="w-full space-y-6"
+        className="w-full space-y-3"
       >
         <div className="flex items-center justify-center">
           <CollapsibleTrigger asChild>
             <Button 
               variant="ghost" 
-              className="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full px-6"
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label={isDetailsOpen ? "Hide session details" : "Show session details"}
             >
               <Settings2 className="w-4 h-4" />
               <span>{isDetailsOpen ? 'Hide' : 'Show'} Session Details & History</span>
@@ -304,7 +309,7 @@ export default function FocusTimer() {
           </CollapsibleTrigger>
         </div>
 
-        <CollapsibleContent className="space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
+        <CollapsibleContent className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col h-[400px]">
               <div className="flex items-center justify-between mb-6">
@@ -357,13 +362,15 @@ export default function FocusTimer() {
                 <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => logDistraction('internal', 'minor')}
-                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label="Log internal distraction"
                   >
                     + Internal
                   </button>
                   <button 
                     onClick={() => logDistraction('external', 'minor')}
-                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label="Log external distraction"
                   >
                     + External
                   </button>
@@ -378,15 +385,23 @@ export default function FocusTimer() {
               </h3>
               
               {isLoading ? (
-                <div className="animate-pulse flex flex-col gap-4">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-slate-100 rounded-xl w-full"></div>
+                <div className="space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </div>
                   ))}
                 </div>
               ) : history.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
-                  No sessions recorded yet.
-                </div>
+                <EmptyState
+                  icon={Timer}
+                  title="No sessions recorded yet"
+                  description="Start a focus session to see your history here."
+                />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -447,7 +462,8 @@ export default function FocusTimer() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                    aria-label="Session actions"
                                   >
                                     <MoreHorizontal className="w-4 h-4" />
                                   </Button>

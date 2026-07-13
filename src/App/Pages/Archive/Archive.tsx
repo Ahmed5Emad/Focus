@@ -14,6 +14,8 @@ import { supabase } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 interface ArchivedTask {
   id: string;
@@ -160,28 +162,27 @@ export default function ArchivePage() {
 
       <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-10 h-10 border-4 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
-            <p className="font-['Inter',sans-serif] text-[16px] text-slate-600 font-medium">
-              Loading archive...
-            </p>
+          <div className="divide-y divide-slate-200">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 p-5">
+                <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-3 w-1/4" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-8 h-8 rounded-lg" />
+                  <Skeleton className="w-8 h-8 rounded-lg" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : isEmpty ? (
-          <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-            <div className="w-24 h-24 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] rounded-3xl flex items-center justify-center mb-8 shadow-sm">
-              <Archive className="w-12 h-12 text-[#7b68ee]" />
-            </div>
-            <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-slate-900 mb-4 tracking-tight">
-              {searchQuery
-                ? "No archived items found"
-                : "Nothing archived yet"}
-            </h2>
-            <p className="font-['Inter',sans-serif] text-[18px] leading-relaxed text-slate-600 max-w-lg">
-              {searchQuery
-                ? "Try a different search term."
-                : `Completed or inactive ${activeTab === "tasks" ? "tasks" : "projects"} will appear here after archiving.`}
-            </p>
-          </div>
+          <EmptyState
+            icon={Archive}
+            title={searchQuery ? "No archived items found" : "Nothing archived yet"}
+            description={searchQuery ? "Try adjusting your filters." : "Items you archive will appear here."}
+          />
         ) : (
           <div className="divide-y divide-slate-200">
             {activeTab === "tasks"
@@ -201,13 +202,13 @@ export default function ArchivePage() {
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                         {task.projects?.title && (
                           <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
-                            <Folder className="w-3.5 h-3.5 text-[#7b68ee]" />
+                            <Folder className="w-3.5 h-3.5 text-primary" />
                             <span>{task.projects.title}</span>
                           </div>
                         )}
                         {task.goals?.title && (
                           <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
-                            <Target className="w-3.5 h-3.5 text-[#7b68ee]" />
+                            <Target className="w-3.5 h-3.5 text-primary" />
                             <span>{task.goals.title}</span>
                           </div>
                         )}
@@ -291,7 +292,7 @@ export default function ArchivePage() {
       </div>
 
       {!isLoading && !isEmpty && (
-        <div className="mt-4 flex items-center justify-between px-2">
+        <div className="mt-3 flex items-center justify-between px-2">
           <p className="font-['Inter',sans-serif] text-[14px] text-slate-600 font-medium">
             Showing{" "}
             {activeTab === "tasks"

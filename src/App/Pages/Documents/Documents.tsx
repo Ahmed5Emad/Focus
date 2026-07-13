@@ -120,7 +120,7 @@ export default function Documents() {
         destructive
       />
       <div className="page-container pt-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-3">
         <div>
           <h1 className="page-title mb-2">Documents</h1>
           <p className="page-description">
@@ -220,14 +220,15 @@ export default function Documents() {
             return (
               <section key={projectId}>
                 <div className="flex items-center gap-2 mb-3">
-                  <FolderOpen className="w-5 h-5 text-[#7b68ee]" />
+                  <FolderOpen className="w-5 h-5 text-primary" />
                   <h3 className="font-['Spline_Sans',sans-serif] text-lg font-semibold text-slate-900">
                     {projectName}
                   </h3>
                   <button
                     onClick={() => handleCreate(projectId)}
-                    className="ml-1 p-1 rounded-md text-slate-400 hover:text-[#7b68ee] hover:bg-slate-50 transition-colors"
+                    className="ml-1 p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     title="Add document to this project"
+                    aria-label={`Add document to ${projectName}`}
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -240,7 +241,7 @@ export default function Documents() {
                       onClick={() => navigate(`/documents/${doc.id}`)}
                     >
                       <div className="w-10 h-10 bg-[#f5f3ff] rounded-xl flex items-center justify-center shrink-0">
-                        <FileText className="w-5 h-5 text-[#7b68ee]" />
+                        <FileText className="w-5 h-5 text-primary" />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -253,7 +254,7 @@ export default function Documents() {
                               if (e.key === "Enter") handleRename(doc.id);
                               if (e.key === "Escape") setEditingId(null);
                             }}
-                            className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2 py-1 w-full outline-none focus:border-[#7b68ee]"
+                            className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2 py-1 w-full outline-none focus:border-primary"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
@@ -272,7 +273,7 @@ export default function Documents() {
                             {doc.created_by === user?.id ? "You" : "Collaborator"}
                           </span>
                           {doc.task_id && doc.tasks?.title && (
-                            <span className="flex items-center gap-1 text-[11px] text-[#7b68ee] truncate max-w-[150px]">
+                            <span className="flex items-center gap-1 text-[11px] text-primary truncate max-w-[150px]">
                               <FileText className="w-3 h-3 shrink-0" />
                               <span className="truncate">{doc.tasks.title}</span>
                             </span>
@@ -285,7 +286,8 @@ export default function Documents() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            aria-label="Document actions"
                           >
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>

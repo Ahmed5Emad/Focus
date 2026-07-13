@@ -56,30 +56,31 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-50 w-full flex justify-center py-4 mt-2">
-      <div className="w-full px-[48px]">
-        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-between px-6 py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
+      <div className="w-full px-4 md:px-[48px]">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-between px-4 md:px-6 py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
           <button
             data-search-trigger
             onClick={() => setPaletteOpen(true)}
-            className="flex items-center gap-3 bg-white/50 transition-all duration-300 px-6 py-2.5 rounded-full border border-white/40 text-slate-500 text-sm group cursor-pointer shadow-sm focus-within:ring-2 focus-within:ring-purple-500/30 hover:scale-[1.01] active:scale-[0.99] w-full max-w-[600px]"
+            className="flex items-center gap-3 bg-white/50 transition-all duration-300 px-4 md:px-6 py-2.5 rounded-full border border-white/40 text-slate-500 text-sm group cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary hover:scale-[1.01] active:scale-[0.99] w-full max-w-[600px]"
           >
             <Search className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-            <span className="font-medium">Search anything...</span>
-            <div className="flex items-center gap-1 ml-auto opacity-60 group-hover:opacity-100 transition-opacity">
+            <span className="font-medium hidden sm:inline">Search anything...</span>
+            <span className="font-medium sm:hidden">Search...</span>
+            <div className="hidden sm:flex items-center gap-1 ml-auto opacity-60 group-hover:opacity-100 transition-opacity">
               <kbd className="bg-white/80 border border-white/60 px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-400 shadow-sm">⌘</kbd>
               <kbd className="bg-white/80 border border-white/60 px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-400 shadow-sm">K</kbd>
             </div>
           </button>
           <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
-          <div className="flex items-center gap-[12px]">
+          <div className="flex items-center gap-[8px] md:gap-[12px]">
             <ThemeToggle />
-            <button onClick={() => navigate('/focus-timer')} className="p-2 rounded-xl transition-colors text-slate-600 cursor-pointer group">
+            <button onClick={() => navigate('/focus-timer')} className="min-h-10 min-w-10 flex items-center justify-center p-2 rounded-xl transition-colors text-slate-600 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open focus timer">
               <Timer className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </button>
             <Popover open={notifOpen} onOpenChange={setNotifOpen}>
               <PopoverTrigger asChild>
-                <button className="p-2 rounded-xl transition-colors text-slate-600 relative cursor-pointer group">
+                <button className="min-h-10 min-w-10 flex items-center justify-center p-2 rounded-xl transition-colors text-slate-600 relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open notifications">
                   <BellRing className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full px-1 shadow-sm border border-white">
@@ -94,7 +95,8 @@ export function TopBar() {
                   {unreadCount > 0 && (
                     <button
                       onClick={() => { markAllAsRead(); }}
-                      className="flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700 transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-label="Mark all notifications as read"
                     >
                       <Check className="w-3.5 h-3.5" />
                       Mark all read
@@ -142,7 +144,8 @@ export function TopBar() {
                                   e.stopPropagation();
                                   markAsRead(notif.id);
                                 }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded-full cursor-pointer"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                aria-label="Dismiss notification"
                               >
                                 <X className="w-3.5 h-3.5 text-slate-400" />
                               </button>
@@ -160,7 +163,7 @@ export function TopBar() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-9 h-9 rounded-full border-2 border-white/60 overflow-hidden bg-white/50 transition-all shadow-sm flex items-center justify-center cursor-pointer group">
+                <button className="w-9 h-9 rounded-full border-2 border-white/60 overflow-hidden bg-white/50 transition-all shadow-sm flex items-center justify-center cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open user menu">
                   <Avatar className="size-9">
                     <AvatarFallback className="bg-purple-100 text-purple-700 text-xs font-semibold">
                       {user?.email?.charAt(0).toUpperCase() ?? <User className="w-4 h-4" />}

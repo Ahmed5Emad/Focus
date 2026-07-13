@@ -13,7 +13,7 @@ export function EmptyProjectsState({ onCreateProject }: EmptyProjectsStateProps)
       icon={Layout}
       title="Build something amazing"
       description="You haven't created any projects yet. Start a new initiative to organize your tasks and achieve your goals."
-      blurColor="#7b68ee"
+      blurColor="var(--primary)"
       iconGradientFrom="#f5f3ff"
       iconGradientTo="#ede9fe"
     >

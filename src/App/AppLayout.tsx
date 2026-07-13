@@ -2,6 +2,8 @@ import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
+import { PagePresence } from "./components/PagePresence";
+import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { useFocus } from "../contexts/FocusContext";
 import { Timer, Play, Pause, Square, AlertCircle, X } from "lucide-react";
 
@@ -19,6 +21,7 @@ const formatTime = (seconds: number) => {
 export function AppLayout() {
   const { isActive, isPaused, activeSession, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
   const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
+  const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -30,6 +33,16 @@ export function AppLayout() {
         e.preventDefault();
         setIsDistractionModalOpen(true);
       }
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && e.shiftKey) {
+        if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+          e.preventDefault();
+          setIsKeyboardShortcutsOpen(prev => !prev);
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        setIsKeyboardShortcutsOpen(prev => !prev);
+      }
     };
     
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -40,13 +53,20 @@ export function AppLayout() {
     <div 
       className="flex items-start relative w-full h-screen overflow-hidden bg-background"
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
       <Sidebar />
       
       <div className="flex flex-col flex-1 h-full overflow-hidden relative">
         <TopBar />
         
-        <main className="flex-1 overflow-y-auto w-full relative">
-          <div className="w-full h-full px-[48px] pt-0 pb-6 flex flex-col">
+        <main id="main-content" className="flex-1 overflow-y-auto w-full relative">
+          <div className="w-full h-full px-4 md:px-[48px] pt-0 pb-6 flex flex-col">
+            <PagePresence />
             <Outlet />
           </div>
 
@@ -82,8 +102,9 @@ export function AppLayout() {
                     </button>
                     <button 
                       onClick={() => isPaused ? resumeSession() : pauseSession()}
-                      className="bg-slate-100 hover:bg-slate-200 transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer"
+                      className="bg-slate-100 hover:bg-slate-200 transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       title={isPaused ? "Resume" : "Pause"}
+                      aria-label={isPaused ? "Resume focus session" : "Pause focus session"}
                     >
                       {isPaused ? (
                         <Play className="w-3.5 h-3.5 text-slate-600" />
@@ -93,7 +114,8 @@ export function AppLayout() {
                     </button>
                     <button 
                       onClick={() => stopSession()}
-                      className="bg-slate-100 hover:bg-slate-200 transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer"
+                      className="bg-slate-100 hover:bg-slate-200 transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-label="Stop focus session"
                     >
                       <Square className="w-3 h-3 text-slate-600 fill-slate-600" />
                     </button>
@@ -183,6 +205,10 @@ export function AppLayout() {
               </div>
             </div>
           )}
+          <KeyboardShortcutsModal
+            open={isKeyboardShortcutsOpen}
+            onOpenChange={setIsKeyboardShortcutsOpen}
+          />
         </main>
       </div>
     </div>

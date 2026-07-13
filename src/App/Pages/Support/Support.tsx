@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const faqs = [
   {
@@ -92,14 +93,14 @@ export default function Support() {
 
   return (
     <div className="page-container pt-3">
-      <div className="flex flex-col gap-0.5 mb-4">
+      <div className="flex flex-col gap-0.5 mb-3">
         <h1 className="page-title">Support</h1>
         <p className="page-description">
           Find answers to common questions or reach out to our team.
         </p>
       </div>
 
-      <div className="relative w-full max-w-md mb-5">
+      <div className="relative w-full max-w-md mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <Input
           placeholder="Search FAQs..."
@@ -119,15 +120,11 @@ export default function Support() {
             </div>
 
             {filteredFaqs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <HelpCircle className="w-12 h-12 text-slate-300 mb-4" />
-                <p className="font-['Inter',sans-serif] text-[16px] text-slate-600 font-medium">
-                  No matching questions found
-                </p>
-                <p className="text-sm text-slate-500 mt-1">
-                  Try a different search term or browse the categories below.
-                </p>
-              </div>
+              <EmptyState
+                icon={HelpCircle}
+                title="No matching questions found"
+                description="Try searching with different keywords."
+              />
             ) : (
               <div className="divide-y divide-slate-200">
                 {filteredFaqs.map((faq, index) => (
@@ -171,7 +168,7 @@ export default function Support() {
           <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
-                <HelpCircle className="w-5 h-5 text-[#7b68ee]" />
+                <HelpCircle className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Need more help?</h3>
@@ -188,7 +185,7 @@ export default function Support() {
                 const content = (
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors no-underline">
                     <div className="w-9 h-9 rounded-lg bg-[#f5f3ff] flex items-center justify-center shrink-0">
-                      <option.icon className="w-4 h-4 text-[#7b68ee]" />
+                      <option.icon className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -201,7 +198,7 @@ export default function Support() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs font-semibold text-[#7b68ee] shrink-0"
+                      className="text-xs font-semibold text-primary shrink-0"
                     >
                       {option.action}
                       {isExternal && <ExternalLink className="w-3 h-3 ml-1" />}
@@ -224,7 +221,7 @@ export default function Support() {
               Connect with other power users, share tips, and get early access
               to new features.
             </p>
-            <Button className="bg-[#7b68ee] hover:opacity-90 text-white w-full">
+            <Button className="bg-primary hover:opacity-90 text-white w-full">
               <MessageCircle className="w-4 h-4 mr-2" />
               Join Discord
             </Button>

@@ -18,6 +18,7 @@ import {
   Folder, 
   Settings as SettingsIcon,
   User,
+  Users,
   Sliders,
   Briefcase,
   Puzzle,
@@ -28,10 +29,18 @@ import {
   Calendar,
   MessageCircle,
   FileText,
+  Bell,
+  Plus,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import { Dropdown } from '@/components/shared/Dropdown';
+import { EmptyState } from "@/components/shared/EmptyState";
+import { useTasks } from '@/hooks/useTasks';
+import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface WorkspaceMember {
   member_id: string;
@@ -76,6 +85,49 @@ export default function Settings() {
 
   const { preferences, updatePreference } = usePreferences();
 
+  // Notification preferences
+  const [notifPrefs, setNotifPrefs] = useState<{ email_notifications: boolean; push_notifications: boolean; digest_frequency: string } | null>(null);
+  const [notifPrefsLoading, setNotifPrefsLoading] = useState(false);
+  const [notifPrefsSaving, setNotifPrefsSaving] = useState(false);
+
+  const fetchNotifPrefs = async () => {
+    if (!user) return;
+    setNotifPrefsLoading(true);
+    try {
+      const { data } = await supabase
+        .from("notification_preferences")
+        .select("email_notifications, push_notifications, digest_frequency")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        setNotifPrefs(data);
+      } else {
+        setNotifPrefs({ email_notifications: true, push_notifications: false, digest_frequency: "instant" });
+      }
+    } catch {
+      setNotifPrefs({ email_notifications: true, push_notifications: false, digest_frequency: "instant" });
+    } finally {
+      setNotifPrefsLoading(false);
+    }
+  };
+
+  const saveNotifPrefs = async (updates: Partial<typeof notifPrefs>) => {
+    if (!user || !notifPrefs) return;
+    setNotifPrefsSaving(true);
+    try {
+      const merged = { ...notifPrefs, ...updates };
+      const { error } = await supabase
+        .from("notification_preferences")
+        .upsert({ user_id: user.id, ...merged, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+      if (error) throw error;
+      setNotifPrefs(merged);
+    } catch (error) {
+      console.error("Failed to save notification preferences:", error);
+    } finally {
+      setNotifPrefsSaving(false);
+    }
+  };
+
   useEffect(() => {
     if (currentWorkspaceId) {
       fetchMembers();
@@ -97,7 +149,10 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    if (user) fetchProfile();
+    if (user) {
+      fetchProfile();
+      fetchNotifPrefs();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -323,7 +378,7 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-8 bg-muted/50 p-1">
+        <TabsList className="mb-3 bg-muted/50 p-1">
           <TabsTrigger value="account" className="gap-2">
             <User className="w-4 h-4" />
             Account
@@ -331,6 +386,10 @@ export default function Settings() {
           <TabsTrigger value="preferences" className="gap-2">
             <Sliders className="w-4 h-4" />
             Preferences
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-2">
+            <Bell className="w-4 h-4" />
+            Notifications
           </TabsTrigger>
           <TabsTrigger value="workspace" className="gap-2">
             <Briefcase className="w-4 h-4" />
@@ -340,6 +399,10 @@ export default function Settings() {
             <Puzzle className="w-4 h-4" />
             Integrations
           </TabsTrigger>
+          <TabsTrigger value="workflow" className="gap-2">
+            <ListChecks className="w-4 h-4" />
+            Workflow
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="account" className="space-y-6">
@@ -348,7 +411,7 @@ export default function Settings() {
               <div className="bg-card rounded-xl p-6 shadow-sm border">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
-                    <User className="w-5 h-5 text-[#7b68ee]" />
+                    <User className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">Profile Information</h3>
@@ -357,8 +420,20 @@ export default function Settings() {
                 </div>
 
                 {profileLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  <div className="space-y-5">
+                    <div className="space-y-1">
+                      <Skeleton className="h-3 w-12" />
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                    <div className="space-y-1">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                    <div className="space-y-1">
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                    <Skeleton className="h-10 w-28 rounded-lg" />
                   </div>
                 ) : (
                   <div className="space-y-5">
@@ -402,7 +477,7 @@ export default function Settings() {
                     <Button
                       onClick={handleSaveProfile}
                       disabled={profileSaving}
-                      className="bg-[#7b68ee] hover:opacity-90 text-white"
+                      className="bg-primary hover:opacity-90 text-white"
                     >
                       {profileSaving ? (
                         <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
@@ -421,7 +496,7 @@ export default function Settings() {
                   <div className="relative mb-4">
                     <Avatar className="w-24 h-24">
                       <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="text-2xl bg-[#f5f3ff] text-[#7b68ee]">
+                      <AvatarFallback className="text-2xl bg-[#f5f3ff] text-primary">
                         {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -453,7 +528,7 @@ export default function Settings() {
             <div className="bg-card rounded-xl p-6 shadow-sm border">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
-                  <ListChecks className="w-5 h-5 text-[#7b68ee]" />
+                  <ListChecks className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Task Defaults</h3>
@@ -482,7 +557,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">New tasks are automatically assigned to you.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={preferences.autoAssignToSelf} onChange={(e) => updatePreference('autoAssignToSelf', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoAssignToSelf} onChange={(e) => updatePreference('autoAssignToSelf', e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
                   </div>
                 </div>
 
@@ -492,7 +567,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Hide completed tasks after 7 days.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={preferences.autoArchiveCompleted} onChange={(e) => updatePreference('autoArchiveCompleted', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoArchiveCompleted} onChange={(e) => updatePreference('autoArchiveCompleted', e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
                   </div>
                 </div>
 
@@ -502,7 +577,7 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Display completed tasks in the task list.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={preferences.showCompletedTasks} onChange={(e) => updatePreference('showCompletedTasks', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.showCompletedTasks} onChange={(e) => updatePreference('showCompletedTasks', e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
                   </div>
                 </div>
               </div>
@@ -511,7 +586,7 @@ export default function Settings() {
             <div className="bg-card rounded-xl p-6 shadow-sm border">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
-                  <Folder className="w-5 h-5 text-[#7b68ee]" />
+                  <Folder className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Project Defaults</h3>
@@ -540,13 +615,84 @@ export default function Settings() {
                     <p className="text-xs text-muted-foreground">Mark projects as completed when all tasks are done.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={preferences.autoCloseCompletedProjects} onChange={(e) => updatePreference('autoCloseCompletedProjects', e.target.checked)} className="rounded border-input text-[#7b68ee] focus:ring-[#7b68ee]" />
+                    <input type="checkbox" checked={preferences.autoCloseCompletedProjects} onChange={(e) => updatePreference('autoCloseCompletedProjects', e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-card rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Email & Push Notifications</h3>
+                  <p className="text-sm text-muted-foreground">Control how and when you receive notifications.</p>
+                </div>
+              </div>
+
+              {notifPrefsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-12 w-full rounded-lg" />
+                  <Skeleton className="h-12 w-full rounded-lg" />
+                  <Skeleton className="h-12 w-full rounded-lg" />
+                </div>
+              ) : notifPrefs ? (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Email notifications</p>
+                      <p className="text-xs text-muted-foreground">Receive notifications via email.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={notifPrefs.email_notifications} onChange={(e) => saveNotifPrefs({ email_notifications: e.target.checked })} className="rounded border-input text-primary focus:ring-primary" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Push notifications</p>
+                      <p className="text-xs text-muted-foreground">Receive push notifications in-app.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={notifPrefs.push_notifications} onChange={(e) => saveNotifPrefs({ push_notifications: e.target.checked })} className="rounded border-input text-primary focus:ring-primary" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Digest frequency</p>
+                      <p className="text-xs text-muted-foreground">How often to receive digest emails.</p>
+                    </div>
+                    <Dropdown
+                      value={notifPrefs.digest_frequency}
+                      onValueChange={(val) => val && saveNotifPrefs({ digest_frequency: val })}
+                      options={[
+                        { value: "instant", label: "Instant" },
+                        { value: "daily", label: "Daily" },
+                        { value: "weekly", label: "Weekly" },
+                      ]}
+                      showSearch={false}
+                      triggerClassName="w-40 h-9 text-sm"
+                    />
+                  </div>
+
+                  {notifPrefsSaving && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="workspace" className="space-y-6">
@@ -717,8 +863,19 @@ export default function Settings() {
                   <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Current Members</h4>
                   
                   {isLoadingMembers ? (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    <div className="space-y-2">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Skeleton className="w-8 h-8 rounded-full" />
+                            <div className="space-y-1">
+                              <Skeleton className="h-4 w-40" />
+                              <Skeleton className="h-3 w-24" />
+                            </div>
+                          </div>
+                          <Skeleton className="h-8 w-24 rounded-md" />
+                        </div>
+                      ))}
                     </div>
                   ) : members.length > 0 ? (
                     <div className="space-y-2">
@@ -766,9 +923,11 @@ export default function Settings() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No members found.
-                    </p>
+                    <EmptyState
+                      icon={Users}
+                      title="No members found"
+                      description="Invite members to your workspace to collaborate."
+                    />
                   )}
                 </div>
               </div>
@@ -874,7 +1033,7 @@ export default function Settings() {
         <TabsContent value="integrations" className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
-              <Puzzle className="w-5 h-5 text-[#7b68ee]" />
+              <Puzzle className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Integrations</h3>
@@ -891,7 +1050,7 @@ export default function Settings() {
                 description: "Get task notifications and updates directly in your Slack channels.",
                 icon: MessageCircle,
                 color: "bg-[#f5f3ff]",
-                iconColor: "text-[#7b68ee]",
+                iconColor: "text-primary",
                 connected: false,
               },
               {
@@ -923,7 +1082,7 @@ export default function Settings() {
                 description: "Export tasks and goals to Notion for extended documentation.",
                 icon: FileText,
                 color: "bg-[#f5f3ff]",
-                iconColor: "text-[#7b68ee]",
+                iconColor: "text-primary",
                 connected: false,
               },
               {
@@ -965,7 +1124,7 @@ export default function Settings() {
                   className={
                     integration.connected
                       ? ""
-                      : "bg-[#7b68ee] hover:opacity-90 text-white"
+                      : "bg-primary hover:opacity-90 text-white"
                   }
                   onClick={() => toast.info(integration.connected ? "Disconnect coming soon" : "Integration coming soon")}
                 >
@@ -977,7 +1136,7 @@ export default function Settings() {
 
           <div className="bg-card rounded-xl p-6 shadow-sm border border-dashed flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-full bg-[#f5f3ff] flex items-center justify-center mb-3">
-              <Puzzle className="w-6 h-6 text-[#7b68ee]" />
+              <Puzzle className="w-6 h-6 text-primary" />
             </div>
             <h4 className="text-sm font-semibold text-slate-900 mb-1">
               API Access
@@ -991,6 +1150,10 @@ export default function Settings() {
             </Button>
           </div>
         </TabsContent>
+
+        <TabsContent value="workflow" className="space-y-6">
+          <WorkflowSettingsContent />
+        </TabsContent>
       </Tabs>
 
       <ConfirmDialog
@@ -1002,6 +1165,331 @@ export default function Settings() {
         confirmLabel="Remove"
         destructive
       />
+    </div>
+  );
+}
+
+function WorkflowSettingsContent() {
+  const { currentWorkspaceId } = useAuth();
+  const {
+    workflowStatuses,
+    customFields,
+    addWorkflowStatus,
+    updateWorkflowStatus,
+    deleteWorkflowStatus,
+    addCustomField,
+    deleteCustomField,
+  } = useTasks();
+
+  const [newStatusName, setNewStatusName] = useState('');
+  const [newStatusColor, setNewStatusColor] = useState('#7b68ee');
+  const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
+  const [editingStatusName, setEditingStatusName] = useState('');
+  const [editingStatusColor, setEditingStatusColor] = useState('');
+
+  const [newFieldName, setNewFieldName] = useState('');
+  const [newFieldType, setNewFieldType] = useState('text');
+  const [newFieldOptions, setNewFieldOptions] = useState('');
+
+  const handleAddStatus = async () => {
+    if (!newStatusName.trim()) return;
+    const ok = await addWorkflowStatus(newStatusName.trim(), newStatusColor);
+    if (ok) {
+      setNewStatusName('');
+      setNewStatusColor('#7b68ee');
+      toast.success('Status added');
+    } else {
+      toast.error('Failed to add status');
+    }
+  };
+
+  const handleUpdateStatus = async (id: string) => {
+    const ok = await updateWorkflowStatus(id, { name: editingStatusName, color: editingStatusColor } as any);
+    if (ok) {
+      setEditingStatusId(null);
+      toast.success('Status updated');
+    } else {
+      toast.error('Failed to update status');
+    }
+  };
+
+  const handleDeleteStatus = async (id: string) => {
+    const ok = await deleteWorkflowStatus(id);
+    if (ok) {
+      toast.success('Status deleted');
+    } else {
+      toast.error('Failed to delete status');
+    }
+  };
+
+  const handleMoveStatus = async (id: string, direction: 'up' | 'down') => {
+    const idx = workflowStatuses.findIndex(s => s.id === id);
+    if (direction === 'up' && idx === 0) return;
+    if (direction === 'down' && idx === workflowStatuses.length - 1) return;
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    const current = workflowStatuses[idx];
+    const target = workflowStatuses[targetIdx];
+    await updateWorkflowStatus(current.id, { position: target.position } as any);
+    await updateWorkflowStatus(target.id, { position: current.position } as any);
+  };
+
+  const handleAddField = async () => {
+    if (!newFieldName.trim()) return;
+    let options: string[] = [];
+    if (newFieldType === 'select' || newFieldType === 'multi_select') {
+      options = newFieldOptions.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    const ok = await addCustomField({
+      workspace_id: currentWorkspaceId!,
+      name: newFieldName.trim(),
+      field_type: newFieldType,
+      options,
+      position: customFields.length,
+    });
+    if (ok) {
+      setNewFieldName('');
+      setNewFieldType('text');
+      setNewFieldOptions('');
+      toast.success('Custom field added');
+    } else {
+      toast.error('Failed to add custom field');
+    }
+  };
+
+  const handleDeleteField = async (id: string) => {
+    const ok = await deleteCustomField(id);
+    if (ok) {
+      toast.success('Custom field deleted');
+    } else {
+      toast.error('Failed to delete custom field');
+    }
+  };
+
+  if (!currentWorkspaceId) {
+    return (
+      <EmptyState
+        icon={ListChecks}
+        title="No workspace selected"
+        description="Select a workspace to configure workflow settings."
+      />
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="bg-card rounded-xl p-6 shadow-sm border">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+            <ListChecks className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Custom Statuses</h3>
+            <p className="text-sm text-muted-foreground">Define custom task statuses for this workspace.</p>
+          </div>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {workflowStatuses.map((status, idx) => (
+            <div
+              key={status.id}
+              className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border"
+            >
+              <div className="flex flex-col gap-0.5">
+                <button
+                  onClick={() => handleMoveStatus(status.id, 'up')}
+                  disabled={idx === 0}
+                  className="w-4 h-3 flex items-center justify-center text-slate-400 hover:text-primary disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <ChevronUp className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => handleMoveStatus(status.id, 'down')}
+                  disabled={idx === workflowStatuses.length - 1}
+                  className="w-4 h-3 flex items-center justify-center text-slate-400 hover:text-primary disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </div>
+
+              {editingStatusId === status.id ? (
+                <div className="flex-1 flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={editingStatusColor}
+                    onChange={(e) => setEditingStatusColor(e.target.value)}
+                    className="w-8 h-8 rounded border cursor-pointer"
+                  />
+                  <Input
+                    value={editingStatusName}
+                    onChange={(e) => setEditingStatusName(e.target.value)}
+                    className="flex-1 h-8 text-sm"
+                    placeholder="Status name"
+                  />
+                  <Button size="sm" variant="ghost" onClick={() => handleUpdateStatus(status.id)} className="h-8 px-2">
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingStatusId(null)} className="h-8 px-2">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="w-4 h-4 rounded-full shrink-0"
+                    style={{ backgroundColor: status.color }}
+                  />
+                  <span className="flex-1 text-sm font-medium">{status.name}</span>
+                  {status.is_default && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                      Default
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setEditingStatusId(status.id);
+                      setEditingStatusName(status.name);
+                      setEditingStatusColor(status.color);
+                    }}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </Button>
+                  {!status.is_default && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteStatus(status.id)}
+                      className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+          {workflowStatuses.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No custom statuses defined yet.
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 pt-3 border-t">
+          <input
+            type="color"
+            value={newStatusColor}
+            onChange={(e) => setNewStatusColor(e.target.value)}
+            className="w-9 h-9 rounded border cursor-pointer shrink-0"
+          />
+          <Input
+            value={newStatusName}
+            onChange={(e) => setNewStatusName(e.target.value)}
+            placeholder="New status name"
+            className="flex-1 h-9 text-sm"
+            onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
+          />
+          <Button
+            size="sm"
+            onClick={handleAddStatus}
+            disabled={!newStatusName.trim()}
+            className="h-9 px-3 bg-primary hover:opacity-90 text-white"
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-card rounded-xl p-6 shadow-sm border">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+            <ListChecks className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Custom Fields</h3>
+            <p className="text-sm text-muted-foreground">Add custom data fields to your tasks.</p>
+          </div>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {customFields.map((field) => (
+            <div
+              key={field.id}
+              className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{field.name}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                    {field.field_type}
+                  </span>
+                </div>
+                {field.options.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                    Options: {field.options.join(', ')}
+                  </p>
+                )}
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleDeleteField(field.id)}
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+          {customFields.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No custom fields defined yet.
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-3 pt-3 border-t">
+          <div className="flex gap-2">
+            <Input
+              value={newFieldName}
+              onChange={(e) => setNewFieldName(e.target.value)}
+              placeholder="Field name"
+              className="flex-1 h-9 text-sm"
+            />
+            <Dropdown
+              value={newFieldType}
+              onValueChange={(val) => setNewFieldType(val ?? 'text')}
+              options={[
+                { value: 'text', label: 'Text' },
+                { value: 'number', label: 'Number' },
+                { value: 'date', label: 'Date' },
+                { value: 'select', label: 'Select' },
+                { value: 'multi_select', label: 'Multi Select' },
+              ]}
+              showSearch={false}
+              triggerClassName="w-32 h-9 text-sm"
+            />
+          </div>
+          {(newFieldType === 'select' || newFieldType === 'multi_select') && (
+            <Input
+              value={newFieldOptions}
+              onChange={(e) => setNewFieldOptions(e.target.value)}
+              placeholder="Comma-separated options"
+              className="h-9 text-sm"
+            />
+          )}
+          <Button
+            size="sm"
+            onClick={handleAddField}
+            disabled={!newFieldName.trim()}
+            className="w-full h-9 bg-primary hover:opacity-90 text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Field
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

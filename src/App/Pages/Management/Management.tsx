@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { EmptyState } from "@/components/shared/EmptyState";
 import {
   Avatar,
   AvatarFallback,
@@ -113,7 +114,7 @@ export default function Management() {
       value: taskCounts.total,
       icon: ListChecks,
       color: "bg-[#f5f3ff]",
-      iconColor: "text-[#7b68ee]",
+      iconColor: "text-primary",
     },
     {
       label: "In Progress",
@@ -140,7 +141,7 @@ export default function Management() {
 
   return (
     <div className="page-container pt-3">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-3">
         <div className="flex flex-col gap-0.5">
           <h1 className="page-title">Management</h1>
           <p className="page-description">
@@ -205,7 +206,7 @@ export default function Management() {
         <div className="content-card flex flex-col items-center justify-center py-24 px-6">
           <div className="max-w-md text-center flex flex-col items-center">
             <div className="w-24 h-24 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] rounded-3xl flex items-center justify-center mb-8 shadow-sm">
-              <Target className="w-12 h-12 text-[#7b68ee]" />
+              <Target className="w-12 h-12 text-primary" />
             </div>
             <h2 className="font-['Spline_Sans',sans-serif] text-[32px] font-bold text-slate-900 mb-4 tracking-tight">
               No active tasks or goals
@@ -283,10 +284,11 @@ export default function Management() {
               </div>
               <div className="divide-y divide-slate-200">
                 {members.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center px-4">
-                    <AlertCircle className="w-8 h-8 text-slate-300 mb-2" />
-                    <p className="text-sm text-slate-500">No members found</p>
-                  </div>
+                  <EmptyState
+                    icon={Users}
+                    title="No members found"
+                    description="Invite members to your workspace to collaborate."
+                  />
                 ) : (
                   members.map((member) => (
                     <div
@@ -295,7 +297,7 @@ export default function Management() {
                     >
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={member.avatar_url ?? undefined} />
-                        <AvatarFallback className="text-xs bg-[#f5f3ff] text-[#7b68ee]">
+                        <AvatarFallback className="text-xs bg-[#f5f3ff] text-primary">
                           {(member.display_name ?? "U").charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>

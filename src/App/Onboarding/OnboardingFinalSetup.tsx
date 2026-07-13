@@ -21,6 +21,7 @@ const OnboardingFinalSetup: React.FC = () => {
             <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-slate-500">STEP 4 OF 4</span>
                 <Link to="/onboarding/power-tools" className="text-slate-900 font-bold">Back</Link>
+                <Link to="/dashboard" className="text-sm font-medium text-slate-500 hover:text-slate-900">Skip onboarding</Link>
             </div>
         </div>
       </main>
