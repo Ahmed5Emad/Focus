@@ -192,7 +192,7 @@ export default function DocumentEditor() {
         </div>
       </div>
 
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex gap-3 min-h-0">
         <div className="flex-1 flex flex-col min-h-0">
           <Editor
             documentId={id!}

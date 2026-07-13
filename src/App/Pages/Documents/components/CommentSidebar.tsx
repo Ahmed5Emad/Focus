@@ -38,6 +38,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const [highlightedComment, setHighlightedComment] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const profileCacheRef = useRef<Map<string, Profile>>(new Map());
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const getProfile = useCallback(async (userId: string): Promise<Profile> => {
     const cached = profileCacheRef.current.get(userId);
@@ -124,6 +125,11 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
     };
   }, [open, documentId, getProfile]);
 
+  useEffect(() => {
+    if (!scrollRef.current || comments.length === 0) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [comments.length]);
+
   const handleSend = async () => {
     if (!newComment.trim() || !user) return;
     setSending(true);
@@ -162,8 +168,6 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
     }
   };
 
-  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
   const handleCommentClick = (comment: Comment) => {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
     setHighlightedComment(comment.id);
@@ -190,74 +194,95 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
     return d.toLocaleDateString();
   };
 
+  const isOwnComment = (comment: Comment) => comment.user_id === user?.id;
+
   return (
-    <div className="w-80 border-l border-sidebar-border bg-sidebar flex flex-col shrink-0">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
-        <h3 className="text-sm font-semibold text-sidebar-foreground flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-primary" />
+    <div className="w-80 bg-background rounded-2xl border border-border flex flex-col shrink-0 max-h-[calc(100vh-200px)]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-cu-purple" />
           Comments
         </h3>
         <button
           onClick={() => onOpenChange(false)}
-          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-4">
         {loading ? (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex items-center justify-center py-12">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : comments.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">
+          <p className="text-sm text-muted-foreground text-center py-12">
             No comments yet
           </p>
         ) : (
-          comments.map((comment) => (
-            <div
-              key={comment.id}
-              onClick={() => handleCommentClick(comment)}
-              className={`flex gap-3 p-2 -mx-2 rounded-xl cursor-pointer transition-colors ${
-                highlightedComment === comment.id
-                  ? "bg-primary/10 ring-1 ring-primary/30"
-                  : "hover:bg-accent/50"
-              }`}
-            >
-              <Avatar className="w-7 h-7 shrink-0 mt-0.5">
-                <AvatarImage
-                  src={comment.profile?.avatar_url ?? undefined}
-                  alt={comment.profile?.display_name ?? "User"}
-                />
-                <AvatarFallback className="text-[10px]">
-                  {(comment.profile?.display_name ?? "U").charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-sidebar-foreground">
-                    {comment.profile?.display_name ?? "Unknown"}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {formatTime(comment.created_at)}
-                  </span>
-                </div>
-                {comment.selection_from != null && (
-                  <span className="text-[11px] text-primary font-medium">
-                    Anchored to text
-                  </span>
-                )}
-                <div className="mt-1 px-3 py-2 bg-accent rounded-xl text-sm text-accent-foreground leading-relaxed">
-                  {comment.content}
+          comments.map((comment) => {
+            const isOwn = isOwnComment(comment);
+            return (
+              <div
+                key={comment.id}
+                onClick={() => handleCommentClick(comment)}
+                className={`flex gap-2.5 cursor-pointer transition-all duration-150 ${
+                  isOwn ? "flex-row-reverse" : ""
+                } ${
+                  highlightedComment === comment.id
+                    ? "opacity-100"
+                    : "opacity-90 hover:opacity-100"
+                }`}
+              >
+                <Avatar className="mt-1 shrink-0 w-7 h-7">
+                  <AvatarImage
+                    src={comment.profile?.avatar_url ?? undefined}
+                    alt={comment.profile?.display_name ?? "User"}
+                  />
+                  <AvatarFallback className="text-[10px]">
+                    {(comment.profile?.display_name ?? "U").charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className={`flex flex-col max-w-[80%] ${isOwn ? "items-end" : ""}`}>
+                  <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? "flex-row-reverse" : ""}`}>
+                    <span className="text-xs font-semibold text-foreground">
+                      {comment.profile?.display_name ?? "Unknown"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {formatTime(comment.created_at)}
+                    </span>
+                    {comment.selection_from != null && (
+                      <span className="text-[10px] font-medium text-cu-purple">
+                        anchored
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    className={`px-3 py-2 text-sm leading-relaxed rounded-2xl ${
+                      isOwn
+                        ? "bg-cu-purple text-white"
+                        : "bg-white border border-slate-100 shadow-sm text-slate-900"
+                    } ${
+                      highlightedComment === comment.id
+                        ? isOwn
+                          ? "ring-2 ring-cu-purple/60"
+                          : "ring-2 ring-cu-purple/40"
+                        : ""
+                    }`}
+                  >
+                    {comment.content}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
-      <div className="border-t border-sidebar-border px-4 py-3">
+      <div className="border-t border-border px-4 py-3">
         <div className="flex items-end gap-2">
           <textarea
             value={newComment}
@@ -268,13 +293,13 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
               : "Add a comment..."
             }
             rows={2}
-            className="flex-1 px-3 py-2 text-sm bg-background border border-input rounded-lg resize-none outline-none focus:border-ring focus:ring-1 focus:ring-ring/20 text-foreground placeholder:text-muted-foreground transition-colors"
+            className="flex-1 px-3 py-2 text-sm rounded-xl bg-[#f8f7fc] border border-border resize-none outline-none focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 text-foreground placeholder:text-muted-foreground transition-all"
           />
           <Button
             onClick={handleSend}
             disabled={!newComment.trim() || sending}
             size="icon"
-            className="h-9 w-9 shrink-0 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="h-9 w-9 shrink-0 rounded-xl bg-cu-purple hover:bg-cu-purple/90 text-white"
           >
             {sending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
