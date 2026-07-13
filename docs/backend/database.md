@@ -42,6 +42,13 @@
 | `parent_task_id` | `uuid?` | FK → `tasks.id` |
 | `assignee_id` | `uuid?` | FK → `auth.users.id` |
 | `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `position` | `int` | Reorderable (drag-and-drop) |
+| `is_archived` | `boolean` | Default `false` |
+| `archived_at` | `timestamptz?` | |
+| `recurrence_rule` | `text?` | RRULE string for recurring tasks |
+| `recurrence_end_date` | `timestamptz?` | |
+| `last_recurrence_at` | `timestamptz?` | |
+| `template_id` | `uuid?` | FK → `task_templates.id` |
 
 ### `goals`
 | Column | Type | Notes |
@@ -133,6 +140,91 @@
 ### `focus_sessions`
 Tracks Pomodoro/flow timer sessions with `status` (active/paused/completed/abandoned), `flow_score`, `actual_duration_seconds`, and heartbeat tracking.
 
+### `activity_logs`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `user_id` | `uuid` | FK → `auth.users.id` |
+| `action` | `text` | `task_created`, `task_completed`, etc. |
+| `entity_type` | `text` | `task`, `project`, `goal`, `document` |
+| `entity_id` | `uuid?` | |
+| `metadata` | `jsonb` | Extra context |
+| `created_at` | `timestamptz` | |
+
+### `distraction_logs`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `session_id` | `uuid` | FK → `focus_sessions.id` |
+| `reason` | `text` | Distraction description |
+| `created_at` | `timestamptz` | |
+
+### `task_dependencies`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `task_id` | `uuid` | FK → `tasks.id` (CASCADE) |
+| `depends_on_task_id` | `uuid` | FK → `tasks.id` (CASCADE) |
+| `created_at` | `timestamptz` | |
+
+### `task_templates`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `name` | `text` | Template name |
+| `description` | `text?` | |
+| `task_title` | `text` | Default title for created tasks |
+| `task_description` | `text?` | |
+| `task_priority` | `text` | Default priority |
+| `subtask_templates` | `jsonb` | Array of `{ title }` objects |
+| `created_at` | `timestamptz` | |
+| `created_by` | `uuid` | FK → `auth.users.id` |
+
+### `workflow_statuses`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `name` | `text` | Status label (e.g. "In Progress") |
+| `color` | `text` | Hex color |
+| `position` | `int` | Sort order |
+| `is_default` | `boolean` | Default status for new tasks |
+
+### `custom_fields`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `name` | `text` | Field label |
+| `field_type` | `text` | `text`, `number`, `select`, `date` |
+| `options` | `text[]` | Options for `select` type |
+| `position` | `int` | Sort order |
+
+### `task_custom_values`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `task_id` | `uuid` | FK → `tasks.id` (CASCADE) |
+| `field_id` | `uuid` | FK → `custom_fields.id` (CASCADE) |
+| `value` | `text?` | Field value |
+
+### `notification_preferences`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `uuid` | PK |
+| `user_id` | `uuid` | FK → `auth.users.id` |
+| `workspace_id` | `uuid` | FK → `workspaces.id` |
+| `mention` | `boolean` | Default `true` |
+| `assignment` | `boolean` | Default `true` |
+| `comment` | `boolean` | Default `true` |
+| `status_change` | `boolean` | Default `true` |
+| `session_reminder` | `boolean` | Default `true` |
+
+### `documents` — additional columns
+- `project_id` (`uuid?`, FK → `projects.id`) — Document-to-project association
+
 ## Row-Level Security (RLS)
 
 All tables have RLS enabled. General pattern:
@@ -169,3 +261,26 @@ Located in `supabase/migrations/`. Applied in order:
 | `20260702_create_documents_tables.sql` | Documents and document_comments |
 | `20260707_add_document_relations.sql` | Document RLS and relations |
 | `20260707_document_yjs_snapshot_policy.sql` | Yjs snapshot bytea column and update policy |
+| `20260713_workflow_config.sql` | workflow_statuses, custom_fields, task_custom_values, task_templates |
+| `20260713_task_dependencies.sql` | task_dependencies table |
+| `20260713_task_reordering.sql` | position column on tasks |
+| `20260713_recurring_tasks.sql` | recurrence_rule, recurrence_end_date, last_recurrence_at on tasks |
+| `20260713_add_missing_task_columns.sql` | is_archived, archived_at, template_id on tasks |
+| `20260713_fulltext_search.sql` | Full-text search indexes + search_tasks_fulltext RPC |
+| `20260713_activity_feed.sql` | activity_logs table, trigger function for auto-logging |
+| `20260713_notification_preferences.sql` | notification_preferences table |
+| `20260713_data_archival_policy.sql` | Archival cleanup policy |
+| `20260713_rate_limit_rpcs.sql` | Rate-limiting RPCs for API protection |
+| `20260713_add_composite_indexes.sql` | Performance composite indexes |
+
+## Custom RPCs
+
+| Function | Description |
+|----------|-------------|
+| `get_dashboard_stats` | Aggregated stats for Dashboard (flow score, deep work time, task counts) |
+| `get_workspace_members_with_email` | Members list joined with auth.users emails |
+| `search_tasks_fulltext` | Full-text search across task titles and descriptions |
+
+## Database-Level Automation
+
+- **Activity feed trigger**: An `insert_activity_log` trigger function on `tasks` INSERT/UPDATE/DELETE automatically inserts activity_logs rows

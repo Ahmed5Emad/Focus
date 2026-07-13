@@ -2,6 +2,14 @@
 
 ## Common Issues
 
+### All data disappears when switching tabs, apps, or workspaces
+
+**Cause**: Supabase GoTrue client fires `SIGNED_IN` via `_recoverAndRefresh()` every time the browser tab becomes visible. The old `AuthContext` handler re-ran `setUser`/`setSession`/`fetchWorkspaces` on every event — even when nothing changed — causing cascading re-renders that nullified `currentWorkspaceId`.
+
+**Fix**: The `AuthContext` now uses a `hasInitialFetch` ref to skip redundant work on repeated `SIGNED_IN`/`TOKEN_REFRESHED` events. After initial auth, these events are fully ignored — no state changes, no re-renders. Additionally, `useTasks` and `useActivityFeed` Realtime callbacks use silent fetch mode (no loading state) so WebSocket reconnection on tab return doesn't show skeletons.
+
+**If still happening**: Clear browser cookies and re-login. Ensure you're on the latest `main` commit containing the `hasInitialFetch` fix in `src/contexts/AuthContext.tsx`.
+
 ### OAuth callback redirects to a blank page
 
 **Cause**: HashRouter stores the auth code in the URL hash (`#/auth/callback?code=xxx`).
@@ -31,13 +39,15 @@ signInWithOAuth({
 
 ### TypeScript build errors after pull
 
-**Cause**: New dependencies may have been added.
+**Cause**: New dependencies may have been added, or the `tsconfig.app.json` `verbatimModuleSyntax` setting requires type-only imports for type-only exports.
 
 **Fix**:
 ```bash
 bun install
 bun run build
 ```
+
+If errors persist for test files, ensure `@testing-library/jest-dom` and `vitest` are installed. The `src/vitest.d.ts` file provides the jest-dom matcher type augmentation (requires `import "@testing-library/jest-dom/vitest"` in test setup).
 
 ### Document content not saving
 

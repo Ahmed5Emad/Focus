@@ -26,6 +26,10 @@ Already configured for SPA routing (required for HashRouter fallback):
 }
 ```
 
+### Build
+
+The build pipeline runs `tsc -b` (TypeScript project build) then `vite build`. Type errors fail the build. Test files are excluded from the build via `tsconfig.app.json` but are type-checked if included in compilation.
+
 ### Custom Domain
 
 Add it in Vercel project → Settings → Domains. Vercel provisions SSL automatically.
@@ -41,5 +45,15 @@ supabase db push
 ```
 
 Or manually run migration files in the Supabase dashboard SQL editor.
+
+## Edge Functions
+
+The `send-notification` Edge Function is deployed to Supabase. Deploy via:
+
+```bash
+supabase functions deploy send-notification
+```
+
+The function is triggered via POST and handles sending push notifications for mentions, assignments, and comments.
 
 > **No separate server needed.** Document collaboration syncs directly through Supabase Realtime Broadcast — no Hocuspocus, no WebSocket server, no extra deployment.

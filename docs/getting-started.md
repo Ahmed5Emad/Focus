@@ -50,14 +50,13 @@ Opens at `http://localhost:5174`.
 
 | Command | Description |
 |---------|-------------|
-| `bun run dev` | Start Vite dev server |
-| `bun run build` | TypeScript check + Vite production build |
+| `bun run dev` | Start Vite dev server at `http://localhost:5174` |
+| `bun run build` | TypeScript check (`tsc -b`) + Vite production build |
 | `bun run lint` | Run ESLint |
+| `bun run test` | Run Vitest tests |
 
 ## Build
 
 ```bash
-bun run build   # tsc -b + vite build
+bun run build   # tsc -b + vite build, output → dist/
 ```
-
-Output goes to `dist/`.

@@ -27,6 +27,17 @@ On page refresh:
 5. `onAuthStateChange` is registered, which emits `INITIAL_SESSION` with the current session
 6. `ProtectedRoute` sees the session and renders children
 
+### Tab Visibility & Data Persistence
+
+When the browser tab comes back after being in the background (e.g., switching to another tab or app), Supabase's GoTrue client automatically calls `_recoverAndRefresh()` on visibility change. This was causing ALL data (tasks, chat, documents, dashboard) to disappear — replaced by skeleton/loading states — requiring a hard reload.
+
+**Root cause**: Every `SIGNED_IN`/`TOKEN_REFRESHED` event triggered `setUser`/`setSession`/`fetchWorkspaces()` in the `AuthContext` `onAuthStateChange` handler, even when nothing had changed. This cascading re-render caused all hooks depending on `currentWorkspaceId` to reset their loading states.
+
+**Fix** (`src/contexts/AuthContext.tsx`):
+- A `hasInitialFetch` ref prevents redundant re-fetches on repeated auth events. After the initial fetch, `SIGNED_IN`/`TOKEN_REFRESHED` on tab return is completely skipped — no state changes, no re-renders.
+- The workspace validation `useEffect` no longer has a `setCurrentWorkspaceId(null)` branch that could fire during race conditions.
+- `useTasks` and `useActivityFeed` Realtime callbacks use silent fetch mode (no loading state) for WebSocket reconnection replays.
+
 ### PKCE OAuth Flow (Google, Apple, Magic Link)
 
 1. User clicks OAuth button → `signInWithOAuth({ provider })` — generates code_verifier stored in cookie
