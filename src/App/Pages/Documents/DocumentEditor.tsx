@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Cloud, CloudOff, MessageSquare } from "lucide-react";
+import { ArrowLeft, Cloud, CloudOff, MessageSquare, Wifi, WifiOff } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Editor } from "./components/Editor";
+import { Editor, type ConnectionStatus } from "./components/Editor";
 import { TaskLinkSelector } from "./components/TaskLinkSelector";
 import { CommentSidebar } from "./components/CommentSidebar";
 
@@ -16,6 +16,7 @@ export default function DocumentEditor() {
   const [notFound, setNotFound] = useState(false);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "unsaved">("saved");
   const [showComments, setShowComments] = useState(false);
+  const [connection, setConnection] = useState<ConnectionStatus>("connecting");
   const mountedRef = useRef(true);
   const titleSaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -143,6 +144,31 @@ export default function DocumentEditor() {
           <span className="text-xs text-slate-400 italic">
             Collaborators will see changes in real-time
           </span>
+          {connection === "connected" ? (
+            <div
+              className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium"
+              title="Realtime sync active"
+            >
+              <Wifi className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Synced</span>
+            </div>
+          ) : connection === "connecting" ? (
+            <div
+              className="flex items-center gap-1.5 text-xs text-amber-600 font-medium"
+              title="Connecting to realtime channel..."
+            >
+              <Wifi className="w-3.5 h-3.5 animate-pulse text-amber-500" />
+              <span>Connecting...</span>
+            </div>
+          ) : (
+            <div
+              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium"
+              title="Realtime connection lost. Edits will sync on reconnect."
+            >
+              <WifiOff className="w-3.5 h-3.5 text-rose-500" />
+              <span>Offline</span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
             {saveState === "saving" ? (
               <>
@@ -170,6 +196,7 @@ export default function DocumentEditor() {
             documentId={id!}
             documentTitle={title}
             onTitleChange={setTitle}
+            onConnectionChange={setConnection}
           />
         </div>
         {showComments && (

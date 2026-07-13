@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type Editor as TiptapEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -73,13 +73,42 @@ interface AwarenessState {
   lastSeen: number;
 }
 
+export type ConnectionStatus = "connecting" | "connected" | "disconnected";
+
 interface EditorProps {
   documentId: string;
   documentTitle: string;
   onTitleChange: (title: string) => void;
+  onConnectionChange?: (status: ConnectionStatus) => void;
 }
 
-export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps) {
+type SupabaseClient = ReturnType<typeof createClient>;
+type BroadcastChannel = ReturnType<SupabaseClient["channel"]>;
+
+function safeSend(
+  channel: BroadcastChannel | null,
+  payload: { type: "broadcast"; event: string; payload: unknown }
+): boolean {
+  if (!channel) return false;
+  try {
+    void channel.send(payload as Parameters<BroadcastChannel["send"]>[0]);
+    return true;
+  } catch (e) {
+    console.error("Broadcast send failed:", e);
+    return false;
+  }
+}
+
+function refreshCursorDecorations(editor: TiptapEditor | null) {
+  if (!editor) return;
+  try {
+    editor.view.dispatch(editor.state.tr.setMeta("yjs-cursor-update", true));
+  } catch {
+    /* editor may be mid-destroy; safe to ignore */
+  }
+}
+
+export function Editor({ documentId, documentTitle, onTitleChange, onConnectionChange }: EditorProps) {
   const { user } = useAuth();
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
@@ -91,76 +120,178 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ydoc = useMemo(() => new Y.Doc(), [documentId]);
   const dirtyRef = useRef(false);
-  const channelRef = useRef<ReturnType<typeof supabase.channel>>(null!);
+  const channelRef = useRef<BroadcastChannel | null>(null);
+  const editorRef = useRef<TiptapEditor | null>(null);
   const awarenessRef = useRef<Map<number, AwarenessState>>(new Map());
+  const snapshotLoadedRef = useRef(false);
+  const pendingUpdatesRef = useRef<Uint8Array[]>([]);
+  const connectionStateRef = useRef<ConnectionStatus>("connecting");
+  const onConnectionChangeRef = useRef<((s: ConnectionStatus) => void) | undefined>(onConnectionChange);
+
+  useEffect(() => {
+    onConnectionChangeRef.current = onConnectionChange;
+  }, [onConnectionChange]);
+
+  const setConnectionState = useCallback((s: ConnectionStatus) => {
+    if (connectionStateRef.current === s) return;
+    connectionStateRef.current = s;
+    onConnectionChangeRef.current?.(s);
+  }, []);
 
   useEffect(() => {
     let destroyed = false;
 
-    supabase
-      .from("documents")
-      .select("yjs_snapshot")
-      .eq("id", documentId)
-      .single()
-      .then(({ data }) => {
-        if (destroyed || !data?.yjs_snapshot) return;
+    setConnectionState("connecting");
+
+    const applyUpdateSafe = (uint8: Uint8Array) => {
+      if (snapshotLoadedRef.current) {
         try {
-          Y.applyUpdate(ydoc, hexToUint8(data.yjs_snapshot as string));
+          Y.applyUpdate(ydoc, uint8);
         } catch (e) {
-          console.error("Failed to load Yjs snapshot, starting fresh document:", e);
+          console.error("Remote sync error:", e);
         }
-      });
+      } else {
+        pendingUpdatesRef.current.push(uint8);
+      }
+    };
+
+    const fetchSnapshot = async (): Promise<boolean> => {
+      try {
+        const { data, error } = await supabase
+          .from("documents")
+          .select("yjs_snapshot")
+          .eq("id", documentId)
+          .single();
+        if (error) {
+          console.warn("Snapshot fetch error:", error.message);
+          return false;
+        }
+        if (destroyed) return false;
+        if (data?.yjs_snapshot) {
+          try {
+            Y.applyUpdate(ydoc, hexToUint8(data.yjs_snapshot as string));
+          } catch (e) {
+            console.error("Failed to load Yjs snapshot:", e);
+          }
+        }
+        return true;
+      } catch (e) {
+        console.error("Snapshot fetch exception:", e);
+        return false;
+      }
+    };
+
+    const flushPendingUpdates = () => {
+      const pending = pendingUpdatesRef.current;
+      pendingUpdatesRef.current = [];
+      for (const u of pending) {
+        try {
+          Y.applyUpdate(ydoc, u);
+        } catch (e) {
+          console.error("Flush pending update error:", e);
+        }
+      }
+    };
+
+    const loadSnapshotAndQueue = async () => {
+      await fetchSnapshot();
+      if (destroyed) return;
+      snapshotLoadedRef.current = true;
+      flushPendingUpdates();
+    };
+
+    void loadSnapshotAndQueue();
 
     const channel = supabase.channel(`document-${documentId}`);
+    channelRef.current = channel;
 
     channel.on("broadcast", { event: "yjs-update" }, ({ payload }) => {
       if (destroyed) return;
-      try {
-        Y.applyUpdate(ydoc, base64ToUint8(payload.data));
-      } catch (e) {
-        console.error("Remote sync error:", e);
-      }
+      applyUpdateSafe(base64ToUint8(payload.data));
     });
 
     channel.on("broadcast", { event: "awareness" }, ({ payload }) => {
       if (destroyed || payload.clientId === ydoc.clientID) return;
-      awarenessRef.current.set(payload.clientId, { ...payload.state, lastSeen: Date.now() });
+      const incoming = payload.state as AwarenessState;
+      awarenessRef.current.set(payload.clientId, { ...incoming, lastSeen: Date.now() });
+      refreshCursorDecorations(editorRef.current);
     });
 
-    channel.subscribe();
-    channelRef.current = channel;
+    channel.on("broadcast", { event: "sync-request" }, ({ payload }) => {
+      if (destroyed || payload.clientId === ydoc.clientID) return;
+      if (!snapshotLoadedRef.current) return;
+      const stateUpdate = Y.encodeStateAsUpdate(ydoc);
+      safeSend(channel, {
+        type: "broadcast",
+        event: "sync-response",
+        payload: { target: payload.clientId, data: uint8ToBase64(stateUpdate) },
+      });
+    });
+
+    channel.on("broadcast", { event: "sync-response" }, ({ payload }) => {
+      if (destroyed || payload.target !== ydoc.clientID) return;
+      if (!snapshotLoadedRef.current) return;
+      try {
+        Y.applyUpdate(ydoc, base64ToUint8(payload.data));
+      } catch (e) {
+        console.error("Sync response apply error:", e);
+      }
+    });
+
+    channel.subscribe((status) => {
+      if (destroyed) return;
+      if (status === "SUBSCRIBED") {
+        setConnectionState("connected");
+        safeSend(channel, {
+          type: "broadcast",
+          event: "sync-request",
+          payload: { clientId: ydoc.clientID },
+        });
+      } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+        setConnectionState("disconnected");
+      }
+    });
 
     const cleanup = setInterval(() => {
       const now = Date.now();
+      let changed = false;
       awarenessRef.current.forEach((state, id) => {
-        if (now - state.lastSeen > 10000) {
+        if (now - state.lastSeen > 15000) {
           awarenessRef.current.delete(id);
+          changed = true;
         }
       });
-    }, 10000);
+      if (changed) refreshCursorDecorations(editorRef.current);
+    }, 5000);
 
     return () => {
       destroyed = true;
       clearInterval(cleanup);
-      supabase.removeChannel(channel);
-    };
-  }, [documentId, ydoc, supabase]);
-
-  const broadcastAwareness = useCallback(
-    (cursor: { anchor: number; head: number | null } | null) => {
-      channelRef.current?.send({
+      safeSend(channel, {
         type: "broadcast",
         event: "awareness",
         payload: {
           clientId: ydoc.clientID,
-          state: {
-            user: { name: userName, color: userColor },
-            cursor,
-          },
+          state: { user: { name: userName, color: userColor }, cursor: null },
+        },
+      });
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+    };
+  }, [documentId, ydoc, supabase, userName, userColor, setConnectionState]);
+
+  const broadcastAwareness = useCallback(
+    (cursor: { anchor: number; head: number | null } | null) => {
+      safeSend(channelRef.current, {
+        type: "broadcast",
+        event: "awareness",
+        payload: {
+          clientId: ydoc.clientID,
+          state: { user: { name: userName, color: userColor }, cursor },
         },
       });
     },
-    [ydoc, userName, userColor]
+    [ydoc.clientID, userName, userColor]
   );
 
   const editor = useEditor({
@@ -207,6 +338,10 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
   });
 
   useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
+
+  useEffect(() => {
     if (!editor) return;
     const onUpdate = () => { dirtyRef.current = true; };
     const onSelectionUpdate = () => {
@@ -226,7 +361,7 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
   useEffect(() => {
     const onUpdate = (_update: Uint8Array, origin: unknown) => {
       if (origin === "remote") return;
-      channelRef.current?.send({
+      safeSend(channelRef.current, {
         type: "broadcast",
         event: "yjs-update",
         payload: { data: uint8ToBase64(_update) },
@@ -236,6 +371,7 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
     return () => ydoc.off("update", onUpdate);
   }, [ydoc]);
 
+  // Periodic save to Postgres (every 3s if dirty).
   useEffect(() => {
     if (!editor) return;
     const interval = setInterval(async () => {
@@ -258,11 +394,33 @@ export function Editor({ documentId, documentTitle, onTitleChange }: EditorProps
     return () => clearInterval(interval);
   }, [editor, ydoc, documentId, supabase]);
 
+  // Final save on unmount + destroy ydoc.
   useEffect(() => {
     return () => {
+      if (snapshotLoadedRef.current && dirtyRef.current) {
+        dirtyRef.current = false;
+        try {
+          const yjsSnapshot = `\\x${uint8ToHex(Y.encodeStateAsUpdate(ydoc))}`;
+          const json = editorRef.current?.getJSON() ?? {};
+          Promise.resolve(
+            supabase
+              .from("documents")
+              .update({
+                content: json,
+                yjs_snapshot: yjsSnapshot,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", documentId)
+          )
+            .then(() => {})
+            .catch(() => {});
+        } catch (e) {
+          console.error("Final save failed:", e);
+        }
+      }
       ydoc.destroy();
     };
-  }, [ydoc]);
+  }, [ydoc, documentId, supabase]);
 
   const exportAsMarkdown = useCallback(async () => {
     if (!editor) return;

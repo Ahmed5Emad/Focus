@@ -42,8 +42,9 @@ export const CollaborationCursor = Extension.create<CollaborationCursorOptions>(
           },
           apply(tr, prev, _oldState, newState) {
             const ystate = ySyncPluginKey.getState(newState);
-            if (ystate && ystate.isChangeOrigin) {
-              return buildDecorations(newState, awarenessStates, ystate.doc.clientID);
+            const awarenessChanged = tr.getMeta("yjs-cursor-update");
+            if (awarenessChanged || (ystate && ystate.isChangeOrigin)) {
+              return buildDecorations(newState, awarenessStates, ystate?.doc.clientID ?? 0);
             }
             return prev.map(tr.mapping, tr.doc);
           },
