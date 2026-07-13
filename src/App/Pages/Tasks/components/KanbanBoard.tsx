@@ -1,4 +1,4 @@
-import { Task, WorkflowStatus } from "@/hooks/useTasks";
+import type { Task, WorkflowStatus } from "@/hooks/useTasks";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,

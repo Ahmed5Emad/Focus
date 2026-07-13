@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase/client";
 
@@ -493,7 +493,7 @@ export function useTasks() {
 
       const restoredTask = tasks.find(t => t.id === taskId);
       if (restoredTask) {
-        setTasks([...tasks, { ...restoredTask, is_archived: false, archived_at: null }]);
+        setTasks([...tasks, { ...restoredTask, is_archived: false }]);
       } else {
         const { data } = await supabase
           .from('tasks')

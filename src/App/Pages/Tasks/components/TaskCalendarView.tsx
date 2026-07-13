@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, addMonths, subMonths, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Task } from "@/hooks/useTasks";
+import type { Task } from "@/hooks/useTasks";
 import { Button } from "@/components/ui/button";
 import { Calendar, Folder, Target, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 
