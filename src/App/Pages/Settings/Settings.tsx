@@ -1203,7 +1203,7 @@ function WorkflowSettingsContent() {
   };
 
   const handleUpdateStatus = async (id: string) => {
-    const ok = await updateWorkflowStatus(id, { name: editingStatusName, color: editingStatusColor } as any);
+    const ok = await updateWorkflowStatus(id, { name: editingStatusName, color: editingStatusColor });
     if (ok) {
       setEditingStatusId(null);
       toast.success('Status updated');
@@ -1228,8 +1228,8 @@ function WorkflowSettingsContent() {
     const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
     const current = workflowStatuses[idx];
     const target = workflowStatuses[targetIdx];
-    await updateWorkflowStatus(current.id, { position: target.position } as any);
-    await updateWorkflowStatus(target.id, { position: current.position } as any);
+    await updateWorkflowStatus(current.id, { position: target.position });
+    await updateWorkflowStatus(target.id, { position: current.position });
   };
 
   const handleAddField = async () => {

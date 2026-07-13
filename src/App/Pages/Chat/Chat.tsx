@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import {
   MessageCircle,
   MessageSquare,
@@ -159,7 +159,10 @@ export default function Chat() {
 
   const hasMore = mode === "channel" ? groupChat.hasMore ?? false : false;
   const isLoadingMore = mode === "channel" ? groupChat.isLoadingMore ?? false : false;
-  const loadMoreMessages = mode === "channel" ? groupChat.loadMoreMessages ?? (() => {}) : () => {};
+  const groupLoadMore = mode === "channel" ? groupChat.loadMoreMessages : undefined;
+  const loadMoreMessages = useCallback(() => {
+    groupLoadMore?.();
+  }, [groupLoadMore]);
 
   const scrollPosRef = useRef(0);
   const loadingMoreRef = useRef(false);

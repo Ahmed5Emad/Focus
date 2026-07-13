@@ -30,6 +30,7 @@ export const MentionInput = forwardRef<HTMLTextAreaElement, MentionInputProps>(
 
     useEffect(() => {
       if (filteredMembers.length > 0 && mentionIndex >= filteredMembers.length) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMentionIndex(filteredMembers.length - 1);
       }
     }, [filteredMembers.length, mentionIndex]);

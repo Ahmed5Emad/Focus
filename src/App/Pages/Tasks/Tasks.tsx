@@ -119,6 +119,7 @@ export default function Tasks() {
   const visibleTasks = filteredTasks.slice(0, visibleCount);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(BATCH_SIZE);
   }, [searchQuery, statusFilter, projectFilter, goalFilter, assigneeFilter, sortBy]);
 

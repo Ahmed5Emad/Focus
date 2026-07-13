@@ -1,5 +1,4 @@
 import { vi } from "vitest";
-import type { ReactNode } from "react";
 
 export const mockUser = {
   id: "test-user-id",

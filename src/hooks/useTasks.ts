@@ -372,10 +372,10 @@ export function useTasks() {
 
     const chName = `tasks-${currentWorkspaceId}`;
     const ch = supabase.channel(chName);
-    try { ch.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `workspace_id=eq.${currentWorkspaceId}` }, () => { fetchData(true); }); } catch {}
+    try { ch.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `workspace_id=eq.${currentWorkspaceId}` }, () => { fetchData(true); }); } catch { /* channel setup errors are non-critical */ }
     ch.subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [currentWorkspaceId, fetchMembers]);
+  }, [currentWorkspaceId, fetchMembers, fetchWorkflowConfig]);
 
   const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
     let newStatus: string;
