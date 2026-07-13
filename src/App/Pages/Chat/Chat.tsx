@@ -335,7 +335,7 @@ export default function Chat() {
         destructive
       />
       <div className="flex flex-col w-full h-full min-h-0">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6 pb-4 shrink-0">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pt-6 pb-4 shrink-0">
         <div>
           <h1 className="page-title mb-2">Chat</h1>
           <p className="page-description">

@@ -141,7 +141,7 @@ export default function Management() {
 
   return (
     <div className="page-container pt-3">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-3">
         <div className="flex flex-col gap-0.5">
           <h1 className="page-title">Management</h1>
           <p className="page-description">

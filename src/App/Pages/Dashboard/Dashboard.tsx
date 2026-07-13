@@ -245,8 +245,8 @@ export default function Dashboard() {
   const weeklyTrend = useMemo(() => {
     const thisWeekTotal = weeklySessions.reduce((sum, s) => sum + (s.actual_duration_seconds || 0), 0);
     const lastWeekTotal = previousWeeklySessions.reduce((sum, s) => sum + (s.actual_duration_seconds || 0), 0);
-    if (lastWeekTotal === 0) return thisWeekTotal > 0 ? 100 : 0;
-    return Math.round(((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100);
+    if (lastWeekTotal < 60) return thisWeekTotal > 0 ? 100 : 0;
+    return Math.min(Math.round(((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100), 999);
   }, [weeklySessions, previousWeeklySessions]);
 
   const maxWeeklySeconds = Math.max(...weeklyChart.map((d) => d.seconds), 1);
@@ -266,7 +266,7 @@ export default function Dashboard() {
   return (
     <div className="page-container">
       {/* ── Hero ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 mb-3">
         <div>
           <h1 className="page-title mb-1">
             {greeting}
@@ -317,9 +317,9 @@ export default function Dashboard() {
       </div>
 
       {/* ── Metrics ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
         {/* Flow Score */}
-        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-4">
+        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-5 flex flex-col">
           {isLoading ? (
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-start justify-between w-full">
@@ -333,44 +333,34 @@ export default function Dashboard() {
               <Skeleton className="h-4 w-36" />
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">
-                    Flow Score
-                  </p>
-                  <div className="flex items-end gap-0.5">
-                    <span className="font-semibold text-slate-900 text-[30px] leading-9 tracking-[-0.6px]">
-                      {Math.round(stats?.avg_flow_score ?? 0)}
-                    </span>
-                    <span className="font-normal text-slate-400 text-[18px] leading-7">
-                      /100
-                    </span>
-                  </div>
-                </div>
-                <div className="w-9 h-9 bg-[#f5f3ff] rounded-full flex items-center justify-center text-[#8b5cf6] shrink-0">
-                  <BrainCircuit className="w-4.5 h-4.5" />
+            <div className="flex flex-col h-full">
+              <div className="flex items-start justify-between shrink-0">
+                <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">Flow Score</p>
+                <div className="w-10 h-10 bg-[#f5f3ff] rounded-full flex items-center justify-center text-[#8b5cf6] shrink-0">
+                  <BrainCircuit className="w-5 h-5" />
                 </div>
               </div>
-              <div className="bg-slate-100 h-1.5 rounded-2xl overflow-hidden">
-                <div
-                  className="bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 rounded-2xl"
-                  style={{ width: `${stats?.avg_flow_score ?? 0}%` }}
-                />
+              <div className="flex-1 flex items-center py-2">
+                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(123,104,238,0.35)]">
+                  {Math.round(stats?.avg_flow_score ?? 0)}
+                </span>
+                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">/100</span>
               </div>
-              <p className="text-slate-500 text-sm">
-                {stats?.flow_score_change != null &&
-                stats.flow_score_change >= 0
-                  ? "+"
-                  : ""}
-                {Math.round(stats?.flow_score_change ?? 0)}pts vs yesterday
-              </p>
+              <div className="shrink-0 space-y-2">
+                <div className="bg-slate-100 h-1.5 rounded-2xl overflow-hidden">
+                  <div className="bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 rounded-2xl" style={{ width: `${stats?.avg_flow_score ?? 0}%` }} />
+                </div>
+                <p className="text-slate-500 text-sm">
+                  {stats?.flow_score_change != null && stats.flow_score_change >= 0 ? "+" : ""}
+                  {Math.round(stats?.flow_score_change ?? 0)}pts vs yesterday
+                </p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Deep Work */}
-        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-4">
+        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-5 flex flex-col">
           {isLoading ? (
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-start justify-between w-full">
@@ -383,55 +373,43 @@ export default function Dashboard() {
               <Skeleton className="h-10 w-full" />
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">
-                    Deep Work
-                  </p>
-                  <p className="font-semibold text-slate-900 text-[30px] leading-9 tracking-[-0.6px]">
-                    {formatDuration(stats?.today_deep_work_seconds)}
-                  </p>
-                </div>
-                <div className="w-9 h-9 bg-[#ecfdf5] rounded-full flex items-center justify-center text-[#10b981] shrink-0">
-                  <Hourglass className="w-4.5 h-4.5" />
+            <div className="flex flex-col h-full">
+              <div className="flex items-start justify-between shrink-0">
+                <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">Deep Work</p>
+                <div className="w-10 h-10 bg-[#ecfdf5] rounded-full flex items-center justify-center text-[#10b981] shrink-0">
+                  <Hourglass className="w-5 h-5" />
                 </div>
               </div>
-              <div className="flex gap-1.5 items-end h-12">
-                {weeklyChart.map((day, i) => {
-                  const pct = (day.seconds / maxWeeklySeconds) * 100;
-                  const isToday = i === weeklyChart.length - 1;
-                  return (
-                    <div
-                      key={day.label}
-                      className="flex-1 flex flex-col items-center gap-0.5"
-                    >
-                      <div
-                        className={`w-full rounded-t-[2px] transition-all duration-500 ${isToday ? "bg-[#10b981] shadow-[0px_2px_10px_0px_rgba(16,185,129,0.2)]" : "bg-slate-100"}`}
-                        style={{ height: `${Math.max(pct, 8)}%` }}
-                      />
-                      <span
-                        className={`text-[9px] font-medium ${isToday ? "text-[#10b981]" : "text-slate-400"}`}
-                      >
-                        {day.label[0]}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex items-center gap-1.5 text-sm">
-                <TrendingUp className={`w-4 h-4 ${weeklyTrend >= 0 ? "text-emerald-500" : "text-red-500 rotate-180"}`} />
-                <span className={`font-semibold ${weeklyTrend >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                  {weeklyTrend >= 0 ? "+" : ""}{weeklyTrend}%
+              <div className="flex-1 flex items-center py-2">
+                <span className="font-bold text-slate-900 text-3xl leading-none tracking-[-0.5px] drop-shadow-[0_4px_8px_rgba(16,185,129,0.35)]">
+                  {formatDuration(stats?.today_deep_work_seconds)}
                 </span>
-                <span className="text-slate-400">vs last week</span>
+              </div>
+              <div className="shrink-0 space-y-1.5">
+                <div className="flex gap-1.5 items-end h-12">
+                  {weeklyChart.map((day, i) => {
+                    const pct = (day.seconds / maxWeeklySeconds) * 100;
+                    const isToday = i === weeklyChart.length - 1;
+                    return (
+                      <div key={day.label} className="flex-1 flex flex-col items-center gap-0.5">
+                        <div className={`w-full rounded-t-[2px] transition-all duration-500 ${isToday ? "bg-[#10b981] shadow-[0px_2px_10px_0px_rgba(16,185,129,0.2)]" : "bg-slate-100"}`} style={{ height: `${Math.max(pct, 8)}%` }} />
+                        <span className={`text-[9px] font-medium ${isToday ? "text-[#10b981]" : "text-slate-400"}`}>{day.label[0]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-1.5 text-sm">
+                  <TrendingUp className={`w-4 h-4 ${weeklyTrend >= 0 ? "text-emerald-500" : "text-red-500 rotate-180"}`} />
+                  <span className={`font-semibold ${weeklyTrend >= 0 ? "text-emerald-600" : "text-red-600"}`}>{weeklyTrend >= 0 ? "+" : ""}{weeklyTrend}%</span>
+                  <span className="text-slate-400">vs last week</span>
+                </div>
               </div>
             </div>
           )}
         </div>
 
         {/* Tasks Done */}
-        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-4">
+        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-5 flex flex-col">
           {isLoading ? (
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-start justify-between w-full">
@@ -444,40 +422,31 @@ export default function Dashboard() {
               <Skeleton className="h-4 w-24" />
             </div>
           ) : (
-            <div className="flex flex-col gap-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">
-                    Tasks Done
-                  </p>
-                  <div className="flex items-end gap-0.5">
-                    <span className="font-semibold text-slate-900 text-[30px] leading-9 tracking-[-0.6px]">
-                      {stats?.tasks_completed ?? 0}
-                    </span>
-                    <span className="font-normal text-slate-400 text-[18px] leading-7">
-                      /{stats?.tasks_total ?? 0}
-                    </span>
-                  </div>
-                </div>
-                <div className="w-9 h-9 bg-[#eff6ff] rounded-full flex items-center justify-center text-[#3b82f6] shrink-0">
-                  <CheckCircle2 className="w-4.5 h-4.5" />
+            <div className="flex flex-col h-full">
+              <div className="flex items-start justify-between shrink-0">
+                <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">Tasks Done</p>
+                <div className="w-10 h-10 bg-[#eff6ff] rounded-full flex items-center justify-center text-[#3b82f6] shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
               </div>
-              <Link
-                to="/tasks"
-                className="group flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors"
-              >
-                {stats?.tasks_total
-                  ? `${Math.round(((stats.tasks_completed ?? 0) / stats.tasks_total) * 100)}% complete`
-                  : "No tasks yet"}
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+              <div className="flex-1 flex items-center py-2">
+                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(59,130,246,0.35)]">
+                  {stats?.tasks_completed ?? 0}
+                </span>
+                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">/{stats?.tasks_total ?? 0}</span>
+              </div>
+              <div className="shrink-0">
+                <Link to="/tasks" className="group flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+                  {stats?.tasks_total ? `${Math.round(((stats.tasks_completed ?? 0) / stats.tasks_total) * 100)}% complete` : "No tasks yet"}
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
             </div>
           )}
         </div>
 
         {/* Focus Streak */}
-        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-4">
+        <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 p-5 flex flex-col">
           {isLoading ? (
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-start justify-between w-full">
@@ -490,39 +459,31 @@ export default function Dashboard() {
               <Skeleton className="h-4 w-32" />
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">
-                    Focus Streak
-                  </p>
-                  <div className="flex items-end gap-1">
-                    <span className="font-semibold text-slate-900 text-[30px] leading-9 tracking-[-0.6px]">
-                      {streak}
-                    </span>
-                    <span className="font-normal text-slate-400 text-[18px] leading-7">
-                      {streak === 1 ? "day" : "days"}
-                    </span>
-                  </div>
-                </div>
-                <div className="w-9 h-9 bg-[#fff7ed] rounded-full flex items-center justify-center text-[#f97316] shrink-0">
-                  <Flame className="w-4.5 h-4.5" />
+            <div className="flex flex-col h-full">
+              <div className="flex items-start justify-between shrink-0">
+                <p className="font-semibold text-slate-500 text-xs tracking-[1.2px] uppercase">Focus Streak</p>
+                <div className="w-10 h-10 bg-[#fff7ed] rounded-full flex items-center justify-center text-[#f97316] shrink-0">
+                  <Flame className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-slate-500 text-sm">
-                {streak === 0
-                  ? "Start a session to begin your streak"
-                  : streak >= 7
-                    ? "Consistent all week!"
-                    : "Keep it going daily"}
-              </p>
+              <div className="flex-1 flex items-center py-2">
+                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(249,115,22,0.35)]">
+                  {streak}
+                </span>
+                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">{streak === 1 ? "day" : "days"}</span>
+              </div>
+              <div className="shrink-0">
+                <p className="text-slate-500 text-sm">
+                  {streak === 0 ? "Start a session to begin your streak" : streak >= 7 ? "Consistent all week!" : "Keep it going daily"}
+                </p>
+              </div>
             </div>
           )}
         </div>
       </div>
 
       {/* ── Priority Pipeline ── */}
-      <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 mb-4">
+      <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 mb-3">
         <div className="flex items-center justify-between px-6 py-5">
           <div className="flex items-center gap-2">
             <ListTodo className="w-4 h-4 text-slate-500" />
@@ -614,7 +575,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Active Goals ── */}
-      <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0">
+      <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 mb-3">
         <div className="flex items-center justify-between px-6 py-5">
           <div className="flex items-center gap-2">
             <Target className="w-4 h-4 text-slate-500" />
@@ -710,7 +671,7 @@ function RecentActivitySection() {
   const { activities, isLoading } = useActivityFeed();
 
   return (
-    <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0">
+    <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 mb-3">
       <div className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
           <RefreshCw className="w-4 h-4 text-slate-500" />

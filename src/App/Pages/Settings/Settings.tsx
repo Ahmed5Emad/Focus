@@ -378,7 +378,7 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-8 bg-muted/50 p-1">
+        <TabsList className="mb-3 bg-muted/50 p-1">
           <TabsTrigger value="account" className="gap-2">
             <User className="w-4 h-4" />
             Account

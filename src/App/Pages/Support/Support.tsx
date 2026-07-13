@@ -93,14 +93,14 @@ export default function Support() {
 
   return (
     <div className="page-container pt-3">
-      <div className="flex flex-col gap-0.5 mb-4">
+      <div className="flex flex-col gap-0.5 mb-3">
         <h1 className="page-title">Support</h1>
         <p className="page-description">
           Find answers to common questions or reach out to our team.
         </p>
       </div>
 
-      <div className="relative w-full max-w-md mb-5">
+      <div className="relative w-full max-w-md mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <Input
           placeholder="Search FAQs..."

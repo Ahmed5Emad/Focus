@@ -602,7 +602,7 @@ export default function Tasks() {
           </div>
 
           {!isLoading && filteredTasks.length > 0 && (
-            <div className="mt-6 flex items-center justify-between px-2">
+            <div className="mt-3 flex items-center justify-between px-2">
               <p className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600 font-medium">
                 {visibleCount < filteredTasks.length
                   ? `Showing ${visibleCount} of ${filteredTasks.length}`
