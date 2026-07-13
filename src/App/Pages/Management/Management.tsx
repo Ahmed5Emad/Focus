@@ -5,7 +5,6 @@ import {
   ListChecks,
   CheckCircle2,
   TrendingUp,
-  AlertCircle,
   Folder,
   Plus,
 } from "lucide-react";

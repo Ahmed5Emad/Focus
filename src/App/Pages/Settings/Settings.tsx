@@ -37,7 +37,6 @@ import {
 import { Dropdown } from '@/components/shared/Dropdown';
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useTasks } from '@/hooks/useTasks';
-import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
