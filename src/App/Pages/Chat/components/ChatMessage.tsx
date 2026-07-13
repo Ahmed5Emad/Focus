@@ -130,7 +130,7 @@ export function ChatMessage({
                 <img
                   src={fileAttach.url}
                   alt={fileAttach.name}
-                  className="max-w-[240px] max-h-[180px] object-cover"
+                  className="max-w-60 max-h-45 object-cover"
                 />
               </a>
             ) : (
@@ -165,7 +165,7 @@ export function ChatMessage({
               onKeyDown={handleKeyDown}
               className={cn(
                 "flex-1 px-3 py-1.5 text-sm rounded-lg border outline-none",
-                "border-[#7b68ee] ring-1 ring-[#7b68ee]/20 bg-white text-slate-900"
+                "border-cu-purple ring-1 ring-cu-purple/20 bg-white text-slate-900"
               )}
             />
             <button
@@ -188,7 +188,7 @@ export function ChatMessage({
                 className={cn(
                   "px-3 py-2 text-sm leading-relaxed rounded-lg",
                   isOwn
-                    ? "bg-[#7b68ee] text-white"
+                    ? "bg-cu-purple text-white"
                     : "bg-white border border-slate-100 shadow-sm text-slate-900",
                 )}
               >
@@ -198,8 +198,8 @@ export function ChatMessage({
             {isOwn && (
               <span className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
                 <span className={cn(
-                  message.status === "read" && "text-[#7b68ee]",
-                  message.status === "delivered" && "text-[#7b68ee]",
+                  message.status === "read" && "text-cu-purple",
+                  message.status === "delivered" && "text-cu-purple",
                 )}>
                   {statusLabels[message.status] ?? "Sent"}
                 </span>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface Document {
@@ -17,7 +17,6 @@ export interface Document {
 
 export function useDocuments() {
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,7 +41,7 @@ export function useDocuments() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId]);
 
   useEffect(() => {
     fetchDocuments();
@@ -82,7 +81,7 @@ export function useDocuments() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId]);
 
   const createDocument = async (projectId: string, title?: string, taskId?: string | null) => {
     if (!currentWorkspaceId || !user) return null;

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFocus } from "@/contexts/FocusContext";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function formatDuration(seconds: number | null | undefined): string {
@@ -95,7 +95,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, currentWorkspaceId } = useAuth();
   const { activeSession, startSession } = useFocus();
-  const [supabase] = useState(() => createClient());
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [priorityTasks, setPriorityTasks] = useState<PriorityTask[]>([]);
   const [activeGoals, setActiveGoals] = useState<GoalItem[]>([]);
@@ -177,7 +176,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, [currentWorkspaceId, user, supabase]);
+  }, [currentWorkspaceId, user]);
 
   const weeklyChart = useMemo(() => {
     const days: { label: string; seconds: number }[] = [];

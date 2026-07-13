@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 export interface Notification {
   id: string;
@@ -16,7 +16,6 @@ export interface Notification {
 
 export function useNotifications() {
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -43,7 +42,7 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, currentWorkspaceId, supabase]);
+  }, [user, currentWorkspaceId]);
 
   useEffect(() => {
     fetchNotifications();
@@ -71,7 +70,7 @@ export function useNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, currentWorkspaceId, supabase, fetchNotifications]);
+  }, [user, currentWorkspaceId, fetchNotifications]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {
@@ -87,7 +86,7 @@ export function useNotifications() {
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
-  }, [supabase]);
+  }, []);
 
   const markAllAsRead = useCallback(async () => {
     const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
@@ -106,7 +105,7 @@ export function useNotifications() {
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
-  }, [notifications, supabase]);
+  }, [notifications]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 

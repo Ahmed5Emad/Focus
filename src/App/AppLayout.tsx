@@ -30,9 +30,6 @@ export function AppLayout() {
         e.preventDefault();
         setIsDistractionModalOpen(true);
       }
-      if (e.key === 'Escape' && isDistractionModalOpen) {
-        setIsDistractionModalOpen(false);
-      }
     };
     
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -54,7 +51,7 @@ export function AppLayout() {
           </div>
 
           {isActive && (
-            <div className="fixed bottom-8 left-[300px] right-[48px] z-50">
+            <div className="fixed bottom-8 left-4 right-4 lg:left-[300px] lg:right-[48px] z-50">
               <div className="backdrop-blur-md bg-white/90 border border-slate-200 drop-shadow-[0px_8px_15px_rgba(0,0,0,0.08)] flex h-16 items-center justify-between px-4.25 py-px rounded-3xl w-full">
                 <div className="flex gap-4 items-center">
                   <div className="bg-[#f5f3ff] border border-[#ede9fe] flex items-center justify-center rounded-2xl w-10 h-10 shrink-0">
@@ -106,16 +103,39 @@ export function AppLayout() {
             </div>
           )}
           {isDistractionModalOpen && isActive && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+            <div
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="distraction-dialog-title"
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setIsDistractionModalOpen(false);
+                if (e.key === 'Tab') {
+                  const focusable = e.currentTarget.querySelectorAll<HTMLElement>(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                  );
+                  const first = focusable[0];
+                  const last = focusable[focusable.length - 1];
+                  if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last?.focus();
+                  } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first?.focus();
+                  }
+                }
+              }}
+            >
               <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                  <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                  <h3 id="distraction-dialog-title" className="font-semibold text-slate-900 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-cu-orange" />
                     Log Distraction
                   </h3>
-                  <button 
+                  <button
                     onClick={() => setIsDistractionModalOpen(false)}
                     className="text-slate-500 hover:text-slate-900 transition-colors"
+                    aria-label="Close distraction dialog"
                   >
                     <X className="w-5 h-5" />
                   </button>

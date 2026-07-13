@@ -1,7 +1,7 @@
 import { MoreHorizontal, CheckSquare, Calendar, Trash2, Clock, FileText, Plus, Archive } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ export interface Project {
   user_id: string;
   title: string;
   description: string;
-  status: "active" | "completed" | "on_hold";
+  status: "active" | "completed" | "on_hold" | "archived";
   workspace_id: string;
   category: string;
 }
@@ -31,7 +31,6 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
   const [docCount, setDocCount] = useState(0);
 
   useEffect(() => {
-    const supabase = createClient();
     supabase
       .from("documents")
       .select("id", { count: "exact", head: true })
@@ -40,7 +39,6 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
   }, [project.id]);
 
   const handleCreateDoc = async () => {
-    const supabase = createClient();
     const { data } = await supabase
       .from("documents")
       .insert({
@@ -60,10 +58,11 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
     year: "numeric" 
   }).format(new Date(project.created_at));
 
-  const statusColors = {
+  const statusColors: Record<Project["status"], string> = {
     active: "bg-[#e0f2fe] text-[#0369a1]",
     completed: "bg-[#f0fdf4] text-[#15803d]",
     on_hold: "bg-[#fefce8] text-[#a16207]",
+    archived: "bg-[#f1f5f9] text-[#64748b]",
   };
 
   return (

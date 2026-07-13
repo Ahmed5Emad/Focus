@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { usePreferences } from '@/hooks/usePreferences';
 import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Dropdown } from '@/components/shared/Dropdown';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface WorkspaceMember {
   member_id: string;
@@ -42,8 +43,6 @@ interface WorkspaceMember {
 
 export default function Settings() {
   const { user, currentWorkspaceId, workspaces, refreshWorkspaces, setCurrentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
-
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState('');
@@ -70,6 +69,7 @@ export default function Settings() {
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [removeConfirmMemberId, setRemoveConfirmMemberId] = useState<string | null>(null);
   const [applyBrandingToEmail, setApplyBrandingToEmail] = useState(true);
 
   const [latestProjects, setLatestProjects] = useState<{ id: string; title: string; status: string }[]>([]);
@@ -179,12 +179,13 @@ export default function Settings() {
       if (error) throw error;
       const result = data as { success: boolean; error?: string };
       if (!result.success) {
-        alert(result.error);
+        toast.error(result.error ?? "Failed to update role");
         return;
       }
       setMembers(prev => prev.map(m => m.member_id === memberId ? { ...m, role: newRole } : m));
+      toast.success("Role updated");
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to update role');
+      toast.error(error instanceof Error ? error.message : 'Failed to update role');
     }
   };
 
@@ -256,7 +257,6 @@ export default function Settings() {
   }, [currentWorkspace]);
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!confirm('Are you sure you want to remove this member?')) return;
     try {
       const { data, error } = await supabase.rpc('remove_member', {
         p_member_id: memberId,
@@ -264,12 +264,13 @@ export default function Settings() {
       if (error) throw error;
       const result = data as { success: boolean; error?: string };
       if (!result.success) {
-        alert(result.error);
+        toast.error(result.error ?? "Failed to remove member");
         return;
       }
       setMembers(prev => prev.filter(m => m.member_id !== memberId));
+      toast.success("Member removed");
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to remove member');
+      toast.error(error instanceof Error ? error.message : 'Failed to remove member');
     }
   };
 
@@ -285,8 +286,9 @@ export default function Settings() {
       });
       if (error) throw error;
       await refreshWorkspaces();
+      toast.success("Workspace renamed");
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to rename workspace');
+      toast.error(error instanceof Error ? error.message : 'Failed to rename workspace');
     } finally {
       setIsRenaming(false);
     }
@@ -302,8 +304,9 @@ export default function Settings() {
       if (error) throw error;
       setShowDeleteConfirm(false);
       await refreshWorkspaces();
+      toast.success("Workspace deleted");
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to delete workspace');
+      toast.error(error instanceof Error ? error.message : 'Failed to delete workspace');
     } finally {
       setIsDeleting(false);
     }
@@ -751,7 +754,7 @@ export default function Settings() {
                             )}
                             {member.role !== 'owner' && currentUserRole && ['owner', 'admin', 'sub admin'].includes(currentUserRole) && (
                               <button
-                                onClick={() => handleRemoveMember(member.member_id)}
+                                onClick={() => setRemoveConfirmMemberId(member.member_id)}
                                 className="p-1.5 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                                 title="Remove member"
                               >
@@ -989,6 +992,16 @@ export default function Settings() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={!!removeConfirmMemberId}
+        onOpenChange={(open) => { if (!open) setRemoveConfirmMemberId(null); }}
+        onConfirm={() => removeConfirmMemberId && handleRemoveMember(removeConfirmMemberId)}
+        title="Remove Member"
+        description="Are you sure you want to remove this member from the workspace? They will lose access to all workspace data."
+        confirmLabel="Remove"
+        destructive
+      />
     </div>
   );
 }

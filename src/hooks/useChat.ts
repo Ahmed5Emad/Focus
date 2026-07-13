@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface FileAttachment {
@@ -22,7 +22,6 @@ export interface ChatMessage {
 
 export function useChat() {
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [typingUsers, setTypingUsers] = useState<{ userId: string; displayName: string }[]>([]);
@@ -31,11 +30,11 @@ export function useChat() {
 
   const markAsDelivered = useCallback(async (msgId: string) => {
     await supabase.from("chat_messages").update({ status: "delivered" }).eq("id", msgId).eq("status", "sent");
-  }, [supabase]);
+  }, []);
 
   const markAsRead = useCallback(async (msgId: string) => {
     await supabase.from("chat_messages").update({ status: "read" }).eq("id", msgId).neq("user_id", user?.id);
-  }, [supabase, user]);
+  }, [user]);
 
   useEffect(() => {
     if (!currentWorkspaceId || !user) {
@@ -138,7 +137,7 @@ export function useChat() {
       supabase.removeChannel(channel);
       supabase.removeChannel(presenceChannel);
     };
-  }, [currentWorkspaceId, supabase, user, markAsDelivered]);
+  }, [currentWorkspaceId, user, markAsDelivered]);
 
   const sendMessage = async (content: string, file?: FileAttachment) => {
     if ((!content.trim() && !file) || !currentWorkspaceId || !user) return false;

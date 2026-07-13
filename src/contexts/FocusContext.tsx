@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from './AuthContext';
 import { calculateFlowScore } from '@/lib/analytics';
 
@@ -47,8 +47,6 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const [supabase] = useState(() => createClient());
-  
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -83,7 +81,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
         setSecondsElapsed(Math.floor((now - startTime) / 1000));
       }
     }
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     fetchActiveSession();
@@ -106,20 +104,22 @@ export function FocusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (activeSession && activeSession.status === 'active') {
+      const sessionId = activeSession.id;
       heartbeatRef.current = setInterval(async () => {
         await supabase
           .from('focus_sessions')
           .update({ heartbeat_at: new Date().toISOString() })
-          .eq('id', activeSession.id);
+          .eq('id', sessionId);
       }, 60000);
-    } else {
-      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
     }
 
     return () => {
-      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      if (heartbeatRef.current) {
+        clearInterval(heartbeatRef.current);
+        heartbeatRef.current = null;
+      }
     };
-  }, [activeSession, supabase]);
+  }, [activeSession]);
 
   const startSession = async (taskId: string | null, workspaceId: string) => {
     if (!user) return;
@@ -174,14 +174,13 @@ export function FocusProvider({ children }: { children: ReactNode }) {
   const resumeSession = async () => {
     if (!activeSession || activeSession.status !== 'paused') return;
 
-    const newStartTime = new Date(Date.now() - secondsElapsed * 1000).toISOString();
-
+    const elapsed = secondsElapsed;
     const { error } = await supabase
       .from('focus_sessions')
       .update({ 
         status: 'active', 
         heartbeat_at: new Date().toISOString(),
-        start_time: newStartTime
+        actual_duration_seconds: elapsed,
       })
       .eq('id', activeSession.id);
 
@@ -190,7 +189,7 @@ export function FocusProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setActiveSession(prev => prev ? { ...prev, status: 'active', start_time: newStartTime } : null);
+    setActiveSession(prev => prev ? { ...prev, status: 'active' } : null);
     setIsPaused(false);
   };
 

@@ -50,7 +50,7 @@ BEGIN
     'tasks_total', (
       SELECT COUNT(*) FROM tasks
       WHERE workspace_id = p_workspace_id
-        AND status != 'archived'
+        AND (is_archived IS NULL OR is_archived = false)
     ),
     'flow_score_change', (today_flow - yesterday_flow)
   ) INTO result;

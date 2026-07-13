@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 export type Priority = "none" | "low" | "medium" | "high" | "urgent";
 
@@ -41,8 +41,6 @@ export interface MemberProfile {
 
 export function useTasks() {
   const { currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
-
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -92,7 +90,7 @@ export function useTasks() {
     } catch (error) {
       console.error("Error fetching members:", error);
     }
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId]);
 
   useEffect(() => {
     if (!currentWorkspaceId) {
@@ -157,7 +155,7 @@ export function useTasks() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentWorkspaceId, supabase, fetchMembers]);
+  }, [currentWorkspaceId, fetchMembers]);
 
   const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'todo' ? 'in_progress' : currentStatus === 'in_progress' ? 'done' : 'todo';
@@ -180,7 +178,7 @@ export function useTasks() {
     }
   };
 
-  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority; is_archived: boolean; archived_at: string | null }>) => {
+  const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority; is_archived: boolean; archived_at: string | null; updated_at: string }>) => {
     try {
       const dbUpdates: Record<string, string | boolean | null> = { ...updates };
       if (updates.status === 'done') {

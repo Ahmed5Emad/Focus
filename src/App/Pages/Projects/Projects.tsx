@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Layout, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { ProjectCard } from "./components/ProjectCard";
 import type { Project } from "./components/ProjectCard";
@@ -11,7 +11,6 @@ import { EmptyProjectsState } from "./components/EmptyProjectsState";
 
 export default function Projects() {
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"active" | "completed" | "on_hold">("active");

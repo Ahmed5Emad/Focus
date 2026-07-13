@@ -10,9 +10,10 @@ import {
   Target,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface ArchivedTask {
   id: string;
@@ -38,7 +39,6 @@ type ArchiveTab = "tasks" | "projects";
 
 export default function ArchivePage() {
   const { currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [activeTab, setActiveTab] = useState<ArchiveTab>("tasks");
   const [searchQuery, setSearchQuery] = useState("");
   const [tasks, setTasks] = useState<ArchivedTask[]>([]);
@@ -79,22 +79,34 @@ export default function ArchivePage() {
   };
 
   const handleRestore = async (type: "tasks" | "projects", id: string) => {
-    if (type === "tasks") {
-      await supabase.from("tasks").update({ is_archived: false, archived_at: null }).eq("id", id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } else {
-      await supabase.from("projects").update({ status: "active" }).eq("id", id);
-      setProjects((prev) => prev.filter((p) => p.id !== id));
+    try {
+      if (type === "tasks") {
+        await supabase.from("tasks").update({ is_archived: false, archived_at: null, updated_at: new Date().toISOString() }).eq("id", id);
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+      } else {
+        await supabase.from("projects").update({ status: "active", updated_at: new Date().toISOString() }).eq("id", id);
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      }
+      toast.success(`${type === "tasks" ? "Task" : "Project"} restored`);
+    } catch (error) {
+      console.error("Error restoring item:", error);
+      toast.error("Failed to restore item");
     }
   };
 
   const handleDelete = async (type: "tasks" | "projects", id: string) => {
-    if (type === "tasks") {
-      await supabase.from("tasks").delete().eq("id", id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } else {
-      await supabase.from("projects").delete().eq("id", id);
-      setProjects((prev) => prev.filter((p) => p.id !== id));
+    try {
+      if (type === "tasks") {
+        await supabase.from("tasks").delete().eq("id", id);
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+      } else {
+        await supabase.from("projects").delete().eq("id", id);
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      }
+      toast.success(`${type === "tasks" ? "Task" : "Project"} permanently deleted`);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast.error("Failed to delete item");
     }
   };
 

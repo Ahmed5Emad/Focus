@@ -9,7 +9,7 @@ import {
   Paperclip,
   X,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useDirectMessages, type DirectMessage, type FileAttachment } from "@/hooks/useDirectMessages";
@@ -50,8 +50,6 @@ type ChatMode = "channel" | "dm";
 
 export default function Chat() {
   const { user, currentWorkspaceId, workspaces } = useAuth();
-  const [supabase] = useState(() => createClient());
-
   const [mode, setMode] = useState<ChatMode>("channel");
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -137,10 +135,12 @@ export default function Chat() {
       setIsAdmin(data?.role === "admin");
     };
     checkAdmin();
-  }, [currentWorkspaceId, supabase, user]);
+  }, [currentWorkspaceId, user]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
   }, [groupChat.messages, dmChat.messages, groupChat, dmChat]);
 
   useEffect(() => {
@@ -204,11 +204,13 @@ export default function Chat() {
     }
 
     const success = await active.sendMessage(inputValue, fileAttachment);
-    if (success) {
-      setInputValue("");
-      setPendingFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!success) {
+      toast.error("Failed to send message");
+      return;
     }
+    setInputValue("");
+    setPendingFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -271,6 +273,7 @@ export default function Chat() {
 
   return (
     <>
+      {/* Used instead of the Bad looking console dialog */}
       <ConfirmDialog
         open={clearConfirmOpen}
         onOpenChange={setClearConfirmOpen}
@@ -326,7 +329,7 @@ export default function Chat() {
 
             {membersLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="w-5 h-5 border-2 border-slate-200 border-t-[#7b68ee] rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-slate-200 border-t-cu-purple rounded-full animate-spin" />
               </div>
             ) : members.length === 0 ? (
               <p className="text-xs text-slate-400 text-center py-4 px-2">
@@ -375,9 +378,9 @@ export default function Chat() {
             <div>
               <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                 {mode === "channel" ? (
-                  <Hash className="w-4 h-4 text-[#7b68ee]" />
+                  <Hash className="w-4 h-4 text-cu-purple" />
                 ) : (
-                  <MessageCircle className="w-4 h-4 text-[#7b68ee]" />
+                  <MessageCircle className="w-4 h-4 text-cu-purple" />
                 )}
                 {headerTitle}
                 {isAdmin && (
@@ -391,7 +394,7 @@ export default function Chat() {
                 {headerDescription}
               </p>
               {typingText && (
-                <p className="text-[11px] text-[#7b68ee] italic mt-0.5 animate-pulse">
+                <p className="text-[11px] text-cu-purple italic mt-0.5 animate-pulse">
                   {typingText}
                 </p>
               )}
@@ -425,12 +428,12 @@ export default function Chat() {
           <div className="flex-1 overflow-y-auto">
             {active.isLoading ? (
               <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-[#7b68ee] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-cu-purple rounded-full animate-spin" />
               </div>
             ) : active.messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className="w-16 h-16 bg-[#f5f3ff] rounded-2xl flex items-center justify-center mb-6">
-                  <MessageCircle className="w-8 h-8 text-[#7b68ee]" />
+                  <MessageCircle className="w-8 h-8 text-cu-purple" />
                 </div>
                 <h3 className="font-['Spline_Sans',sans-serif] text-xl font-bold text-slate-900 mb-2">
                   {mode === "channel"
@@ -486,11 +489,11 @@ export default function Chat() {
                 </button>
               </div>
             )}
-            <div className="flex items-end gap-2 bg-[#f8f7fc] border border-slate-200 rounded-xl focus-within:border-[#7b68ee] focus-within:ring-2 focus-within:ring-[#7b68ee]/20 transition-all p-1.5">
+            <div className="flex items-end gap-2 bg-[#f8f7fc] border border-slate-200 rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="p-2 text-slate-400 hover:text-[#7b68ee] rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                className="p-2 text-slate-400 hover:text-cu-purple rounded-lg transition-colors shrink-0 disabled:opacity-50"
               >
                 <Paperclip className="w-4 h-4" />
               </button>
@@ -512,7 +515,7 @@ export default function Chat() {
                     : `Message @ ${selectedMember?.display_name ?? "user"}`
                 }
                 rows={1}
-                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-slate-900 placeholder:text-slate-400 resize-none max-h-[120px]"
+                className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1.5 text-slate-900 placeholder:text-slate-400 resize-none max-h-30"
                 style={{ minHeight: "36px" }}
                 onInput={(e) => {
                   const el = e.currentTarget;
@@ -523,7 +526,7 @@ export default function Chat() {
               <button
                 onClick={handleSend}
                 disabled={(!inputValue.trim() && !pendingFile) || uploading}
-                className="p-2 bg-[#7b68ee] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                className="p-2 bg-cu-purple text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               >
                 {uploading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

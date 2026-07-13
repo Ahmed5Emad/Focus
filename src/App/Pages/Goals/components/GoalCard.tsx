@@ -29,8 +29,7 @@ interface GoalCardProps {
 export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
   const [editOpen, setEditOpen] = useState(false);
 
-  const handleProgressUpdate = () => {
-    const newProgress = Math.min(goal.progress + 10, 100);
+  const handleProgressUpdate = (newProgress: number) => {
     onUpdate(goal.id, { progress: newProgress, is_complete: newProgress === 100 });
   };
 
@@ -84,11 +83,16 @@ export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
           <span>Progress</span>
           <span className="font-semibold text-[#6b38d4]">{goal.progress}%</span>
         </div>
-        <div className="w-full bg-[#e5eeff] h-2 rounded-full overflow-hidden cursor-pointer" onClick={handleProgressUpdate}>
-          <div
-            className="bg-[#00687a] h-full rounded-full transition-all duration-300"
-            style={{ width: `${goal.progress}%` }}
-          ></div>
+        <div className="w-full flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value={goal.progress}
+            onChange={(e) => handleProgressUpdate(Number(e.target.value))}
+            className="flex-1 h-2 rounded-full appearance-none cursor-pointer bg-[#e5eeff] accent-[#00687a] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#00687a] [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer"
+          />
         </div>
         <div className="mt-4 flex gap-2">
           <div className="flex items-center gap-1 text-slate-600 font-['Inter',sans-serif] text-[14px] leading-[1.4] bg-[#eff4ff] px-3 py-1.5 rounded-lg">

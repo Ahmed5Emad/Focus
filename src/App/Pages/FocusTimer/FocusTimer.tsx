@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useFocus } from '@/contexts/FocusContext';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Square, Play, Pause, AlertCircle, Clock, Activity, ChevronDown, ChevronUp, Settings2, MoreHorizontal, Pencil, Trash2, Folder } from 'lucide-react';
 import {
@@ -52,8 +52,6 @@ const formatTime = (seconds: number) => {
 export default function FocusTimer() {
   const { activeSession, isActive, isPaused, secondsElapsed, startSession, pauseSession, resumeSession, stopSession, logDistraction, deleteSession, updateSession } = useFocus();
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
-  
   const [history, setHistory] = useState<SessionHistory[]>([]);
   const [currentLogs, setCurrentLogs] = useState<DistractionLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,7 +77,7 @@ export default function FocusTimer() {
     };
     
     fetchHistory();
-  }, [user, supabase, activeSession]);
+  }, [user, activeSession]);
 
   useEffect(() => {
     const fetchCurrentLogs = async () => {
@@ -100,29 +98,29 @@ export default function FocusTimer() {
     };
     
     fetchCurrentLogs();
-    
-    if (activeSession) {
-      const channel = supabase
-        .channel('distraction_logs_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'distraction_logs',
-            filter: `session_id=eq.${activeSession.id}`
-          },
-          (payload) => {
-            setCurrentLogs(prev => [payload.new as DistractionLog, ...prev]);
-          }
-        )
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [activeSession, supabase]);
+
+    if (!activeSession) return;
+
+    const channel = supabase
+      .channel('distraction_logs_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'distraction_logs',
+          filter: `session_id=eq.${activeSession.id}`
+        },
+        (payload) => {
+          setCurrentLogs(prev => [payload.new as DistractionLog, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [activeSession]);
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
@@ -144,7 +142,7 @@ export default function FocusTimer() {
       setAllTasks(data ?? []);
     };
     fetchTasks();
-  }, [currentWorkspaceId, supabase]);
+  }, [currentWorkspaceId]);
 
   const handleEdit = (session: SessionHistory) => {
     setEditSession(session);

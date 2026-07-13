@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface FileAttachment {
@@ -23,7 +23,6 @@ export interface DirectMessage {
 
 export function useDirectMessages(otherUserId: string | null) {
   const { user, currentWorkspaceId } = useAuth();
-  const [supabase] = useState(() => createClient());
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [typingUsers, setTypingUsers] = useState<{ userId: string; displayName: string }[]>([]);
@@ -65,7 +64,7 @@ export function useDirectMessages(otherUserId: string | null) {
     } finally {
       setIsLoading(false);
     }
-  }, [currentWorkspaceId, user, otherUserId, supabase]);
+  }, [currentWorkspaceId, user, otherUserId]);
 
   useEffect(() => {
     fetchMessages();
@@ -140,7 +139,7 @@ export function useDirectMessages(otherUserId: string | null) {
       supabase.removeChannel(channel);
       supabase.removeChannel(presenceChannel);
     };
-  }, [currentWorkspaceId, user, otherUserId, supabase]);
+  }, [currentWorkspaceId, user, otherUserId]);
 
   const sendMessage = async (content: string, file?: FileAttachment) => {
     if ((!content.trim() && !file) || !currentWorkspaceId || !user || !otherUserId) return false;
@@ -168,14 +167,14 @@ export function useDirectMessages(otherUserId: string | null) {
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
-      presenceChannelRef.current?.untrack();
+      presenceChannelRef.current?.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User", is_typing: false });
     }, 2000);
   }, [user, otherUserId]);
 
   const stopTyping = useCallback(() => {
     if (!presenceChannelRef.current || !user) return;
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    presenceChannelRef.current.untrack();
+    presenceChannelRef.current.track({ userId: user.id, displayName: user.email?.split("@")[0] ?? "User", is_typing: false });
   }, [user]);
 
   const editMessage = async (messageId: string, newContent: string) => {

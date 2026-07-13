@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 interface Workspace {
   id: string;
@@ -36,8 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
-  const supabase = createClient();
-
   const setCurrentWorkspaceId = useCallback((id: string | null) => {
     setCurrentWorkspaceIdState(id);
     if (id) {
@@ -60,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error fetching workspaces:', error);
     }
-  }, [supabase]);
+  }, []);
 
   const refreshWorkspaces = useCallback(async () => {
     if (user) {
@@ -119,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, fetchWorkspaces, setCurrentWorkspaceId]);
+  }, [fetchWorkspaces, setCurrentWorkspaceId]);
 
   const value = {
     session,

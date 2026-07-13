@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Cloud, CloudOff } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Editor } from "./components/Editor";
 import { TaskLinkSelector } from "./components/TaskLinkSelector";
@@ -9,7 +9,6 @@ import { TaskLinkSelector } from "./components/TaskLinkSelector";
 export default function DocumentEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [supabase] = useState(() => createClient());
   const [title, setTitle] = useState("Untitled Document");
   const [taskId, setTaskId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +47,9 @@ export default function DocumentEditor() {
     };
     fetchDocument();
     return () => { cancelled = true; };
-  }, [id, supabase]);
+  }, [id]);
+
+  const lastSavedTitle = useRef(title);
 
   useEffect(() => {
     if (!id || loading) return;
@@ -56,6 +57,7 @@ export default function DocumentEditor() {
 
     titleSaveTimer.current = setTimeout(async () => {
       if (!mountedRef.current) return;
+      lastSavedTitle.current = title;
       setSaveState("saving");
       try {
         await supabase
@@ -69,9 +71,20 @@ export default function DocumentEditor() {
     }, 800);
 
     return () => {
-      if (titleSaveTimer.current) clearTimeout(titleSaveTimer.current);
+      if (titleSaveTimer.current) {
+        clearTimeout(titleSaveTimer.current);
+        titleSaveTimer.current = undefined;
+      }
+      if (lastSavedTitle.current !== title) {
+        Promise.resolve(
+          supabase
+            .from("documents")
+            .update({ title, updated_at: new Date().toISOString() })
+            .eq("id", id)
+        ).then(() => { lastSavedTitle.current = title; }).catch(() => {});
+      }
     };
-  }, [title, id, supabase, loading]);
+  }, [title, id, loading]);
 
   if (loading) {
     return (
