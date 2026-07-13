@@ -80,6 +80,7 @@ interface EditorProps {
   documentTitle: string;
   onTitleChange: (title: string) => void;
   onConnectionChange?: (status: ConnectionStatus) => void;
+  editorRef?: React.MutableRefObject<TiptapEditor | null>;
 }
 
 type SupabaseClient = ReturnType<typeof createClient>;
@@ -108,7 +109,7 @@ function refreshCursorDecorations(editor: TiptapEditor | null) {
   }
 }
 
-export function Editor({ documentId, documentTitle, onTitleChange, onConnectionChange }: EditorProps) {
+export function Editor({ documentId, documentTitle, onTitleChange, onConnectionChange, editorRef: externalEditorRef }: EditorProps) {
   const { user } = useAuth();
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
@@ -339,7 +340,8 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
 
   useEffect(() => {
     editorRef.current = editor;
-  }, [editor]);
+    if (externalEditorRef) externalEditorRef.current = editor;
+  }, [editor, externalEditorRef]);
 
   useEffect(() => {
     if (!editor) return;

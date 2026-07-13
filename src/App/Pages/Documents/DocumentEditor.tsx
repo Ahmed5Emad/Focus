@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import { ArrowLeft, Cloud, CloudOff, MessageSquare, Wifi, WifiOff } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export default function DocumentEditor() {
   const [saveState, setSaveState] = useState<"saved" | "saving" | "unsaved">("saved");
   const [showComments, setShowComments] = useState(false);
   const [connection, setConnection] = useState<ConnectionStatus>("connecting");
+  const editorRef = useRef<TiptapEditor | null>(null);
   const mountedRef = useRef(true);
   const titleSaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -197,6 +199,7 @@ export default function DocumentEditor() {
             documentTitle={title}
             onTitleChange={setTitle}
             onConnectionChange={setConnection}
+            editorRef={editorRef}
           />
         </div>
         {showComments && (
@@ -204,6 +207,7 @@ export default function DocumentEditor() {
             documentId={id!}
             open={showComments}
             onOpenChange={setShowComments}
+            editorRef={editorRef}
           />
         )}
       </div>
