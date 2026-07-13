@@ -197,7 +197,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const isOwnComment = (comment: Comment) => comment.user_id === user?.id;
 
   return (
-    <div className="w-80 bg-background rounded-2xl border border-border flex flex-col shrink-0 max-h-[calc(100vh-200px)]">
+    <div className="w-80 bg-white rounded-2xl border border-border flex flex-col shrink-0 max-h-[calc(100vh-200px)]">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-cu-purple" />
