@@ -19,9 +19,9 @@ export function useActivityFeed() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchActivities = useCallback(async () => {
+  const fetchActivities = useCallback(async (silent = false) => {
     if (!currentWorkspaceId) return;
-    setIsLoading(true);
+    if (!silent) setIsLoading(true);
     try {
       const { data } = await supabase
         .from("activity_logs")
@@ -52,7 +52,7 @@ export function useActivityFeed() {
           filter: `workspace_id=eq.${currentWorkspaceId}`,
         },
         () => {
-          fetchActivities();
+          fetchActivities(true);
         }
       )
       .subscribe();

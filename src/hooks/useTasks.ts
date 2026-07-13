@@ -267,8 +267,8 @@ export function useTasks() {
       return;
     }
 
-    const fetchData = async () => {
-      setIsLoading(true);
+    const fetchData = async (silent = false) => {
+      if (!silent) setIsLoading(true);
       try {
         const { data: tasksData, error: tasksError } = await supabase
           .from('tasks')
@@ -372,7 +372,7 @@ export function useTasks() {
 
     const chName = `tasks-${currentWorkspaceId}`;
     const ch = supabase.channel(chName);
-    try { ch.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `workspace_id=eq.${currentWorkspaceId}` }, () => { fetchData(); }); } catch {}
+    try { ch.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `workspace_id=eq.${currentWorkspaceId}` }, () => { fetchData(true); }); } catch {}
     ch.subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [currentWorkspaceId, fetchMembers]);

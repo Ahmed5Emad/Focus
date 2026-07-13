@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const hasInitialFetch = useRef(false);
   const [currentWorkspaceId, setCurrentWorkspaceIdState] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem(WORKSPACE_STORAGE_KEY);
@@ -73,10 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!currentWorkspaceId || !isValid) {
         setCurrentWorkspaceId(workspaces[0].id);
       }
-    } else if (!isLoading && currentWorkspaceId) {
-      setCurrentWorkspaceId(null);
     }
-  }, [workspaces, currentWorkspaceId, setCurrentWorkspaceId, isLoading]);
+  }, [workspaces, currentWorkspaceId, setCurrentWorkspaceId]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -91,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (currentUser) {
           await fetchWorkspaces();
+          hasInitialFetch.current = true;
         }
       } catch (error) {
         console.error('Error getting session:', error);
@@ -101,20 +101,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      Sentry.setUser(currentUser ? { id: currentUser.id, email: currentUser.email } : null);
-      
-      if (currentUser) {
-        await fetchWorkspaces();
-      } else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        if (!hasInitialFetch.current) {
+          setSession(session);
+          setUser(session.user);
+          Sentry.setUser({ id: session.user.id, email: session.user.email ?? undefined });
+          await fetchWorkspaces();
+          hasInitialFetch.current = true;
+        }
+      } else if (event === "SIGNED_OUT") {
+        setSession(null);
+        setUser(null);
+        Sentry.setUser(null);
         setWorkspaces([]);
         setCurrentWorkspaceId(null);
+        hasInitialFetch.current = false;
       }
-      
-      setIsLoading(false);
     });
 
     return () => {
