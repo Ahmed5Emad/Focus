@@ -65,7 +65,7 @@ export default function Featured() {
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl mt-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-6xl mt-12">
             <StatCard icon={BarChart3} value="Flow Score" label="Algorithmic focus quality metric" colorClass="text-cu-purple" bgClass="bg-cu-purple/10" />
             <StatCard icon={Target} value="Goals" label="Track progress with linked tasks" colorClass="text-cu-green" bgClass="bg-cu-green/10" />
             <StatCard icon={Users} value="Team" label="Real-time collaboration" colorClass="text-cu-blue" bgClass="bg-cu-blue/10" />
