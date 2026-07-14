@@ -3,6 +3,13 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorBoundaryFallback } from "./components/ErrorBoundaryFallback";
 import { AppLoadingFallback } from "./components/shared/AppLoadingFallback";
+import { HomeSkeleton } from "./Pages/Home/HomeSkeleton";
+import { PricingSkeleton } from "./Pages/Pricing/PricingSkeleton";
+import { AboutSkeleton } from "./Pages/About/AboutSkeleton";
+import { FeaturedSkeleton } from "./Pages/Featured/FeaturedSkeleton";
+import { LoginSkeleton } from "./Pages/LogIn/LoginSkeleton";
+import { SignUpSkeleton } from "./Pages/SignUp/SignUpSkeleton";
+import { NotFoundSkeleton } from "./Pages/NotFound/NotFoundSkeleton";
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from "@vercel/analytics/react"
 import { AppLayout } from "./App/AppLayout";
@@ -62,18 +69,18 @@ function App() {
             <Analytics />
             <Suspense fallback={<AppLoadingFallback />}>
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/features" element={<Featured />} />
-                <Route path="/onboarding" element={<OnboardingWelcome />} />
-                <Route path="/onboarding/deep-work" element={<OnboardingDeepWork />} />
-                <Route path="/onboarding/power-tools" element={<OnboardingPowerTools />} />
-                <Route path="/onboarding/final-setup" element={<OnboardingFinalSetup />} />
-                <Route path="/signup" element={<SignupForm />} />
-                <Route path="/login" element={<LoginForm />} />
-                <Route path="/auth/verification-pending" element={<VerificationPending />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/" element={<Suspense fallback={<HomeSkeleton />}><Home /></Suspense>} />
+                <Route path="/pricing" element={<Suspense fallback={<PricingSkeleton />}><Pricing /></Suspense>} />
+                <Route path="/about" element={<Suspense fallback={<AboutSkeleton />}><About /></Suspense>} />
+                <Route path="/features" element={<Suspense fallback={<FeaturedSkeleton />}><Featured /></Suspense>} />
+                <Route path="/onboarding" element={<Suspense fallback={<AppLoadingFallback />}><OnboardingWelcome /></Suspense>} />
+                <Route path="/onboarding/deep-work" element={<Suspense fallback={<AppLoadingFallback />}><OnboardingDeepWork /></Suspense>} />
+                <Route path="/onboarding/power-tools" element={<Suspense fallback={<AppLoadingFallback />}><OnboardingPowerTools /></Suspense>} />
+                <Route path="/onboarding/final-setup" element={<Suspense fallback={<AppLoadingFallback />}><OnboardingFinalSetup /></Suspense>} />
+                <Route path="/signup" element={<Suspense fallback={<SignUpSkeleton />}><SignupForm /></Suspense>} />
+                <Route path="/login" element={<Suspense fallback={<LoginSkeleton />}><LoginForm /></Suspense>} />
+                <Route path="/auth/verification-pending" element={<Suspense fallback={<LoginSkeleton />}><VerificationPending /></Suspense>} />
+                <Route path="/auth/callback" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>}><AuthCallback /></Suspense>} />
                 <Route element={<AppLayout />}>
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
@@ -90,7 +97,7 @@ function App() {
                   <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
                   <Route path="*" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
+                <Route path="*" element={<Suspense fallback={<NotFoundSkeleton />}><NotFound /></Suspense>} />
               </Routes>
             </Suspense>
           </HashRouter>
