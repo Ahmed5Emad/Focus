@@ -52,6 +52,14 @@ export default function Documents() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
+  useEffect(() => {
+    const lastDocId = sessionStorage.getItem("lastDocumentId");
+    if (lastDocId) {
+      sessionStorage.removeItem("lastDocumentId");
+      navigate(`/documents/${lastDocId}`, { replace: true });
+    }
+  }, [navigate]);
+
   const projectFilter = searchParams.get("project");
   const selectedProject = projectFilter ?? "all";
 

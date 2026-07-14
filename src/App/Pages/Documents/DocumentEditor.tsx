@@ -27,6 +27,10 @@ export default function DocumentEditor() {
   }, []);
 
   useEffect(() => {
+    if (id) sessionStorage.setItem("lastDocumentId", id);
+  }, [id]);
+
+  useEffect(() => {
     if (!id) return;
     let cancelled = false;
     const fetchDocument = async () => {
@@ -105,7 +109,7 @@ export default function DocumentEditor() {
         <div className="flex flex-col items-center justify-center py-20">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Document not found</h2>
           <p className="text-slate-500 mb-6">This document doesn't exist or you don't have access.</p>
-          <Button onClick={() => navigate("/documents")} className="btn-primary">
+          <Button onClick={() => { sessionStorage.removeItem("lastDocumentId"); navigate("/documents"); }} className="btn-primary">
             Back to Documents
           </Button>
         </div>
@@ -118,7 +122,7 @@ export default function DocumentEditor() {
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/documents")}
+          onClick={() => { sessionStorage.removeItem("lastDocumentId"); navigate("/documents"); }}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-900"
         >
           <ArrowLeft className="w-4 h-4" />
