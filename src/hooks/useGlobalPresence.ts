@@ -16,10 +16,7 @@ export function useGlobalPresence(): Set<string> {
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!user || !currentWorkspaceId) {
-      setOnlineUserIds(new Set());
-      return;
-    }
+    if (!user || !currentWorkspaceId) return;
 
     if (!workspaceChannels.has(currentWorkspaceId)) {
       const channel = supabase.channel(`global-presence-${currentWorkspaceId}`, {
@@ -76,7 +73,6 @@ export function useGlobalPresence(): Set<string> {
       setOnlineUserIds(new Set(entry.onlineUserIds));
     };
     entry.listeners.add(listener);
-    setOnlineUserIds(new Set(entry.onlineUserIds));
 
     return () => {
       entry.subscriberCount--;

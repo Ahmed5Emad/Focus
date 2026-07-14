@@ -2,13 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase/client";
 
-interface TaskWatcher {
-  id: string;
-  task_id: string;
-  user_id: string;
-  created_at: string;
-}
-
 export function useTaskWatchers(taskId: string | null) {
   const { user } = useAuth();
   const [watcherIds, setWatcherIds] = useState<string[]>([]);
