@@ -142,13 +142,13 @@ export function HeroSection() {
                     <div className="h-4 w-40 bg-muted-foreground/20 rounded"></div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-28 rounded-lg border border-border bg-card flex items-center justify-center gap-2">
-                      <Zap className="w-3 h-3 text-muted-foreground/40" />
-                      <span className="text-[8px] font-semibold tracking-[1px] text-muted-foreground">QUICK TASK</span>
+                    <div className="h-9 rounded-lg border border-border bg-card inline-flex items-center px-3 gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-muted-foreground/40" />
+                      <span className="text-[9px] font-semibold tracking-[1px] text-muted-foreground leading-none">QUICK TASK</span>
                     </div>
-                    <div className="h-9 w-32 rounded-lg bg-gradient-to-r from-[#8b5cf6] to-[#6366f1] flex items-center justify-center gap-2 shadow-sm">
-                      <Play className="w-3 h-3 fill-white/80 text-white" />
-                      <span className="text-[8px] font-semibold tracking-[1px] text-white">START SESSION</span>
+                    <div className="h-9 rounded-lg bg-gradient-to-r from-[#8b5cf6] to-[#6366f1] inline-flex items-center px-3 gap-1.5 shadow-sm">
+                      <Play className="w-3.5 h-3.5 fill-white text-white" />
+                      <span className="text-[9px] font-semibold tracking-[1px] text-white leading-none">START SESSION</span>
                     </div>
                   </div>
                 </div>
