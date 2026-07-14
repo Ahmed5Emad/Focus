@@ -50,10 +50,10 @@ export function Header() {
         {/* Actions (Desktop) & Mobile Trigger */}
         <div className="flex items-center gap-2 md:gap-5 py-3 md:py-5">
           <div className="hidden md:flex items-center gap-5">
+            <ThemeToggle />
             <Link to="/login" className="text-base font-medium text-foreground hover:text-muted-foreground transition-colors">
               Login
             </Link>
-            <ThemeToggle />
             <Link to="/signup">
               <Button className="font-bold text-base h-11 px-6 bg-foreground text-background hover:bg-foreground/90 rounded-md">
                 Get Started
@@ -91,15 +91,15 @@ export function Header() {
                 ))}
               </nav>
               <div className="flex flex-col gap-3 mt-auto pt-8 pb-8 px-6 border-t border-border">
-                <div className="flex justify-center">
+                <div className="flex items-center gap-3">
                   <ThemeToggle />
-                </div>
-                <Link to="/login">
+                  <Link to="/login" className="flex-1">
                   <Button variant="outline" className="w-full text-base font-bold h-12 rounded-xl text-foreground border-border">
                     Login
                   </Button>
                 </Link>
-                <Link to="/signup">
+              </div>
+              <Link to="/signup">
                   <Button className="w-full text-base font-bold bg-foreground text-background hover:bg-foreground/90 h-12 rounded-xl">
                     Get Started Free
                   </Button>

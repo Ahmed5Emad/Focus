@@ -44,7 +44,7 @@ export default function Featured() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 flex flex-col items-center w-full pb-24">
-        
+
         {/* Hero */}
         <section className="flex flex-col items-center w-full max-w-7xl pt-20 pb-16 px-4 md:pt-32 md:pb-24 md:px-6 gap-8">
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-foreground tracking-tight text-center leading-none">
@@ -52,7 +52,7 @@ export default function Featured() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">Unified.</span>
           </h1>
           <p className="text-xl text-muted-foreground text-center max-w-2xl leading-relaxed mt-4">
-            Tasks, documents, chat, goals, and focus tools — all deeply integrated. 
+            Tasks, documents, chat, goals, and focus tools — all deeply integrated.
             One workspace designed for teams who value speed and clarity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
@@ -81,8 +81,8 @@ export default function Featured() {
               Know Your Productivity —<br />Quantified.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Flow Score measures your focus quality in real-time. Track deep work hours, 
-              monitor daily streaks, and watch weekly trends. Every session, every distraction, 
+              Flow Score measures your focus quality in real-time. Track deep work hours,
+              monitor daily streaks, and watch weekly trends. Every session, every distraction,
               every insight at a glance.
             </p>
             <ul className="space-y-3 mt-2">
@@ -138,7 +138,7 @@ export default function Featured() {
               Deep Work,<br />On Purpose.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Start a focus session linked to any task. The timer runs, distractions get logged, 
+              Start a focus session linked to any task. The timer runs, distractions get logged,
               and every completed session builds your Flow Score. Pomodoro never felt this intentional.
             </p>
             <ul className="space-y-3 mt-2">
@@ -187,8 +187,8 @@ export default function Featured() {
               Documents That<br />Work Together.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Real-time collaborative editing powered by TipTap. Comments on selected text, 
-              task linking, code blocks with syntax highlighting, tables, and images — 
+              Real-time collaborative editing powered by TipTap. Comments on selected text,
+              task linking, code blocks with syntax highlighting, tables, and images —
               all syncing instantly across your team.
             </p>
             <ul className="space-y-3 mt-2">
@@ -245,7 +245,7 @@ export default function Featured() {
               Team Messaging,<br />Zero Noise.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Channels and direct messages with file sharing, @mentions, and typing indicators. 
+              Channels and direct messages with file sharing, @mentions, and typing indicators.
               Integrated with your tasks — mention someone and they get a notification, no separate app needed.
             </p>
             <ul className="space-y-3 mt-2">
@@ -304,8 +304,8 @@ export default function Featured() {
               Tasks That Fit<br />Your Brain.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Three views — List, Calendar, and Kanban — so you can work the way you think. 
-              Add dependencies, set recurrence rules, save templates, and define custom fields. 
+              Three views — List, Calendar, and Kanban — so you can work the way you think.
+              Add dependencies, set recurrence rules, save templates, and define custom fields.
               Tasks finally flexible enough for real workflows.
             </p>
             <ul className="space-y-3 mt-2">
@@ -359,15 +359,13 @@ export default function Featured() {
               Your Process,<br />Your Rules.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Custom status pipelines, custom fields, integrations — Focus adapts to your team's process, 
+              Custom status pipelines, custom fields, integrations — Focus adapts to your team's process,
               not the other way around. Connect GitHub, Slack, Google Calendar, and more.
             </p>
             <ul className="space-y-3 mt-2">
               {[
                 "Custom workflow statuses (color-coded, reorderable)",
                 "Custom fields: text, number, date, select, multi-select",
-                "6 integrations: Slack, GitHub, Discord, Google Calendar, Notion, Linear",
-                "REST API for custom integrations (coming soon)",
                 "Multi-workspace with role management (admin, member)",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3 text-foreground">
@@ -403,16 +401,6 @@ export default function Featured() {
                   </div>
                 </div>
               ))}
-            </div>
-            <div className="mt-6 pt-4 border-t border-border">
-              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Integrations</span>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {["Slack", "GitHub", "Discord", "Google Calendar", "Notion", "Linear"].map((name) => (
-                  <div key={name} className="px-3 py-1.5 rounded-lg bg-muted text-xs font-medium text-muted-foreground border border-border">
-                    {name}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </section>
