@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Shield, EyeOff } from "lucide-react";
 
 const TEAM = [
-  { name: "Ali I.", role: "CEO" },
-  { name: "Ahmed E.", role: "CTO" },
+  { name: "Ahmed E.", role: "CEO" },
+  { name: "Ali I.", role: "CTO" },
   { name: "Gamal A.", role: "CCO" },
 ];
 
