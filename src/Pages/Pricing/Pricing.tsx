@@ -9,23 +9,40 @@ import { cn } from "@/lib/utils";
 
 const comparisonFeatures = [
   {
-    category: "Core Features",
+    category: "Task Management",
     features: [
       { name: "Projects", personal: "1", pro: "Unlimited", enterprise: "Unlimited" },
-      { name: "Task History", personal: "7 days", pro: "Unlimited", enterprise: "Unlimited" },
-      { name: "File Uploads", personal: "5 MB", pro: "100 MB", enterprise: "5 GB" },
+      { name: "List / Calendar / Kanban views", personal: "List", pro: true, enterprise: true },
+      { name: "Task dependencies & recurrence", personal: false, pro: true, enterprise: true },
+      { name: "Custom fields & statuses", personal: false, pro: true, enterprise: true },
+      { name: "Task templates", personal: false, pro: true, enterprise: true },
+    ],
+  },
+  {
+    category: "Deep Work",
+    features: [
+      { name: "Focus Timer with distraction logging", personal: true, pro: true, enterprise: true },
+      { name: "Flow Score analytics", personal: true, pro: true, enterprise: true },
+      { name: "Focus Streak tracking", personal: true, pro: true, enterprise: true },
+      { name: "Session history & reports", personal: "7 days", pro: "Unlimited", enterprise: "Unlimited" },
     ],
   },
   {
     category: "Collaboration",
     features: [
-      { name: "Guests", personal: false, pro: true, enterprise: true },
-      { name: "Permissions", personal: false, pro: "Standard", enterprise: "Advanced" },
+      { name: "Team Chat (channels & DMs)", personal: false, pro: true, enterprise: true },
+      { name: "File sharing in chat", personal: "5 MB", pro: "100 MB", enterprise: "5 GB" },
+      { name: "Real-time document editor", personal: false, pro: true, enterprise: true },
+      { name: "Document comments & collaboration", personal: false, pro: true, enterprise: true },
+      { name: "Goals & progress tracking", personal: false, pro: true, enterprise: true },
     ],
   },
   {
-    category: "Security & Support",
+    category: "Integrations & Admin",
     features: [
+      { name: "GitHub / Slack / Discord integrations", personal: false, pro: "GitHub only", enterprise: true },
+      { name: "Multi-workspace support", personal: "1 workspace", pro: "5 workspaces", enterprise: "Unlimited" },
+      { name: "Role management", personal: false, pro: "Standard", enterprise: "Advanced" },
       { name: "SSO (SAML)", personal: false, pro: false, enterprise: true },
       { name: "Support Level", personal: "Community", pro: "Priority Email", enterprise: "24/7 Dedicated" },
     ],
@@ -39,6 +56,8 @@ const PricingFeature = ({ text, included = true }: { text: string; included?: bo
   </li>
 );
 
+const limitedValues = ["1", "7 days", "5 MB", "Community", "List", "GitHub only", "1 workspace"];
+
 const FeatureValue = ({ value, mobile = false }: { value: string | boolean; mobile?: boolean }) => {
   if (typeof value === "boolean") {
     return value ? (
@@ -50,7 +69,7 @@ const FeatureValue = ({ value, mobile = false }: { value: string | boolean; mobi
   return (
     <span className={cn(
       "font-light",
-      (value === "1" || value === "7 days" || value === "5 MB" || value === "Community") ? "text-muted-foreground!" : "text-card-foreground"
+      limitedValues.includes(value) ? "text-muted-foreground!" : "text-card-foreground"
     )}>
       {value}
     </span>
@@ -109,21 +128,24 @@ export default function Pricing() {
         {/* Pricing Cards */}
         <section className="grid grid-cols-1 md:grid-cols-3 max-w-6xl w-full px-6 gap-8 justify-center items-stretch mt-4">
           
-          {/* Personal */}
+          {/* Free */}
           <div className="bg-card border border-border rounded-2xl p-8 flex flex-col relative shadow-sm">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-card-foreground">Personal</h3>
-              <p className="text-muted-foreground mt-2 text-sm">For individuals just starting out.</p>
+              <h3 className="text-xl font-bold text-card-foreground">Free</h3>
+              <p className="text-muted-foreground mt-2 text-sm">For individuals building their focus habit.</p>
             </div>
             <div className="text-center mb-8">
               <span className="text-5xl font-light text-card-foreground tracking-tight">$0</span>
               <span className="text-muted-foreground ml-1">/mo</span>
             </div>
             <ul className="flex flex-col gap-4 mb-8 flex-1">
-              <PricingFeature text="Basic task lists" />
+              <PricingFeature text="Focus Timer & distraction logging" />
+              <PricingFeature text="Flow Score & Focus Streak" />
+              <PricingFeature text="Basic task management" />
               <PricingFeature text="1 active project" />
               <PricingFeature text="Community support" />
               <PricingFeature text="Calendar View" included={false} />
+              <PricingFeature text="Team Chat" included={false} />
             </ul>
             <Button variant="outline" className="w-full h-12 text-md font-bold rounded-xl border-border">
               Get Started
@@ -137,17 +159,22 @@ export default function Pricing() {
             </div>
             <div className="text-center mb-6 mt-2">
               <h3 className="text-xl font-bold">Pro</h3>
-              <p className="text-muted-foreground mt-2 text-sm">For power users who need more focus.</p>
+              <p className="text-muted-foreground mt-2 text-sm">For power users who need the full stack.</p>
             </div>
             <div className="text-center mb-8">
               <span className="text-5xl font-light tracking-tight">${isYearly ? "8" : "10"}</span>
               <span className="text-muted-foreground ml-1">/mo</span>
             </div>
             <ul className="flex flex-col gap-4 mb-8 flex-1 [&_li]:text-card-foreground [&_li>svg]:text-card-foreground dark:[&_li]:text-card-foreground dark:[&_li>svg]:text-card-foreground">
-              <PricingFeature text="Unlimited projects" />
-              <PricingFeature text="Calendar & Timeline view" />
-              <PricingFeature text="Priority support" />
-              <PricingFeature text="Advanced integrations" />
+              <PricingFeature text="Unlimited projects & tasks" />
+              <PricingFeature text="Kanban, Calendar & List views" />
+              <PricingFeature text="Task dependencies & recurrence" />
+              <PricingFeature text="Custom fields & statuses" />
+              <PricingFeature text="Real-time document editor" />
+              <PricingFeature text="Team Chat (channels & DMs)" />
+              <PricingFeature text="Goals & progress tracking" />
+              <PricingFeature text="GitHub integration" />
+              <PricingFeature text="Priority email support" />
             </ul>
             <Button className="w-full h-12 text-md font-bold rounded-xl bg-background text-foreground hover:bg-muted">
               Start Free Trial
@@ -164,8 +191,10 @@ export default function Pricing() {
               <span className="text-4xl font-light text-card-foreground tracking-tight">Custom</span>
             </div>
             <ul className="flex flex-col gap-4 mb-8 flex-1 mt-2">
+              <PricingFeature text="Everything in Pro" />
               <PricingFeature text="SSO & SAML" />
-              <PricingFeature text="Audit logs & Data export" />
+              <PricingFeature text="Unlimited workspaces" />
+              <PricingFeature text="Advanced role management" />
               <PricingFeature text="Dedicated Success Manager" />
               <PricingFeature text="Custom SLAs" />
             </ul>

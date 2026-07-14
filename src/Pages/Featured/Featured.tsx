@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/sections/footer/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search, Activity, Command, Zap, Layers, Share2, Check, Copy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, BrainCircuit, Timer, FileText, MessageCircle, CheckSquare, Workflow, Command, Target, BarChart3, Users, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FeatureBadgeProps {
@@ -11,9 +11,10 @@ interface FeatureBadgeProps {
   colorClass: string;
 }
 
-interface FlowItemProps {
+interface StatCardProps {
   icon: React.ComponentType<{ className?: string }>;
-  text: string;
+  value: string;
+  label: string;
   colorClass: string;
   bgClass: string;
 }
@@ -24,262 +25,410 @@ const FeatureBadge = ({ icon: Icon, text, colorClass }: FeatureBadgeProps) => (
   </span>
 );
 
-const FlowItem = ({ icon: Icon, text, colorClass, bgClass }: FlowItemProps) => (
-  <li className="flex items-center gap-4 text-foreground font-bold text-sm">
-    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgClass)}>
-      <Icon className={cn("w-4 h-4", colorClass)} />
+const StatCard = ({ icon: Icon, value, label, colorClass, bgClass }: StatCardProps) => (
+  <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
+    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", bgClass)}>
+      <Icon className={cn("w-5 h-5", colorClass)} />
     </div>
-    {text}
-  </li>
+    <span className="text-2xl font-bold text-foreground tracking-tight">{value}</span>
+    <span className="text-sm text-muted-foreground">{label}</span>
+  </div>
 );
 
 export default function Featured() {
-  const [copied, setCopied] = useState(false);
-
-  const codeString = `// Initialize Graph Engine\nconst graph = new FocusGraph({ resolution: 'high' });\ngraph.linkNodes(process_01, data_stream_04);\n\nSTATUS: RENDER_SUCCESS [244ms]`;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(codeString);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background font-sans">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 flex flex-col items-center w-full pb-24">
         
-        {/* Hero Section */}
-        <section className="flex flex-col items-center w-full max-w-7xl pt-20 pb-16 px-4 md:pt-32 md:pb-24 md:px-6 gap-8 relative">
-          <div className="absolute inset-0 bg-grid-slate-100/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-900/[0.04] dark:bg-[bottom_1px_center] mask-image:linear-gradient(to_bottom,transparent,black)"></div>
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-foreground tracking-tight text-center leading-none z-10">
-            Built for the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">power user.</span>
+        {/* Hero */}
+        <section className="flex flex-col items-center w-full max-w-7xl pt-20 pb-16 px-4 md:pt-32 md:pb-24 md:px-6 gap-8">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-foreground tracking-tight text-center leading-none">
+            Your Entire Workflow, <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">Unified.</span>
           </h1>
-          <div className="flex flex-col items-center w-full max-w-2xl mt-12 gap-8 z-10 text-center">
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Precision tools engineered for high-velocity workflows. No fluff, just pure performance.
-            </p>
-            <Button variant="outline" className="h-14 px-8 rounded-xl font-bold border-2 border-border text-foreground hover:bg-muted shadow-sm flex items-center gap-2">
-              <Command className="w-5 h-5 text-muted-foreground" /> View Documentation
+          <p className="text-xl text-muted-foreground text-center max-w-2xl leading-relaxed mt-4">
+            Tasks, documents, chat, goals, and focus tools — all deeply integrated. 
+            One workspace designed for teams who value speed and clarity.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <Button
+              className="shadow-xl bg-cu-purple hover:bg-cu-purple/90 text-white px-8 h-14 font-bold text-lg rounded-xl cursor-pointer"
+              onClick={() => navigate("/signup")}
+            >
+              Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl mt-12">
+            <StatCard icon={BarChart3} value="Flow Score" label="Algorithmic focus quality metric" colorClass="text-cu-purple" bgClass="bg-cu-purple/10" />
+            <StatCard icon={Target} value="Goals" label="Track progress with linked tasks" colorClass="text-cu-green" bgClass="bg-cu-green/10" />
+            <StatCard icon={Users} value="Team" label="Real-time collaboration" colorClass="text-cu-blue" bgClass="bg-cu-blue/10" />
+            <StatCard icon={Sparkles} value="⌘K" label="Universal command palette" colorClass="text-cu-orange" bgClass="bg-cu-orange/10" />
+          </div>
         </section>
 
-        {/* Feature 01: Real-time Sync */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-card py-24 md:py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
-            <FeatureBadge icon={Activity} text="01_Sync" colorClass="text-cu-green" />
-            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
-              Sub-millisecond synchronization.
+        {/* Feature: Dashboard & Flow Score */}
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={BrainCircuit} text="01_Analytics" colorClass="text-cu-purple" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Know Your Productivity —<br />Quantified.
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              State management reimagined. Your data flows across devices with negligible latency, ensuring your focus remains unbroken across every interface.
+              Flow Score measures your focus quality in real-time. Track deep work hours, 
+              monitor daily streaks, and watch weekly trends. Every session, every distraction, 
+              every insight at a glance.
             </p>
-            <div className="flex items-center gap-4 mt-4 bg-muted px-4 py-2 rounded-lg w-fit border border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-cu-green animate-pulse"></div>
-                <span className="text-sm font-bold text-foreground">ACTIVE_SYNC</span>
-              </div>
-              <div className="w-px h-4 bg-border"></div>
-              <span className="text-sm font-medium text-muted-foreground">LATENCY: 0.8MS</span>
-            </div>
-          </div>
-          <div className="flex-1 w-full bg-gradient-to-br from-cu-green/5 to-cu-blue/5 border border-border rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm">
-            <div className="relative w-full max-w-md aspect-video bg-card rounded-2xl shadow-xl border border-border flex flex-col justify-center p-8">
-              <div className="flex items-center justify-between relative w-full">
-                {/* Connecting Line */}
-                <div className="absolute left-8 right-8 h-0.5 bg-gradient-to-r from-cu-purple via-cu-pink to-cu-blue top-1/2 -translate-y-1/2 opacity-30"></div>
-                
-                {/* Node A */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cu-purple to-cu-pink shadow-lg flex items-center justify-center z-10 relative">
-                  <Layers className="text-white w-8 h-8" />
-                </div>
-                
-                {/* Bouncing Arrow */}
-                <div className="w-8 h-8 bg-card border-2 border-cu-pink rounded-full flex items-center justify-center shadow-sm z-10 animate-bounce relative">
-                  <ArrowRight className="w-4 h-4 text-cu-pink" />
-                </div>
-                
-                {/* Node B */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cu-blue to-cu-green shadow-lg flex items-center justify-center z-10 relative">
-                  <Share2 className="text-white w-8 h-8" />
-                </div>
-              </div>
-              
-              {/* Text Labels */}
-              <div className="flex justify-between w-full mt-4 px-1">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center w-16">Node A</span>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center w-16">Node B</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Feature 02: Command Palette */}
-        <section className="flex flex-col items-center w-full border-t border-border bg-muted/50 py-32 px-6">
-          <div className="flex flex-col items-center w-full max-w-4xl gap-6 text-center mb-16">
-            <FeatureBadge icon={Command} text="02_Control" colorClass="text-cu-purple" />
-            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
-              Total control at your fingertips.
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              The Command Palette is the nervous system of Focus. Navigate, search, and execute complex operations without ever touching your mouse.
-            </p>
-          </div>
-
-          <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col scale-105 transform origin-top">
-            <div className="flex items-center px-4 py-4 border-b border-border bg-muted/50">
-              <Search className="w-5 h-5 text-cu-purple mr-3" />
-              <input 
-                type="text" 
-                placeholder="Search commands or files..." 
-                className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground font-medium"
-                readOnly
-              />
-              <div className="flex items-center gap-1">
-                <kbd className="bg-card border border-border rounded px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm">⌘</kbd>
-                <kbd className="bg-card border border-border rounded px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm">K</kbd>
-              </div>
-            </div>
-            <div className="p-2 flex flex-col gap-1">
-              <div className="flex items-center justify-between px-3 py-2.5 bg-cu-purple/10 rounded-xl cursor-default">
-                <div className="flex items-center gap-3">
-                  <Zap className="w-4 h-4 text-cu-purple" />
-                  <span className="text-sm font-bold text-cu-purple">Execute Rapid Indexing</span>
-                </div>
-                <div className="flex items-center gap-1">
-                   <kbd className="text-xs font-bold text-cu-purple/60">SHIFT</kbd>
-                   <span className="text-cu-purple/40 text-xs">+</span>
-                   <kbd className="text-xs font-bold text-cu-purple/60">ENTER</kbd>
-                </div>
-              </div>
-              <div className="flex items-center justify-between px-3 py-2.5 hover:bg-muted rounded-xl cursor-default transition-colors">
-                <div className="flex items-center gap-3">
-                  <Command className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Open Shell Integration</span>
-                </div>
-              </div>
-               <div className="flex items-center justify-between px-3 py-2.5 hover:bg-muted rounded-xl cursor-default transition-colors">
-                <div className="flex items-center gap-3">
-                  <Activity className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Toggle Advanced Debugger</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Feature 03: Flow */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-card py-24 md:py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
-            <FeatureBadge icon={Zap} text="03_Flow" colorClass="text-cu-pink" />
-            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
-              Zero-latency interaction.
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Customizable key bindings that mirror your mental model. Every shortcut is globally accessible and optimized for minimal finger travel.
-            </p>
-            <ul className="mt-6 flex flex-col gap-4 border-t border-border pt-6">
-              <FlowItem icon={Layers} text="Fully Remappable HID" colorClass="text-cu-pink" bgClass="bg-cu-pink/10" />
-              <FlowItem icon={Command} text="JSON-based config exports" colorClass="text-cu-orange" bgClass="bg-cu-orange/10" />
-              <FlowItem icon={Zap} text="Multi-layered modal editing" colorClass="text-cu-blue" bgClass="bg-cu-blue/10" />
+            <ul className="space-y-3 mt-2">
+              {[
+                "Flow Score: algorithmic quality metric (0–100)",
+                "Deep Work hours with 7-day trend chart",
+                "Focus Streak counter with daily consistency tracking",
+                "Priority Pipeline: see what needs attention now",
+                "Active Goals with progress bars and deadlines",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-purple/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-purple"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
-          <div className="flex-1 w-full bg-muted border border-border rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[400px]">
-            <div className="grid grid-cols-3 gap-4 w-full max-w-xs relative z-10">
-              <div className="aspect-square bg-card border-2 border-border rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-pink hover:shadow-cu-pink/20 transition-all cursor-default">
-                <span className="text-2xl font-black text-muted-foreground/40 group-hover:text-cu-pink">Q</span>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl p-6 shadow-sm aspect-video flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Flow Score</span>
+              <div className="w-8 h-8 rounded-full bg-[#f5f3ff] flex items-center justify-center">
+                <BrainCircuit className="w-4 h-4 text-cu-purple" />
               </div>
-              <div className="aspect-square bg-gradient-to-br from-cu-purple to-cu-pink border-2 border-transparent rounded-2xl shadow-xl flex items-center justify-center scale-110 z-10">
-                <span className="text-3xl font-black text-white">W</span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-5xl font-bold text-foreground tracking-tight drop-shadow-[0_4px_8px_rgba(123,104,238,0.35)]">72</span>
+              <span className="text-muted-foreground text-lg">/100</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#6366f1]" style={{ width: "72%" }}></div>
+            </div>
+            <div className="grid grid-cols-7 gap-1.5 mt-auto">
+              {[40, 55, 48, 68, 72, 65, 60].map((val, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <div className="w-full rounded-sm bg-gradient-to-t from-cu-purple to-cu-purple/60" style={{ height: `${val}%`, minHeight: "12px" }}></div>
+                  <span className="text-[9px] text-muted-foreground">{["M","T","W","T","F","S","S"][i]}</span>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <span className="text-emerald-500 font-semibold">+12%</span> vs last week
+            </div>
+          </div>
+        </section>
+
+        {/* Feature: Focus Timer */}
+        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={Timer} text="02_Focus" colorClass="text-cu-pink" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Deep Work,<br />On Purpose.
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Start a focus session linked to any task. The timer runs, distractions get logged, 
+              and every completed session builds your Flow Score. Pomodoro never felt this intentional.
+            </p>
+            <ul className="space-y-3 mt-2">
+              {[
+                "Start/pause/resume with task linking",
+                "Real-time distraction logging (internal/external)",
+                "Session history with duration, score, and status",
+                "Live distraction feed during active sessions",
+                "Zero-distraction encouragement & streak tracking",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-pink/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-pink"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl p-6 shadow-sm aspect-video flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Active Session</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-cu-green animate-pulse"></div>
+                <span className="text-[10px] font-bold text-cu-green uppercase">Focusing</span>
               </div>
-              <div className="aspect-square bg-card border-2 border-border rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-orange hover:shadow-cu-orange/20 transition-all cursor-default">
-                <span className="text-2xl font-black text-muted-foreground/40 group-hover:text-cu-orange">E</span>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3">
+              <div className="relative">
+                <svg className="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-muted" strokeWidth="6" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#7b68ee" strokeWidth="6" strokeDasharray="263.89" strokeDashoffset="65.97" strokeLinecap="round" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-foreground">24:00</span>
               </div>
-              <div className="col-span-3 h-12 mt-4 bg-card border-2 border-border rounded-xl shadow-sm flex items-center justify-center group hover:border-cu-blue transition-all">
-                  <span className="text-sm font-bold text-muted-foreground group-hover:text-cu-blue">SPACE</span>
+              <span className="text-sm font-medium text-muted-foreground">Design System UI</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature: Documents */}
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={FileText} text="03_Docs" colorClass="text-cu-orange" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Documents That<br />Work Together.
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Real-time collaborative editing powered by TipTap. Comments on selected text, 
+              task linking, code blocks with syntax highlighting, tables, and images — 
+              all syncing instantly across your team.
+            </p>
+            <ul className="space-y-3 mt-2">
+              {[
+                "Real-time collaboration with live cursors",
+                "Inline comments anchored to text selections",
+                "Task linking — connect docs to tasks and goals",
+                "Rich formatting: tables, code blocks, lists, images",
+                "Auto-save with connection status indicator",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-orange"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-cu-red"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-cu-yellow"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-cu-green"></div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-cu-green"></div>
+                <span className="text-[10px] text-cu-green font-semibold">Synced</span>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="h-6 w-3/4 bg-muted rounded"></div>
+              <div className="h-4 w-full bg-muted/60 rounded"></div>
+              <div className="h-4 w-5/6 bg-muted/60 rounded"></div>
+              <div className="flex items-start gap-3 mt-6">
+                <div className="w-6 h-6 rounded-full bg-cu-purple/30 flex items-center justify-center shrink-0">
+                  <span className="text-[8px] font-bold text-cu-purple">AE</span>
+                </div>
+                <div className="flex-1 p-3 bg-cu-purple/5 border border-cu-purple/20 rounded-lg">
+                  <div className="h-3 w-4/5 bg-muted rounded mb-2"></div>
+                  <div className="h-3 w-3/5 bg-muted/60 rounded"></div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Feature 04: Global Graph */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-muted/50 py-24 md:py-32 px-6">
-          <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
-            <FeatureBadge icon={Share2} text="04_Graph" colorClass="text-cu-blue" />
-            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
-              Visualizing the network.
+        {/* Feature: Chat */}
+        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={MessageCircle} text="04_Chat" colorClass="text-cu-blue" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Team Messaging,<br />Zero Noise.
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-              See how your projects, tasks, and data points interconnect. Our Global Graph engine generates architectural-style visualizations of your entire workflow architecture.
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Channels and direct messages with file sharing, @mentions, and typing indicators. 
+              Integrated with your tasks — mention someone and they get a notification, no separate app needed.
             </p>
-            
-            <div className="mt-6 w-full bg-slate-900 rounded-2xl p-6 shadow-2xl border border-slate-800 relative group">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute top-4 right-4 h-8 w-8 text-muted-foreground hover:text-white hover:bg-slate-800"
-                onClick={copyToClipboard}
-              >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                <span className="sr-only">Copy code</span>
-              </Button>
-              <div className="flex gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-cu-red"></div>
-                <div className="w-3 h-3 rounded-full bg-cu-yellow"></div>
-                <div className="w-3 h-3 rounded-full bg-cu-green"></div>
-              </div>
-              <pre className="font-mono text-xs md:text-sm leading-loose overflow-x-auto pr-4 md:pr-8">
-                <code className="text-muted-foreground">{'// Initialize Graph Engine'}</code><br/>
-                <code className="text-cu-pink">const</code> <code className="text-white">graph =</code> <code className="text-cu-pink">new</code> <code className="text-cu-blue">FocusGraph</code><code className="text-white">({'{'} resolution: </code><code className="text-cu-orange">'high'</code> <code className="text-white">{'}'});</code><br/>
-                <code className="text-white">graph.</code><code className="text-cu-blue">linkNodes</code><code className="text-white">(process_01, data_stream_04);</code><br/>
-                <br/>
-                <code className="text-cu-green font-bold bg-cu-green/20 px-2 py-1 rounded">STATUS: RENDER_SUCCESS [244ms]</code>
-              </pre>
+            <ul className="space-y-3 mt-2">
+              {[
+                "Channel (#general) and direct message modes",
+                "File sharing: images, PDFs, docs (up to 10MB)",
+                "@mentions with real-time notifications",
+                "Typing indicators and read receipts",
+                "Message edit, delete, and conversation management",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-blue"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-muted/30">
+              <div className="text-sm font-bold text-foreground"># general</div>
+              <div className="text-[10px] text-muted-foreground">3 online</div>
+            </div>
+            <div className="p-5 space-y-4">
+              {[
+                { name: "Alex", initial: "A", color: "bg-cu-purple/30 text-cu-purple", msg: "Ready for the sprint review?", time: "2m ago" },
+                { name: "You", initial: "Y", color: "bg-cu-blue/30 text-cu-blue", msg: "Pushing the final changes now", time: "1m ago", self: true },
+                { name: "Sam", initial: "S", color: "bg-cu-green/30 text-cu-green", msg: "Flow Score hit 85 today 🔥", time: "Just now" },
+              ].map((msg) => (
+                <div key={msg.msg} className={cn("flex items-start gap-3", msg.self && "flex-row-reverse")}>
+                  <div className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold", msg.color)}>
+                    {msg.initial}
+                  </div>
+                  <div className={cn("flex flex-col", msg.self ? "items-end" : "items-start")}>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs font-semibold text-foreground">{msg.name}</span>
+                      <span className="text-[10px] text-muted-foreground">{msg.time}</span>
+                    </div>
+                    <div className={cn("px-3 py-2 rounded-lg text-sm", msg.self ? "bg-cu-purple/10 text-foreground" : "bg-muted text-foreground")}>
+                      {msg.msg}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div className="text-xs text-cu-purple italic">Sam is typing...</div>
             </div>
           </div>
+        </section>
 
-          <div className="flex-1 w-full bg-card border border-border rounded-3xl p-4 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[450px]">
-            <div className="relative w-full max-w-[240px] md:max-w-sm aspect-square">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-cu-purple to-cu-blue shadow-xl z-20 flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-card/20"></div>
+        {/* Feature: Tasks */}
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={CheckSquare} text="05_Tasks" colorClass="text-cu-green" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Tasks That Fit<br />Your Brain.
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Three views — List, Calendar, and Kanban — so you can work the way you think. 
+              Add dependencies, set recurrence rules, save templates, and define custom fields. 
+              Tasks finally flexible enough for real workflows.
+            </p>
+            <ul className="space-y-3 mt-2">
+              {[
+                "List / Calendar / Kanban view modes",
+                "Task dependencies, recurrence, and templates",
+                "Custom fields: text, number, date, select, multi-select",
+                "Workflow statuses — fully customizable pipelines",
+                "Priority indicators, assignees, tracked time, and filters",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-green"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl p-6 shadow-sm space-y-3">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Priority Tasks</span>
+              <div className="flex gap-1">
+                <div className="px-2 py-1 rounded-md bg-cu-purple/10 text-[10px] font-semibold text-cu-purple">List</div>
+                <div className="px-2 py-1 rounded-md bg-muted text-[10px] text-muted-foreground">Calendar</div>
+                <div className="px-2 py-1 rounded-md bg-muted text-[10px] text-muted-foreground">Board</div>
               </div>
-              <div className="absolute top-[18.18%] left-[18.18%] -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-cu-pink/20 border-2 border-cu-pink flex items-center justify-center z-10">
-                  <div className="w-3 h-3 rounded-full bg-cu-pink"></div>
+            </div>
+            {[
+              { title: "Design system migration", priority: "bg-red-500", status: "In Progress", due: "Today" },
+              { title: "Q3 roadmap planning", priority: "bg-cu-orange", status: "To Do", due: "Tomorrow" },
+              { title: "API rate limiting audit", priority: "bg-blue-500", status: "In Progress", due: "In 3d" },
+              { title: "Update onboarding flow", priority: "bg-slate-400", status: "To Do", due: "" },
+            ].map((task, i) => (
+              <div key={i} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
+                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/30 shrink-0"></div>
+                <div className={`w-2 h-2 rounded-full ${task.priority} shrink-0`}></div>
+                <div className="flex-1 text-sm text-foreground truncate">{task.title}</div>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-cu-purple/10 text-cu-purple">{task.status}</span>
+                {task.due && <span className="text-[10px] font-medium text-muted-foreground">{task.due}</span>}
               </div>
-              <div className="absolute top-[81.82%] left-[81.82%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-cu-orange/20 border-2 border-cu-orange flex items-center justify-center z-10">
-                  <div className="w-4 h-4 rounded-full bg-cu-orange"></div>
-              </div>
-              <div className="absolute top-[28.79%] left-[71.21%] -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cu-green/20 border-2 border-cu-green flex items-center justify-center z-10">
-                  <div className="w-2 h-2 rounded-full bg-cu-green"></div>
-              </div>
+            ))}
+          </div>
+        </section>
 
-              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-                {/* SVG dashed circles matching the paths */}
-                <circle cx="50%" cy="50%" r="45%" fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="6 6" className="animate-[spin_60s_linear_infinite]" style={{ transformOrigin: '50% 50%' }} />
-                <circle cx="50%" cy="50%" r="30%" fill="none" stroke="#f3f4f6" strokeWidth="2" />
-                
-                <line x1="50%" y1="50%" x2="18.18%" y2="18.18%" stroke="url(#grad1)" strokeWidth="3" strokeDasharray="6 6" />
-                <line x1="50%" y1="50%" x2="81.82%" y2="81.82%" stroke="url(#grad2)" strokeWidth="3" strokeDasharray="6 6" />
-                <line x1="50%" y1="50%" x2="71.21%" y2="28.79%" stroke="url(#grad3)" strokeWidth="3" strokeDasharray="6 6" />
-                <defs>
-                  <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--primary)" />
-                    <stop offset="100%" stopColor="#ff5cba" />
-                  </linearGradient>
-                  <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--primary)" />
-                    <stop offset="100%" stopColor="#ff8d36" />
-                  </linearGradient>
-                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--primary)" />
-                    <stop offset="100%" stopColor="#00a843" />
-                  </linearGradient>
-                </defs>
-              </svg>
+        {/* Feature: Custom Workflows */}
+        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+          <div className="flex-1 flex flex-col gap-5">
+            <FeatureBadge icon={Workflow} text="06_Adapt" colorClass="text-cu-purple" />
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              Your Process,<br />Your Rules.
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Custom status pipelines, custom fields, integrations — Focus adapts to your team's process, 
+              not the other way around. Connect GitHub, Slack, Google Calendar, and more.
+            </p>
+            <ul className="space-y-3 mt-2">
+              {[
+                "Custom workflow statuses (color-coded, reorderable)",
+                "Custom fields: text, number, date, select, multi-select",
+                "6 integrations: Slack, GitHub, Discord, Google Calendar, Notion, Linear",
+                "REST API for custom integrations (coming soon)",
+                "Multi-workspace with role management (admin, member)",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground">
+                  <div className="w-5 h-5 rounded-full bg-cu-purple/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-cu-purple"></div>
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 w-full bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Workflow Statuses</span>
+            </div>
+            <div className="space-y-2">
+              {[
+                { name: "To Do", color: "bg-slate-400" },
+                { name: "In Progress", color: "bg-blue-500" },
+                { name: "Review", color: "bg-cu-orange" },
+                { name: "Done", color: "bg-cu-green" },
+              ].map((status) => (
+                <div key={status.name} className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                  <div className={`w-2.5 h-2.5 rounded-full ${status.color}`}></div>
+                  <span className="text-sm text-foreground">{status.name}</span>
+                  <div className="ml-auto flex items-center gap-1">
+                    <div className="w-5 h-5 rounded bg-muted flex items-center justify-center cursor-default">
+                      <svg className="w-3 h-3 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </div>
+                    <div className="w-5 h-5 rounded bg-muted flex items-center justify-center cursor-default">
+                      <svg className="w-3 h-3 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 pt-4 border-t border-border">
+              <span className="text-[10px] font-bold tracking-[1px] text-muted-foreground uppercase">Integrations</span>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {["Slack", "GitHub", "Discord", "Google Calendar", "Notion", "Linear"].map((name) => (
+                  <div key={name} className="px-3 py-1.5 rounded-lg bg-muted text-xs font-medium text-muted-foreground border border-border">
+                    {name}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+        </section>
+
+        {/* CTA */}
+        <section className="flex flex-col items-center max-w-4xl w-full mt-16 px-6 gap-8 py-20 bg-foreground text-background dark:bg-card dark:text-card-foreground rounded-3xl mx-6">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-center">
+            Ready to Focus?
+          </h2>
+          <p className="text-lg opacity-80 text-center max-w-xl">
+            Join thousands of engineers and creators who've reclaimed their deep work.
+          </p>
+          <Button
+            className="bg-background text-foreground dark:bg-foreground dark:text-background hover:bg-muted px-8 h-14 font-bold text-lg rounded-xl cursor-pointer"
+            onClick={() => navigate("/signup")}
+          >
+            Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
         </section>
 
       </main>

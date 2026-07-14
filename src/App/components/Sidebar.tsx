@@ -119,7 +119,7 @@ function SidebarContent() {
                 "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 active
                   ? "bg-[#f5f3ff] border-primary border-l-2 text-[#6d28d9]"
-                  : "text-slate-600 hover:bg-slate-50"
+                  : "text-muted-foreground hover:bg-muted"
               )}
             >
               <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-muted-foreground")} />
