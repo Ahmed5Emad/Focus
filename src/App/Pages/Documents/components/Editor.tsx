@@ -336,7 +336,7 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
       TableHeader,
       CodeBlockLowlight.configure({ lowlight }),
       currentWorkspaceId ? createMentionExtension() : null,
-    ].filter(Boolean),
+    ].filter((e): e is NonNullable<typeof e> => e !== null),
     editorProps: {
       attributes: {
         class: "prose prose-sm max-w-none focus:outline-none min-h-[500px] px-8 py-6",

@@ -82,8 +82,8 @@ export function createMentionExtension() {
         return {
           onStart: (props) => {
             const items = props.items as MemberItem[];
-            if (items.length === 0) return;
-            popup = renderPopup(items, () => props.clientRect(), (item) => {
+            if (items.length === 0 || !props.clientRect) return;
+            popup = renderPopup(items, () => props.clientRect!(), (item) => {
               props.command({ id: item.id, label: item.label });
             });
           },
@@ -91,8 +91,8 @@ export function createMentionExtension() {
             popup?.remove();
             popup = null;
             const items = props.items as MemberItem[];
-            if (items.length === 0) return;
-            popup = renderPopup(items, () => props.clientRect(), (item) => {
+            if (items.length === 0 || !props.clientRect) return;
+            popup = renderPopup(items, () => props.clientRect!(), (item) => {
               props.command({ id: item.id, label: item.label });
             });
           },

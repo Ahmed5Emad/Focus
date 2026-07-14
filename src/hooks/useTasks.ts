@@ -95,7 +95,7 @@ export interface TaskCustomValue {
 }
 
 export function useTasks() {
-  const { currentWorkspaceId } = useAuth();
+  const { currentWorkspaceId, user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
