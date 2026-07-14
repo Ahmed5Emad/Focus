@@ -26,12 +26,14 @@ const FeatureBadge = ({ icon: Icon, text, colorClass }: FeatureBadgeProps) => (
 );
 
 const StatCard = ({ icon: Icon, value, label, colorClass, bgClass }: StatCardProps) => (
-  <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
-    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", bgClass)}>
-      <Icon className={cn("w-5 h-5", colorClass)} />
+  <div className="bg-card border border-border rounded-xl p-8 flex flex-col gap-4">
+    <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center", bgClass)}>
+      <Icon className={cn("w-7 h-7", colorClass)} />
     </div>
-    <span className="text-2xl font-bold text-foreground tracking-tight">{value}</span>
-    <span className="text-sm text-muted-foreground">{label}</span>
+    <div className="space-y-1">
+      <span className="text-3xl font-bold text-foreground tracking-tight block">{value}</span>
+      <span className="text-base text-muted-foreground">{label}</span>
+    </div>
   </div>
 );
 

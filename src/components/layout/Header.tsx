@@ -53,12 +53,12 @@ export function Header() {
             <Link to="/login" className="text-base font-medium text-foreground hover:text-muted-foreground transition-colors">
               Login
             </Link>
+            <ThemeToggle />
             <Link to="/signup">
               <Button className="font-bold text-base h-11 px-6 bg-foreground text-background hover:bg-foreground/90 rounded-md">
                 Get Started
               </Button>
             </Link>
-            <ThemeToggle />
           </div>
 
           {/* Mobile Menu */}

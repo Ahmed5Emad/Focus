@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LayoutDashboard, CheckSquare, Layout, Target, FileText, MessageCircle, Timer, Archive, Settings, HelpCircle, BrainCircuit, CheckCircle2, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function HeroSection() {
@@ -64,40 +64,46 @@ export function HeroSection() {
               {/* Nav Items */}
               <nav className="flex-1 flex flex-col gap-0.5 px-3">
                 {[
-                  { label: "Dashboard", active: true, color: "bg-cu-purple" },
-                  { label: "Tasks", active: false, color: "" },
-                  { label: "Projects", active: false, color: "" },
-                  { label: "Goals", active: false, color: "" },
-                  { label: "Documents", active: false, color: "" },
-                  { label: "Chat", active: false, color: "" },
-                  { label: "Focus Timer", active: false, color: "" },
-                  { label: "Archive", active: false, color: "" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-[4px] ${
-                      item.active
-                        ? "bg-[#f5f3ff] border-l-2 border-cu-purple"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    <div className={`w-[14px] h-[14px] rounded-sm ${item.active ? "bg-cu-purple/70" : "bg-muted-foreground/30"}`}></div>
-                    <span className={`text-[10px] tracking-[1px] uppercase font-medium ${
-                      item.active ? "text-[#6d28d9]" : "text-muted-foreground"
-                    }`}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
+                  { label: "Dashboard", active: true, icon: LayoutDashboard },
+                  { label: "Tasks", active: false, icon: CheckSquare },
+                  { label: "Projects", active: false, icon: Layout },
+                  { label: "Goals", active: false, icon: Target },
+                  { label: "Documents", active: false, icon: FileText },
+                  { label: "Chat", active: false, icon: MessageCircle },
+                  { label: "Focus Timer", active: false, icon: Timer },
+                  { label: "Archive", active: false, icon: Archive },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.label}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-[4px] ${
+                        item.active
+                          ? "bg-[#f5f3ff] border-l-2 border-cu-purple"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className={`w-[14px] h-[14px] ${item.active ? "text-cu-purple" : "text-muted-foreground/60"}`} />
+                      <span className={`text-[10px] tracking-[1px] uppercase font-medium ${
+                        item.active ? "text-[#6d28d9]" : "text-muted-foreground"
+                      }`}>
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </nav>
               {/* Bottom Nav */}
               <div className="border-t border-border px-3 py-3">
-                {["Settings", "Support"].map((label) => (
-                  <div key={label} className="flex items-center gap-3 px-3 py-2.5 rounded-[4px] text-muted-foreground">
-                    <div className="w-[14px] h-[14px] rounded-sm bg-muted-foreground/30"></div>
-                    <span className="text-[10px] tracking-[1px] uppercase font-medium">{label}</span>
-                  </div>
-                ))}
+                {[{ label: "Settings", icon: Settings }, { label: "Support", icon: HelpCircle }].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.label} className="flex items-center gap-3 px-3 py-2.5 rounded-[4px] text-muted-foreground">
+                      <Icon className="w-[14px] h-[14px] text-muted-foreground/60" />
+                      <span className="text-[10px] tracking-[1px] uppercase font-medium">{item.label}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -150,16 +156,18 @@ export function HeroSection() {
                 {/* Metric Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
-                    { label: "Flow Score", value: "72", suffix: "/100", color: "bg-cu-purple", iconBg: "bg-[#f5f3ff]", accent: "from-[#8b5cf6] to-[#6366f1]", icon: "🧠" },
-                    { label: "Deep Work", value: "4h 12m", color: "bg-cu-green", iconBg: "bg-[#ecfdf5]", accent: "bg-[#10b981]", icon: "⏳" },
-                    { label: "Tasks Done", value: "8", suffix: "/14", color: "bg-cu-blue", iconBg: "bg-[#eff6ff]", accent: "bg-[#3b82f6]", icon: "✓" },
-                    { label: "Focus Streak", value: "5", suffix: " days", color: "bg-cu-orange", iconBg: "bg-[#fff7ed]", accent: "bg-[#f97316]", icon: "🔥" },
-                  ].map((card) => (
+                    { label: "Flow Score", value: "72", suffix: "/100", icon: BrainCircuit, iconColor: "text-cu-purple", iconBg: "bg-[#f5f3ff]", accent: "from-[#8b5cf6] to-[#6366f1]" },
+                    { label: "Deep Work", value: "4h 12m", icon: Timer, iconColor: "text-cu-green", iconBg: "bg-[#ecfdf5]", accent: "bg-[#10b981]" },
+                    { label: "Tasks Done", value: "8", suffix: "/14", icon: CheckCircle2, iconColor: "text-cu-blue", iconBg: "bg-[#eff6ff]", accent: "bg-[#3b82f6]" },
+                    { label: "Focus Streak", value: "5", suffix: " days", icon: Flame, iconColor: "text-cu-orange", iconBg: "bg-[#fff7ed]", accent: "bg-[#f97316]" },
+                  ].map((card) => {
+                    const Icon = card.icon;
+                    return (
                     <div key={card.label} className="bg-card border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-2">
                       <div className="flex items-start justify-between">
                         <span className="text-[9px] font-semibold tracking-[1px] text-muted-foreground uppercase">{card.label}</span>
                         <div className={`w-8 h-8 ${card.iconBg} rounded-full flex items-center justify-center shrink-0`}>
-                          <div className={`w-4 h-4 rounded-sm ${card.color}/40`}></div>
+                          <Icon className={`w-4 h-4 ${card.iconColor}`} />
                         </div>
                       </div>
                       <div className="flex items-baseline gap-1">
@@ -170,7 +178,7 @@ export function HeroSection() {
                         <div className={`h-full rounded-full ${card.accent}`} style={{ width: "65%" }}></div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
 
                 {/* Priority Pipeline */}
