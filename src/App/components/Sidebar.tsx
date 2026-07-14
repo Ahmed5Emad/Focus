@@ -54,10 +54,10 @@ function SidebarContent() {
       <div className="w-full flex flex-col gap-6">
         <div className="flex flex-col gap-[16px] items-start px-[24px] w-full">
           <div className="flex flex-col gap-[4px] w-full">
-            <div className="flex flex-col font-['Spline_Sans',sans-serif] font-bold justify-center text-slate-900 text-[24px] tracking-[-1.2px] w-full">
+            <div className="flex flex-col font-['Spline_Sans',sans-serif] font-bold justify-center text-foreground text-[24px] tracking-[-1.2px] w-full">
               <p className="leading-[32px]">FOCUS</p>
             </div>
-            <div className="flex flex-col font-['Inter',sans-serif] font-normal justify-center text-slate-500 text-[12px] tracking-[1.2px] uppercase w-full">
+            <div className="flex flex-col font-['Inter',sans-serif] font-normal justify-center text-muted-foreground text-[12px] tracking-[1.2px] uppercase w-full">
               <p className="leading-[16px]">DEEP WORK ENGINE</p>
             </div>
           </div>
@@ -71,7 +71,7 @@ function SidebarContent() {
             placeholder="Select Workspace"
             icon={<Building2 className="w-3.5 h-3.5 shrink-0 text-cu-purple" />}
             showSearch={false}
-            triggerClassName="w-full px-[16px] py-[12px] bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors h-auto"
+            triggerClassName="w-full px-[16px] py-[12px] bg-muted border border-border rounded-md hover:bg-muted/80 transition-colors h-auto"
           />
         </div>
 
@@ -95,10 +95,10 @@ function SidebarContent() {
                   "flex gap-[12px] items-center px-[16px] py-[12px] rounded-[4px] w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   active
                     ? "bg-[#f5f3ff] border-primary border-l-2 text-[#6d28d9]"
-                    : "text-slate-600 hover:bg-slate-50"
+                    : "text-muted-foreground hover:bg-muted"
                 )}
               >
-                <item.icon className={cn("w-[18px] h-[18px]", active ? "text-[#6d28d9]" : "text-slate-600")} />
+                <item.icon className={cn("w-[18px] h-[18px]", active ? "text-[#6d28d9]" : "text-muted-foreground")} />
                 <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">
                   {item.name}
                 </span>
@@ -108,7 +108,7 @@ function SidebarContent() {
         </nav>
       </div>
 
-      <div className="border-slate-100 border-t w-full pb-[16px] pt-[17px] px-[16px] flex flex-col gap-[4px]">
+      <div className="border-border border-t w-full pb-[16px] pt-[17px] px-[16px] flex flex-col gap-[4px]">
         {bottomNavItems.map((item) => {
           const active = isActive(item.path);
           return (
@@ -122,7 +122,7 @@ function SidebarContent() {
                   : "text-slate-600 hover:bg-slate-50"
               )}
             >
-              <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-slate-600")} />
+              <item.icon className={cn("w-[20px] h-[20px]", active ? "text-[#6d28d9]" : "text-muted-foreground")} />
               <span className="font-['Inter',sans-serif] font-normal text-[12px] tracking-[1.2px] uppercase">{item.name}</span>
             </Link>
           );
@@ -135,7 +135,7 @@ function SidebarContent() {
 export function Sidebar() {
   return (
     <>
-      <aside className="hidden lg:flex bg-white border-slate-200 border-r border-solid flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
+      <aside className="hidden lg:flex bg-card border-border border-r border-solid flex-col h-screen items-start justify-between pt-[32px] relative shrink-0 w-[256px] sticky top-0">
         <SidebarContent />
       </aside>
 
@@ -145,9 +145,9 @@ export function Sidebar() {
             variant="ghost"
             size="icon"
             aria-label="Toggle sidebar"
-            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-white/80 backdrop-blur border border-white/20 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center bg-card/80 backdrop-blur border border-border/20 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <Menu className="w-5 h-5 text-slate-600" />
+            <Menu className="w-5 h-5 text-muted-foreground" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-[256px] p-0">

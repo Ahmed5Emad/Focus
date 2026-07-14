@@ -25,7 +25,7 @@ const FeatureBadge = ({ icon: Icon, text, colorClass }: FeatureBadgeProps) => (
 );
 
 const FlowItem = ({ icon: Icon, text, colorClass, bgClass }: FlowItemProps) => (
-  <li className="flex items-center gap-4 text-slate-700 font-bold text-sm">
+  <li className="flex items-center gap-4 text-foreground font-bold text-sm">
     <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgClass)}>
       <Icon className={cn("w-4 h-4", colorClass)} />
     </div>
@@ -45,48 +45,48 @@ export default function Featured() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50/50 font-sans">
+    <div className="flex flex-col min-h-screen bg-background font-sans">
       <Header />
       <main className="flex-1 flex flex-col items-center w-full pb-24">
         
         {/* Hero Section */}
         <section className="flex flex-col items-center w-full max-w-7xl pt-20 pb-16 px-4 md:pt-32 md:pb-24 md:px-6 gap-8 relative">
           <div className="absolute inset-0 bg-grid-slate-100/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-900/[0.04] dark:bg-[bottom_1px_center] mask-image:linear-gradient(to_bottom,transparent,black)"></div>
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-slate-900 tracking-tight text-center leading-none z-10">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-foreground tracking-tight text-center leading-none z-10">
             Built for the <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">power user.</span>
           </h1>
           <div className="flex flex-col items-center w-full max-w-2xl mt-12 gap-8 z-10 text-center">
-            <p className="text-xl text-slate-500 leading-relaxed">
+            <p className="text-xl text-muted-foreground leading-relaxed">
               Precision tools engineered for high-velocity workflows. No fluff, just pure performance.
             </p>
-            <Button variant="outline" className="h-14 px-8 rounded-xl font-bold border-2 border-gray-200 text-slate-700 hover:bg-white shadow-sm flex items-center gap-2">
-              <Command className="w-5 h-5 text-slate-400" /> View Documentation
+            <Button variant="outline" className="h-14 px-8 rounded-xl font-bold border-2 border-border text-foreground hover:bg-muted shadow-sm flex items-center gap-2">
+              <Command className="w-5 h-5 text-muted-foreground" /> View Documentation
             </Button>
           </div>
         </section>
 
         {/* Feature 01: Real-time Sync */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-24 md:py-32 px-6">
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-card py-24 md:py-32 px-6">
           <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Activity} text="01_Sync" colorClass="text-cu-green" />
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Sub-millisecond synchronization.
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               State management reimagined. Your data flows across devices with negligible latency, ensuring your focus remains unbroken across every interface.
             </p>
-            <div className="flex items-center gap-4 mt-4 bg-gray-50 px-4 py-2 rounded-lg w-fit border border-gray-200">
+            <div className="flex items-center gap-4 mt-4 bg-muted px-4 py-2 rounded-lg w-fit border border-border">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-cu-green animate-pulse"></div>
-                <span className="text-sm font-bold text-slate-700">ACTIVE_SYNC</span>
+                <span className="text-sm font-bold text-foreground">ACTIVE_SYNC</span>
               </div>
-              <div className="w-px h-4 bg-gray-300"></div>
-              <span className="text-sm font-medium text-slate-500">LATENCY: 0.8MS</span>
+              <div className="w-px h-4 bg-border"></div>
+              <span className="text-sm font-medium text-muted-foreground">LATENCY: 0.8MS</span>
             </div>
           </div>
-          <div className="flex-1 w-full bg-gradient-to-br from-cu-green/5 to-cu-blue/5 border border-gray-200 rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm">
-            <div className="relative w-full max-w-md aspect-video bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col justify-center p-8">
+          <div className="flex-1 w-full bg-gradient-to-br from-cu-green/5 to-cu-blue/5 border border-border rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm">
+            <div className="relative w-full max-w-md aspect-video bg-card rounded-2xl shadow-xl border border-border flex flex-col justify-center p-8">
               <div className="flex items-center justify-between relative w-full">
                 {/* Connecting Line */}
                 <div className="absolute left-8 right-8 h-0.5 bg-gradient-to-r from-cu-purple via-cu-pink to-cu-blue top-1/2 -translate-y-1/2 opacity-30"></div>
@@ -97,7 +97,7 @@ export default function Featured() {
                 </div>
                 
                 {/* Bouncing Arrow */}
-                <div className="w-8 h-8 bg-white border-2 border-cu-pink rounded-full flex items-center justify-center shadow-sm z-10 animate-bounce relative">
+                <div className="w-8 h-8 bg-card border-2 border-cu-pink rounded-full flex items-center justify-center shadow-sm z-10 animate-bounce relative">
                   <ArrowRight className="w-4 h-4 text-cu-pink" />
                 </div>
                 
@@ -109,37 +109,37 @@ export default function Featured() {
               
               {/* Text Labels */}
               <div className="flex justify-between w-full mt-4 px-1">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider text-center w-16">Node A</span>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider text-center w-16">Node B</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center w-16">Node A</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center w-16">Node B</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Feature 02: Command Palette */}
-        <section className="flex flex-col items-center w-full border-t border-gray-200 bg-gray-50/50 py-32 px-6">
+        <section className="flex flex-col items-center w-full border-t border-border bg-muted/50 py-32 px-6">
           <div className="flex flex-col items-center w-full max-w-4xl gap-6 text-center mb-16">
             <FeatureBadge icon={Command} text="02_Control" colorClass="text-cu-purple" />
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Total control at your fingertips.
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed max-w-2xl">
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
               The Command Palette is the nervous system of Focus. Navigate, search, and execute complex operations without ever touching your mouse.
             </p>
           </div>
 
-          <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col scale-105 transform origin-top">
-            <div className="flex items-center px-4 py-4 border-b border-gray-100 bg-gray-50/50">
+          <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col scale-105 transform origin-top">
+            <div className="flex items-center px-4 py-4 border-b border-border bg-muted/50">
               <Search className="w-5 h-5 text-cu-purple mr-3" />
               <input 
                 type="text" 
                 placeholder="Search commands or files..." 
-                className="flex-1 bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 font-medium"
+                className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground font-medium"
                 readOnly
               />
               <div className="flex items-center gap-1">
-                <kbd className="bg-white border border-gray-200 rounded px-2 py-1 text-xs font-bold text-slate-500 shadow-sm">⌘</kbd>
-                <kbd className="bg-white border border-gray-200 rounded px-2 py-1 text-xs font-bold text-slate-500 shadow-sm">K</kbd>
+                <kbd className="bg-card border border-border rounded px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm">⌘</kbd>
+                <kbd className="bg-card border border-border rounded px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm">K</kbd>
               </div>
             </div>
             <div className="p-2 flex flex-col gap-1">
@@ -154,16 +154,16 @@ export default function Featured() {
                    <kbd className="text-xs font-bold text-cu-purple/60">ENTER</kbd>
                 </div>
               </div>
-              <div className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-xl cursor-default transition-colors">
+              <div className="flex items-center justify-between px-3 py-2.5 hover:bg-muted rounded-xl cursor-default transition-colors">
                 <div className="flex items-center gap-3">
-                  <Command className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-600">Open Shell Integration</span>
+                  <Command className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Open Shell Integration</span>
                 </div>
               </div>
-               <div className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-xl cursor-default transition-colors">
+               <div className="flex items-center justify-between px-3 py-2.5 hover:bg-muted rounded-xl cursor-default transition-colors">
                 <div className="flex items-center gap-3">
-                  <Activity className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-600">Toggle Advanced Debugger</span>
+                  <Activity className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Toggle Advanced Debugger</span>
                 </div>
               </div>
             </div>
@@ -171,47 +171,47 @@ export default function Featured() {
         </section>
 
         {/* Feature 03: Flow */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-white py-24 md:py-32 px-6">
+        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-card py-24 md:py-32 px-6">
           <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Zap} text="03_Flow" colorClass="text-cu-pink" />
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Zero-latency interaction.
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Customizable key bindings that mirror your mental model. Every shortcut is globally accessible and optimized for minimal finger travel.
             </p>
-            <ul className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6">
+            <ul className="mt-6 flex flex-col gap-4 border-t border-border pt-6">
               <FlowItem icon={Layers} text="Fully Remappable HID" colorClass="text-cu-pink" bgClass="bg-cu-pink/10" />
               <FlowItem icon={Command} text="JSON-based config exports" colorClass="text-cu-orange" bgClass="bg-cu-orange/10" />
               <FlowItem icon={Zap} text="Multi-layered modal editing" colorClass="text-cu-blue" bgClass="bg-cu-blue/10" />
             </ul>
           </div>
-          <div className="flex-1 w-full bg-gray-50 border border-gray-200 rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[400px]">
+          <div className="flex-1 w-full bg-muted border border-border rounded-3xl p-8 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[400px]">
             <div className="grid grid-cols-3 gap-4 w-full max-w-xs relative z-10">
-              <div className="aspect-square bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-pink hover:shadow-cu-pink/20 transition-all cursor-default">
-                <span className="text-2xl font-black text-slate-300 group-hover:text-cu-pink">Q</span>
+              <div className="aspect-square bg-card border-2 border-border rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-pink hover:shadow-cu-pink/20 transition-all cursor-default">
+                <span className="text-2xl font-black text-muted-foreground/40 group-hover:text-cu-pink">Q</span>
               </div>
               <div className="aspect-square bg-gradient-to-br from-cu-purple to-cu-pink border-2 border-transparent rounded-2xl shadow-xl flex items-center justify-center scale-110 z-10">
                 <span className="text-3xl font-black text-white">W</span>
               </div>
-              <div className="aspect-square bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-orange hover:shadow-cu-orange/20 transition-all cursor-default">
-                <span className="text-2xl font-black text-slate-300 group-hover:text-cu-orange">E</span>
+              <div className="aspect-square bg-card border-2 border-border rounded-2xl shadow-sm flex items-center justify-center group hover:border-cu-orange hover:shadow-cu-orange/20 transition-all cursor-default">
+                <span className="text-2xl font-black text-muted-foreground/40 group-hover:text-cu-orange">E</span>
               </div>
-              <div className="col-span-3 h-12 mt-4 bg-white border-2 border-gray-200 rounded-xl shadow-sm flex items-center justify-center group hover:border-cu-blue transition-all">
-                  <span className="text-sm font-bold text-slate-400 group-hover:text-cu-blue">SPACE</span>
+              <div className="col-span-3 h-12 mt-4 bg-card border-2 border-border rounded-xl shadow-sm flex items-center justify-center group hover:border-cu-blue transition-all">
+                  <span className="text-sm font-bold text-muted-foreground group-hover:text-cu-blue">SPACE</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Feature 04: Global Graph */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-gray-200 bg-gray-50/50 py-24 md:py-32 px-6">
+        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-16 md:gap-24 items-center border-t border-border bg-muted/50 py-24 md:py-32 px-6">
           <div className="flex-1 flex flex-col gap-6 items-center text-center md:items-start md:text-left">
             <FeatureBadge icon={Share2} text="04_Graph" colorClass="text-cu-blue" />
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
               Visualizing the network.
             </h2>
-            <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
               See how your projects, tasks, and data points interconnect. Our Global Graph engine generates architectural-style visualizations of your entire workflow architecture.
             </p>
             
@@ -219,7 +219,7 @@ export default function Featured() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="absolute top-4 right-4 h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800"
+                className="absolute top-4 right-4 h-8 w-8 text-muted-foreground hover:text-white hover:bg-slate-800"
                 onClick={copyToClipboard}
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -231,7 +231,7 @@ export default function Featured() {
                 <div className="w-3 h-3 rounded-full bg-cu-green"></div>
               </div>
               <pre className="font-mono text-xs md:text-sm leading-loose overflow-x-auto pr-4 md:pr-8">
-                <code className="text-slate-400">{'// Initialize Graph Engine'}</code><br/>
+                <code className="text-muted-foreground">{'// Initialize Graph Engine'}</code><br/>
                 <code className="text-cu-pink">const</code> <code className="text-white">graph =</code> <code className="text-cu-pink">new</code> <code className="text-cu-blue">FocusGraph</code><code className="text-white">({'{'} resolution: </code><code className="text-cu-orange">'high'</code> <code className="text-white">{'}'});</code><br/>
                 <code className="text-white">graph.</code><code className="text-cu-blue">linkNodes</code><code className="text-white">(process_01, data_stream_04);</code><br/>
                 <br/>
@@ -240,10 +240,10 @@ export default function Featured() {
             </div>
           </div>
 
-          <div className="flex-1 w-full bg-white border border-gray-200 rounded-3xl p-4 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[450px]">
+          <div className="flex-1 w-full bg-card border border-border rounded-3xl p-4 md:p-12 flex items-center justify-center relative overflow-hidden shadow-sm aspect-square md:aspect-auto md:min-h-[450px]">
             <div className="relative w-full max-w-[240px] md:max-w-sm aspect-square">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-cu-purple to-cu-blue shadow-xl z-20 flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-white/20"></div>
+                <div className="w-8 h-8 rounded-full bg-card/20"></div>
               </div>
               <div className="absolute top-[18.18%] left-[18.18%] -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-cu-pink/20 border-2 border-cu-pink flex items-center justify-center z-10">
                   <div className="w-3 h-3 rounded-full bg-cu-pink"></div>

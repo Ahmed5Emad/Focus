@@ -210,7 +210,6 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
           <X className="w-4 h-4" />
         </button>
       </div>
-
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-4">
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -253,11 +252,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
                     <span className="text-[10px] text-muted-foreground">
                       {formatTime(comment.created_at)}
                     </span>
-                    {comment.selection_from != null && (
-                      <span className="text-[10px] font-medium text-cu-purple">
-                        anchored
-                      </span>
-                    )}
+
                   </div>
 
                   <div
@@ -283,7 +278,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
       </div>
 
       <div className="border-t border-border px-4 py-3">
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2 bg-[#f8f7fc] border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
@@ -292,14 +287,14 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
               ? "Comment on selected text..."
               : "Add a comment..."
             }
-            rows={2}
-            className="flex-1 px-3 py-2 text-sm rounded-xl bg-[#f8f7fc] border border-border resize-none outline-none focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 text-foreground placeholder:text-muted-foreground transition-all"
+            rows={1}
+            className="flex-1 px-3 py-1.5 text-sm bg-transparent border-none resize-none outline-none text-foreground placeholder:text-muted-foreground"
           />
           <Button
             onClick={handleSend}
             disabled={!newComment.trim() || sending}
             size="icon"
-            className="h-9 w-9 shrink-0 rounded-xl bg-cu-purple hover:bg-cu-purple/90 text-white"
+            className="shrink-0 rounded-lg bg-cu-purple hover:bg-cu-purple/90 text-white h-8 w-8"
           >
             {sending ? (
               <Loader2 className="w-4 h-4 animate-spin" />

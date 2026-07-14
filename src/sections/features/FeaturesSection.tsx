@@ -45,7 +45,7 @@ function FeaturesSection() {
     <section className="flex flex-col self-stretch px-4 md:px-16 lg:px-64 py-16 md:py-24 w-full gap-8 md:gap-16 items-center">
     
         <div className="text-center gap-4 space-y-4">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
+          <h2 className="text-3xl font-black tracking-tight text-foreground md:text-5xl">
             Designed for Deep Work
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -54,10 +54,10 @@ content is clearly organized and accessible.
           </p>
         </div>
         
-        <div className="featureGrid gap-[1px] bg-gray-200 border border-gray-200 rounded-xl overflow-hidden shadow-sm w-full max-w-6xl mx-auto">
+        <div className="featureGrid gap-[1px] bg-border border border-border rounded-xl overflow-hidden shadow-sm w-full max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <FeaturesCard
-              className={`feature${index} w-full h-full bg-white`}
+              className={`feature${index} w-full h-full bg-card`}
               key={index}
               icon={feature.icon}
               head={feature.head}

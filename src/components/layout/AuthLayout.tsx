@@ -19,12 +19,12 @@ export function AuthLayout({
   return (
     <div
       className={cn(
-        "min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-white to-cu-orange/5 p-4",
+        "min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-background to-cu-orange/5 p-4",
         className,
       )}
       {...props}
     >
-      <div className="w-full max-w-md flex flex-col gap-6 bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 sm:p-10 relative overflow-hidden">
+      <div className="w-full max-w-md flex flex-col gap-6 bg-card rounded-3xl shadow-2xl border border-border p-8 sm:p-10 relative overflow-hidden">
         <div className="flex flex-col items-center gap-2 text-center mb-4">
           <Link
             to="/"
@@ -33,22 +33,22 @@ export function AuthLayout({
             <div className="flex flex-col items-center justify-center group-hover:scale-105 transition-transform">
               <img src={logo} alt="logo" className="w-12" />
             </div>
-            <h2 className="text-3xl font-black text-slate-900">Focus</h2>
+            <h2 className="text-3xl font-black text-foreground">Focus</h2>
             <span className="sr-only">Focus</span>
           </Link>
-          <h1 className="text-2xl font-bold mt-2 text-slate-900">{title}</h1>
+          <h1 className="text-2xl font-bold mt-2 text-foreground">{title}</h1>
           <FieldDescription className="text-base mt-1">
             {description}
           </FieldDescription>
         </div>
         {children}
-        <FieldDescription className="px-6 text-center mt-2 text-sm text-gray-500">
+        <FieldDescription className="px-6 text-center mt-2 text-sm text-muted-foreground">
           By clicking continue, you agree to our{" "}
-          <a href="#" className="font-medium text-slate-700 hover:underline">
+          <a href="#" className="font-medium text-card-foreground hover:underline">
             Terms of Service
           </a>{" "}
           and{" "}
-          <a href="#" className="font-medium text-slate-700 hover:underline">
+          <a href="#" className="font-medium text-card-foreground hover:underline">
             Privacy Policy
           </a>
           .

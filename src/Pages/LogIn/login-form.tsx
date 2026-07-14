@@ -57,12 +57,12 @@ export function LoginForm({
   return (
     <div
       className={cn(
-        "min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-white to-cu-orange/5 p-4",
+        "min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-background to-cu-orange/5 p-4",
         className,
       )}
       {...props}
     >
-      <div className="w-full max-w-md flex flex-col gap-6 bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 sm:p-10 relative overflow-hidden">
+      <div className="w-full max-w-md flex flex-col gap-6 bg-card rounded-3xl shadow-2xl border border-border p-8 sm:p-10 relative overflow-hidden">
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <div className="flex flex-col items-center gap-2 text-center mb-4">
@@ -73,32 +73,32 @@ export function LoginForm({
                 <div className="flex flex-col items-center justify-center group-hover:scale-105 transition-transform">
                   <img src={logo} alt="logo" className="w-12" /> 
                 </div>
-                <h2 className="text-3xl font-black text-slate-900">Focus</h2>
+                <h2 className="text-3xl font-black text-foreground">Focus</h2>
                 <span className="sr-only">Focus</span>
               </Link>
-              <h1 className="text-2xl font-bold mt-2 text-slate-900">Sign in to your workspace</h1>
+              <h1 className="text-2xl font-bold mt-2 text-foreground">Sign in to your workspace</h1>
               <FieldDescription className="text-base mt-1">
                 Don&apos;t have an account? <Link to="/signup" className="text-cu-purple font-semibold hover:underline">Sign up</Link>
               </FieldDescription>
             </div>
             <Field>
-              <FieldLabel htmlFor="email" className="font-semibold text-slate-700">Email</FieldLabel>
+              <FieldLabel htmlFor="email" className="font-semibold text-card-foreground">Email</FieldLabel>
               <Input
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                className="h-12 rounded-xl bg-gray-50/50 border-gray-200 focus:bg-white focus:border-cu-purple focus:ring-cu-purple/20"
+                className="h-12 rounded-xl bg-muted border-border focus:bg-card focus:border-cu-purple focus:ring-cu-purple/20"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
-               <FieldLabel htmlFor="password" className="font-semibold text-slate-700 mt-2">Password</FieldLabel>
+               <FieldLabel htmlFor="password" className="font-semibold text-card-foreground mt-2">Password</FieldLabel>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="h-12 rounded-xl bg-gray-50/50 border-gray-200 focus:bg-white focus:border-cu-purple focus:ring-cu-purple/20"
+                className="h-12 rounded-xl bg-muted border-border focus:bg-card focus:border-cu-purple focus:ring-cu-purple/20"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -137,7 +137,7 @@ export function LoginForm({
               </div>
             </Field>
             {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 dark:bg-red-950 dark:border-red-800 dark:text-red-400 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -146,22 +146,22 @@ export function LoginForm({
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </Field>
-            <FieldSeparator className="my-4 text-gray-400">Or continue with</FieldSeparator>
+            <FieldSeparator className="my-4 text-muted-foreground">Or continue with</FieldSeparator>
             <Field className="grid gap-4 sm:grid-cols-2">
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-border hover:bg-muted font-semibold text-card-foreground">
                 <img src={appleIcon} alt="" className="w-5 h-5 mr-2" />
                 Apple
               </Button>
-              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 font-semibold text-slate-700">
+              <Button variant="outline" type="button" onClick={async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/#/auth/callback' } }); }} className="h-12 rounded-xl border-border hover:bg-muted font-semibold text-card-foreground">
                 <img src={googleIcon} alt="" className="w-5 h-5 mr-2" />
                 Google
               </Button>
             </Field>
           </FieldGroup>
         </form>
-        <FieldDescription className="px-6 text-center mt-2 text-sm text-gray-500">
-          By clicking continue, you agree to our <a href="#" className="font-medium text-slate-700 hover:underline">Terms of Service</a>{" "}
-          and <a href="#" className="font-medium text-slate-700 hover:underline">Privacy Policy</a>.
+        <FieldDescription className="px-6 text-center mt-2 text-sm text-muted-foreground">
+          By clicking continue, you agree to our <a href="#" className="font-medium text-card-foreground hover:underline">Terms of Service</a>{" "}
+          and <a href="#" className="font-medium text-card-foreground hover:underline">Privacy Policy</a>.
         </FieldDescription>
       </div>
     </div>

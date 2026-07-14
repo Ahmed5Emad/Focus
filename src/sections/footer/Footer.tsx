@@ -17,12 +17,12 @@ function FooterColumn({ title, links }: FooterColumnProps) {
           <li key={link}>
             <a
               href="#"
-              className="
-                text-gray-600
-                hover:text-black
-                focus:outline-none focus:ring-2 focus:ring-black rounded
-                transition
-              "
+                className="
+                    text-muted-foreground
+                    hover:text-foreground
+                    focus:outline-none focus:ring-2 focus:ring-foreground rounded
+                    transition
+                  "
             >
               {link}
             </a>
@@ -43,7 +43,7 @@ function Footer() {
       </h2>
 
       {/* Main Footer Content */}
-      <section className="bg-white">
+      <section className="bg-card">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <nav
             className="grid grid-cols-1 md:grid-cols-5 gap-10"
@@ -53,7 +53,7 @@ function Footer() {
               <div className="flex items-center gap-2 mb-6 font-bold text-lg">
                 <img src={logo} alt="logo" className="w-10" /> Focus
               </div>
-              <p className="text-gray-600 max-w-sm">
+              <p className="text-muted-foreground max-w-sm">
                 Built for high-performance teams and focused individuals who
                 demand the best from their tools.
               </p>
@@ -80,13 +80,13 @@ function Footer() {
             />
           </nav>
 
-          <div className="border-t mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
+          <div className="border-t border-border mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground">
             <p>© {currentYear} Focus Technology Group. All rights reserved.</p>
 
             <div className="flex gap-4 mt-4 md:mt-0">
               <div className="gap-6 flex flex-row items-center">
                 {icons.map((Icon, index) => (
-                  <a key={index} href="#" className="text-slate-400 hover:text-slate-900 transition-colors">
+                  <a key={index} href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                     <Icon className="w-6 h-6" />
                     <span className="sr-only">Social Link</span>
                   </a>
