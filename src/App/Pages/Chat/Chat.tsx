@@ -337,15 +337,7 @@ export default function Chat() {
         confirmLabel="Clear"
         destructive
       />
-      <div className="flex flex-col w-full h-full min-h-0">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pt-6 pb-4 shrink-0">
-        <div>
-          <h1 className="page-title mb-2">Chat</h1>
-          <p className="page-description">
-            Team conversations and direct messages.
-          </p>
-        </div>
-      </div>
+      <div className="flex flex-col w-full h-full min-h-0 pt-4">
 
       <div className="flex-1 flex flex-col md:flex-row rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-0">
         {/* Sidebar */}
