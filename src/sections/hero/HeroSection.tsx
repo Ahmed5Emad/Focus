@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LayoutDashboard, CheckSquare, Layout, Target, FileText, MessageCircle, Timer, Archive, Settings, HelpCircle, BrainCircuit, CheckCircle2, Flame } from "lucide-react";
+import { ArrowRight, LayoutDashboard, CheckSquare, Layout, Target, FileText, MessageCircle, Timer, Archive, Settings, HelpCircle, BrainCircuit, CheckCircle2, Flame, Plus, Search, Zap, Play, ListChecks } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function HeroSection() {
@@ -57,7 +57,7 @@ export function HeroSection() {
               {/* New Task */}
               <div className="px-4 mb-3">
                 <div className="h-8 rounded-[4px] bg-gradient-to-r from-[#7c3aed] to-[#4f46e5] flex items-center justify-center gap-1.5">
-                  <div className="w-3 h-3 text-white">+</div>
+                  <Plus className="w-3 h-3 text-white" />
                   <span className="text-[10px] text-white font-semibold tracking-[1px]">NEW TASK</span>
                 </div>
               </div>
@@ -118,7 +118,7 @@ export function HeroSection() {
                 </div>
                 {/* Search bar */}
                 <div className="flex-1 max-w-md flex items-center gap-2 h-8 px-3 rounded-full bg-card border border-border/60 shadow-sm">
-                  <div className="w-3.5 h-3.5 text-muted-foreground/50">⌕</div>
+                  <Search className="w-3.5 h-3.5 text-muted-foreground/50" />
                   <div className="flex-1 h-3 rounded bg-muted-foreground/15"></div>
                   <div className="hidden sm:flex items-center gap-1">
                     <kbd className="bg-card/80 border border-border/60 px-1.5 py-0.5 rounded text-[8px] text-muted-foreground">⌘</kbd>
@@ -143,11 +143,11 @@ export function HeroSection() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-28 rounded-lg border border-border bg-card flex items-center justify-center gap-2">
-                      <div className="w-3 h-3 text-muted-foreground/40">⚡</div>
+                      <Zap className="w-3 h-3 text-muted-foreground/40" />
                       <span className="text-[8px] font-semibold tracking-[1px] text-muted-foreground">QUICK TASK</span>
                     </div>
                     <div className="h-9 w-32 rounded-lg bg-gradient-to-r from-[#8b5cf6] to-[#6366f1] flex items-center justify-center gap-2 shadow-sm">
-                      <div className="w-3 h-3 fill-white/80">▶</div>
+                      <Play className="w-3 h-3 fill-white/80 text-white" />
                       <span className="text-[8px] font-semibold tracking-[1px] text-white">START SESSION</span>
                     </div>
                   </div>
@@ -185,7 +185,7 @@ export function HeroSection() {
                 <div className="bg-card border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
                   <div className="flex items-center justify-between px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 text-muted-foreground/40">☰</div>
+                      <ListChecks className="w-3.5 h-3.5 text-muted-foreground/40" />
                       <span className="text-[10px] font-semibold tracking-[1px] text-foreground uppercase">Priority Pipeline</span>
                     </div>
                     <span className="text-[10px] font-semibold text-cu-purple">View All →</span>
@@ -219,7 +219,7 @@ export function HeroSection() {
                 <div className="bg-card border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
                   <div className="flex items-center justify-between px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 text-muted-foreground/40">🎯</div>
+                      <Target className="w-3.5 h-3.5 text-muted-foreground/40" />
                       <span className="text-[10px] font-semibold tracking-[1px] text-foreground uppercase">Active Goals</span>
                     </div>
                   </div>
