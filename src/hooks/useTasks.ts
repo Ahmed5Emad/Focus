@@ -112,6 +112,18 @@ export function useTasks() {
   const [assigneeFilter, setAssigneeFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "title">("newest");
 
+  useEffect(() => {
+    if (projectFilter !== "all" && projects.length > 0 && !projects.some(p => p.id === projectFilter)) {
+      setProjectFilter("all");
+    }
+  }, [projects, projectFilter]);
+
+  useEffect(() => {
+    if (goalFilter !== "all" && goals.length > 0 && !goals.some(g => g.id === goalFilter)) {
+      setGoalFilter("all");
+    }
+  }, [goals, goalFilter]);
+
   const fetchMembers = useCallback(async () => {
     if (!currentWorkspaceId) return;
     try {
@@ -377,6 +389,40 @@ export function useTasks() {
     return () => { supabase.removeChannel(ch); };
   }, [currentWorkspaceId, fetchMembers, fetchWorkflowConfig]);
 
+  const createNotification = async (opts: {
+    userId: string; workspaceId: string; type: string; title: string; body?: string; link?: string;
+  }) => {
+    try {
+      await supabase.from("notifications").insert({
+        user_id: opts.userId,
+        workspace_id: opts.workspaceId,
+        type: opts.type,
+        title: opts.title,
+        body: opts.body ?? null,
+        link: opts.link ?? null,
+      });
+    } catch (e) {
+      console.error("Error creating notification:", e);
+    }
+  };
+
+  const insertActivityLog = async (opts: {
+    userId: string; workspaceId: string; action: string; entityType: string; entityId?: string; metadata?: Record<string, unknown>;
+  }) => {
+    try {
+      await supabase.from("activity_logs").insert({
+        user_id: opts.userId,
+        workspace_id: opts.workspaceId,
+        action: opts.action,
+        entity_type: opts.entityType,
+        entity_id: opts.entityId ?? null,
+        metadata: opts.metadata ?? {},
+      });
+    } catch (e) {
+      console.error("Error inserting activity log:", e);
+    }
+  };
+
   const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
     let newStatus: string;
     if (workflowStatuses.length > 0) {
@@ -404,8 +450,31 @@ export function useTasks() {
       if (error) throw error;
       setTasks(tasks.map(t => t.id === taskId ? { ...t, ...updates } : t));
 
+      const task = tasks.find(t => t.id === taskId);
+      if (task && newStatus !== currentStatus && task.assignee_id && task.assignee_id !== user?.id && currentWorkspaceId) {
+        createNotification({
+          userId: task.assignee_id,
+          workspaceId: currentWorkspaceId,
+          type: "status_change",
+          title: `Task "${task.title}" status changed to ${newStatus.replace(/_/g, ' ')}`,
+          body: `${currentStatus.replace(/_/g, ' ')} → ${newStatus.replace(/_/g, ' ')}`,
+          link: "/tasks",
+        });
+      }
+
+      if (task && currentWorkspaceId) {
+        const action = newStatus === 'done' ? 'task_completed' : 'task_status_changed';
+        await insertActivityLog({
+          userId: user?.id ?? task.assignee_id ?? '',
+          workspaceId: currentWorkspaceId,
+          action,
+          entityType: 'task',
+          entityId: taskId,
+          metadata: { task_title: task.title, from_status: currentStatus, to_status: newStatus },
+        });
+      }
+
       if (newStatus === 'done') {
-        const task = tasks.find(t => t.id === taskId);
         if (task?.recurrence_rule) {
           await generateRecurringTask(taskId);
         }
@@ -417,6 +486,7 @@ export function useTasks() {
 
   const updateTask = async (taskId: string, updates: Partial<{ title: string; status: string; project_id: string | null; assignee_id: string | null; due_date: string | null; priority: Priority; is_archived: boolean; archived_at: string | null; updated_at: string }>) => {
     try {
+      const currentTask = tasks.find(t => t.id === taskId);
       const dbUpdates: Record<string, string | boolean | null> = { ...updates };
       const isTerminalStatus = workflowStatuses.length > 0
         ? updates.status === workflowStatuses[workflowStatuses.length - 1].name
@@ -424,7 +494,6 @@ export function useTasks() {
       if (isTerminalStatus) {
         dbUpdates.completed_at = new Date().toISOString();
       } else if (updates.status) {
-        const currentTask = tasks.find(t => t.id === taskId);
         const wasTerminal = workflowStatuses.length > 0
           ? currentTask?.status === workflowStatuses[workflowStatuses.length - 1].name
           : currentTask?.status === 'done';
@@ -438,6 +507,49 @@ export function useTasks() {
         .eq('id', taskId);
 
       if (error) throw error;
+
+      // Notify on reassignment
+      if (updates.assignee_id !== undefined && currentTask && currentWorkspaceId && user) {
+        if (updates.assignee_id && updates.assignee_id !== currentTask.assignee_id) {
+          createNotification({
+            userId: updates.assignee_id,
+            workspaceId: currentWorkspaceId,
+            type: "assignment",
+            title: `You were assigned a task`,
+            body: currentTask.title,
+            link: "/tasks",
+          });
+          await insertActivityLog({
+            userId: user.id,
+            workspaceId: currentWorkspaceId,
+            action: 'task_reassigned',
+            entityType: 'task',
+            entityId: taskId,
+            metadata: { task_title: currentTask.title, from_assignee: currentTask.assignee_id, to_assignee: updates.assignee_id },
+          });
+        }
+      }
+
+      // Notify on status change
+      if (updates.status && currentTask && updates.status !== currentTask.status && currentTask.assignee_id && currentTask.assignee_id !== user?.id && currentWorkspaceId) {
+        createNotification({
+          userId: currentTask.assignee_id,
+          workspaceId: currentWorkspaceId,
+          type: "status_change",
+          title: `Task "${currentTask.title}" status changed`,
+          body: `${currentTask.status.replace(/_/g, ' ')} → ${updates.status.replace(/_/g, ' ')}`,
+          link: "/tasks",
+        });
+        const action = updates.status === 'done' ? 'task_completed' : 'task_status_changed';
+        await insertActivityLog({
+          userId: user?.id ?? currentTask.assignee_id,
+          workspaceId: currentWorkspaceId,
+          action,
+          entityType: 'task',
+          entityId: taskId,
+          metadata: { task_title: currentTask.title, from_status: currentTask.status, to_status: updates.status },
+        });
+      }
 
       // Merge assignee profile for UI
       let newAssignee: Task["assignee"] = null;

@@ -7,6 +7,12 @@ import {
   FolderPlus,
   Target,
   RefreshCw,
+  UserCheck,
+  GitCompareArrows,
+  MessageSquareText,
+  Send,
+  FileEdit,
+  FilePen,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { ActivityLog } from "@/hooks/useActivityFeed";
@@ -14,20 +20,34 @@ import type { ActivityLog } from "@/hooks/useActivityFeed";
 const actionIcons: Record<string, { icon: typeof CheckCircle; bg: string; color: string }> = {
   task_created: { icon: CheckCircle, bg: "#eff6ff", color: "#3b82f6" },
   task_completed: { icon: CheckCircle2, bg: "#ecfdf5", color: "#10b981" },
+  task_reassigned: { icon: UserCheck, bg: "#fef2f2", color: "#dc2626" },
+  task_status_changed: { icon: GitCompareArrows, bg: "#f0fdf4", color: "#16a34a" },
   session_completed: { icon: Timer, bg: "#f5f3ff", color: "#8b5cf6" },
   member_joined: { icon: UserPlus, bg: "#fffbeb", color: "#f59e0b" },
   project_created: { icon: FolderPlus, bg: "#eef2ff", color: "#6366f1" },
   goal_created: { icon: Target, bg: "#fff1f2", color: "#e11d48" },
+  comment_added: { icon: MessageSquareText, bg: "#f0f9ff", color: "#0284c7" },
+  watcher_added: { icon: UserPlus, bg: "#faf5ff", color: "#9333ea" },
+  notification_sent: { icon: Send, bg: "#fff7ed", color: "#ea580c" },
+  document_created: { icon: FileEdit, bg: "#ecfeff", color: "#0891b2" },
+  document_updated: { icon: FilePen, bg: "#fefce8", color: "#ca8a04" },
 };
 
 const actionLabels: Record<string, string> = {
   task_created: "created a task",
   task_completed: "completed a task",
+  task_reassigned: "reassigned a task",
+  task_status_changed: "changed task status",
   task_archived: "archived a task",
   session_completed: "completed a focus session",
   member_joined: "joined the workspace",
   project_created: "created a project",
   goal_created: "created a goal",
+  comment_added: "added a comment",
+  watcher_added: "added a watcher",
+  notification_sent: "sent a notification",
+  document_created: "created a document",
+  document_updated: "updated a document",
 };
 
 function getDefaultLabel(action: string): string {

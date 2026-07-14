@@ -18,6 +18,7 @@ import * as Y from "yjs";
 import { useAuth } from "@/contexts/AuthContext";
 import { Toolbar } from "./Toolbar";
 import { createClient } from "@/lib/supabase/client";
+import { createMentionExtension, prefetchMembers } from "./mentionSetup";
 
 const lowlight = createLowlight(common);
 
@@ -110,7 +111,7 @@ function refreshCursorDecorations(editor: TiptapEditor | null) {
 }
 
 export function Editor({ documentId, documentTitle, onTitleChange, onConnectionChange, editorRef: externalEditorRef }: EditorProps) {
-  const { user } = useAuth();
+  const { user, currentWorkspaceId } = useAuth();
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
 
@@ -132,6 +133,10 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
   useEffect(() => {
     onConnectionChangeRef.current = onConnectionChange;
   }, [onConnectionChange]);
+
+  useEffect(() => {
+    if (currentWorkspaceId) prefetchMembers(currentWorkspaceId);
+  }, [currentWorkspaceId]);
 
   const setConnectionState = useCallback((s: ConnectionStatus) => {
     if (connectionStateRef.current === s) return;
@@ -330,7 +335,8 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
       TableCell,
       TableHeader,
       CodeBlockLowlight.configure({ lowlight }),
-    ],
+      currentWorkspaceId ? createMentionExtension() : null,
+    ].filter(Boolean),
     editorProps: {
       attributes: {
         class: "prose prose-sm max-w-none focus:outline-none min-h-[500px] px-8 py-6",

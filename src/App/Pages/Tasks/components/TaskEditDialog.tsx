@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/shared/Dropdown";
 import type { Task, MemberProfile, Project, Priority, WorkflowStatus } from "@/hooks/useTasks";
 import { DatePicker } from "@/components/ui/date-picker";
+import { TaskWatcherButton } from "./TaskWatcherButton";
+import { TaskComments } from "./TaskComments";
 
 const STATUS_OPTIONS = [
   { value: "todo", label: "To Do" },
@@ -90,14 +92,17 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
         </DialogHeader>
 
         <div className="space-y-5 py-2">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Title</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Task title"
-              className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 outline-none transition-all text-slate-700 placeholder:text-slate-500"
-            />
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Title</label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Task title"
+                className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 outline-none transition-all text-slate-700 placeholder:text-slate-500"
+              />
+            </div>
+            {task && <TaskWatcherButton taskId={task.id} />}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -234,6 +239,12 @@ export function TaskEditDialog({ task, projects, members, open, onOpenChange, on
             </div>
           </div>
         </div>
+
+        {task && (
+          <div className="border-t border-slate-100 pt-4">
+            <TaskComments taskId={task.id} />
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 pt-2">
           <Button

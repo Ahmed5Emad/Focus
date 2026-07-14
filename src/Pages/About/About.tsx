@@ -159,8 +159,8 @@ export default function About() {
               <TeamMember key={index} name={member.name} role={member.role} />
             ))}
             <Link to="/careers" className="group flex flex-col gap-4">
-              <div className="aspect-[3/4] rounded-xl bg-foreground dark:bg-card flex flex-col items-center justify-center overflow-hidden relative transition-all duration-500">
-                <div className="absolute inset-0 bg-gradient-to-br from-cu-purple/40 via-transparent to-cu-pink/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="aspect-3/4 rounded-xl bg-foreground dark:bg-card flex flex-col items-center justify-center overflow-hidden relative transition-all duration-500">
+                <div className="absolute inset-0 bg-linear-to-br from-cu-purple/40 via-transparent to-cu-pink/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="z-10 w-14 h-14 rounded-full bg-background/10 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 border border-primary">
                   <ArrowRight className="w-6 h-6 text-primary" />
                 </div>

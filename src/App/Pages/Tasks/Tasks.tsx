@@ -37,6 +37,7 @@ import { Dropdown } from "@/components/shared/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTasks } from "@/hooks/useTasks";
+import { useGlobalPresence } from "@/hooks/useGlobalPresence";
 import { useState, useRef, useEffect } from "react";
 import { TaskEditDialog } from "./components/TaskEditDialog";
 import { TaskDependenciesDialog } from "./components/TaskDependenciesDialog";
@@ -99,6 +100,8 @@ export default function Tasks() {
     customFields,
     taskCustomValues,
   } = useTasks();
+
+  const onlineUsers = useGlobalPresence();
 
   const statusOptions = workflowStatuses.length > 0
     ? [{ value: "all", label: "All Status" } as const, ...workflowStatuses.map(s => ({ value: s.name, label: s.name }) as const)]
@@ -410,10 +413,15 @@ export default function Tasks() {
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                         {task.assignee && (
                           <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
-                            <Avatar className="w-4 h-4">
-                              <AvatarImage src={task.assignee.avatar_url ?? undefined} />
-                              <AvatarFallback className="text-[7px]">{(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
+                            <span className="relative inline-block">
+                              <Avatar className="w-4 h-4">
+                                <AvatarImage src={task.assignee.avatar_url ?? undefined} />
+                                <AvatarFallback className="text-[7px]">{(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              {onlineUsers.has(task.assignee_id!) && (
+                                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 ring-1 ring-white" />
+                              )}
+                            </span>
                             <span>{task.assignee.display_name}</span>
                           </div>
                         )}

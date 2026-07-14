@@ -1,4 +1,5 @@
 import type { Task, WorkflowStatus } from "@/hooks/useTasks";
+import { useGlobalPresence } from "@/hooks/useGlobalPresence";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -46,6 +47,7 @@ function formatCardDate(dateStr: string): string {
 }
 
 export default function KanbanBoard({ tasks, onStatusChange, workflowStatuses }: KanbanBoardProps) {
+  const onlineUsers = useGlobalPresence();
   const columns = workflowStatuses && workflowStatuses.length > 0
     ? workflowStatuses.map(s => ({ status: s.name, label: s.name, color: s.color }))
     : DEFAULT_COLUMNS;
@@ -130,12 +132,17 @@ export default function KanbanBoard({ tasks, onStatusChange, workflowStatuses }:
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3">
                     {task.assignee && (
                       <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[13px] leading-normal text-slate-600">
-                        <Avatar className="w-4 h-4">
-                          <AvatarImage src={task.assignee.avatar_url ?? undefined} />
-                          <AvatarFallback className="text-[7px]">
-                            {(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        <span className="relative inline-block">
+                          <Avatar className="w-4 h-4">
+                            <AvatarImage src={task.assignee.avatar_url ?? undefined} />
+                            <AvatarFallback className="text-[7px]">
+                              {(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          {onlineUsers.has(task.assignee_id!) && (
+                            <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 ring-1 ring-white" />
+                          )}
+                        </span>
                         <span className="truncate max-w-[80px]">
                           {task.assignee.display_name}
                         </span>

@@ -32,6 +32,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { useGlobalPresence } from "@/hooks/useGlobalPresence";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,6 +69,7 @@ export default function Chat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const onlineUsers = useGlobalPresence();
   const groupChat = useChat();
   const dmChat = useDirectMessages(
     mode === "dm" ? selectedUserId : null
@@ -405,15 +407,20 @@ export default function Chat() {
                     )}
                     aria-label={`Direct message ${member.display_name ?? "user"}`}
                   >
-                    <Avatar className="w-5 h-5 shrink-0">
-                      <AvatarImage
-                        src={member.avatar_url ?? undefined}
-                        alt={member.display_name ?? "User"}
-                      />
-                      <AvatarFallback className="text-[9px]">
-                        {(member.display_name ?? "U").charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <span className="relative inline-block shrink-0">
+                      <Avatar className="w-5 h-5">
+                        <AvatarImage
+                          src={member.avatar_url ?? undefined}
+                          alt={member.display_name ?? "User"}
+                        />
+                        <AvatarFallback className="text-[9px]">
+                          {(member.display_name ?? "U").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {onlineUsers.has(member.id) && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-white" />
+                      )}
+                    </span>
                     <span className="truncate">
                       {member.display_name ?? "Unknown"}
                     </span>

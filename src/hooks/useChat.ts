@@ -102,7 +102,7 @@ export function useChat() {
               supabase.from("notifications").insert({
                 user_id: user.id,
                 workspace_id: currentWorkspaceId,
-                type: "mention",
+                type: "comment",
                 title: "New message in #general",
                 body: msg.content.slice(0, 120),
                 link: "/chat",
