@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import Footer from "@/sections/footer/Footer";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, BrainCircuit, Timer, FileText, MessageCircle, CheckSquare, Workflow, Command, Target, BarChart3, Users, Sparkles } from "lucide-react";
+import { ArrowRight, BrainCircuit, Timer, FileText, MessageCircle, CheckSquare, Workflow, Target, BarChart3, Users, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FeatureBadgeProps {
