@@ -1,5 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef } from "react";
 import logo from "../../assets/logo.svg";
+
+let pendingHash: string | null = null;
+
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return true;
+  }
+  return false;
+}
+
+function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
+  const navigate = useNavigate();
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (to.includes("#")) {
+        const [path, hash] = to.split("#");
+        pendingHash = hash;
+        navigate(path);
+      } else {
+        navigate(to);
+      }
+    },
+    [navigate, to]
+  );
+
+  return (
+    <a href={to} onClick={handleClick} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+      {children}
+    </a>
+  );
+}
 
 const footerLinks: Record<string, { name: string; to: string }[]> = {
   Product: [
@@ -28,11 +64,28 @@ const footerLinks: Record<string, { name: string; to: string }[]> = {
 
 function Footer() {
   const currentYear = new Date().getFullYear();
+  const attempted = useRef(false);
+
+  useEffect(() => {
+    if (!pendingHash || attempted.current) return;
+    attempted.current = true;
+    const id = pendingHash;
+    pendingHash = null;
+    const tryScroll = () => {
+      if (scrollToId(id)) return;
+      const t1 = setTimeout(tryScroll, 100);
+      const t2 = setTimeout(tryScroll, 300);
+      const t3 = setTimeout(tryScroll, 600);
+      const t4 = setTimeout(tryScroll, 1200);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    };
+    tryScroll();
+  }, []);
 
   return (
     <footer className="border-t border-border bg-gradient-to-b from-background to-muted/30">
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-5">
               <Link to="/" className="flex items-center gap-3">
@@ -54,12 +107,7 @@ function Footer() {
               <ul className="space-y-3">
                 {links.map(({ name, to }) => (
                   <li key={name}>
-                    <Link
-                      to={to}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {name}
-                    </Link>
+                    <FooterLink to={to}>{name}</FooterLink>
                   </li>
                 ))}
               </ul>
