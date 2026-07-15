@@ -26,7 +26,7 @@ const FeatureBadge = ({ icon: Icon, text, colorClass }: FeatureBadgeProps) => (
 );
 
 const StatCard = ({ icon: Icon, value, label, colorClass, bgClass }: StatCardProps) => (
-  <div className="bg-card border border-border rounded-xl p-8 flex flex-col gap-4">
+  <div className="bg-card border border-border rounded-xl p-4 md:p-8 flex flex-col gap-4">
     <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center", bgClass)}>
       <Icon className={cn("w-7 h-7", colorClass)} />
     </div>
@@ -65,7 +65,7 @@ export default function Featured() {
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-6xl mt-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-6xl mt-8 md:mt-12">
             <StatCard icon={BarChart3} value="Flow Score" label="Algorithmic focus quality metric" colorClass="text-cu-purple" bgClass="bg-cu-purple/10" />
             <StatCard icon={Target} value="Goals" label="Track progress with linked tasks" colorClass="text-cu-green" bgClass="bg-cu-green/10" />
             <StatCard icon={Users} value="Team" label="Real-time collaboration" colorClass="text-cu-blue" bgClass="bg-cu-blue/10" />
@@ -74,7 +74,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Dashboard & Flow Score */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+        <section id="dashboard" className="flex flex-col md:flex-row max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={BrainCircuit} text="01_Analytics" colorClass="text-cu-purple" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -131,7 +131,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Focus Timer */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+        <section id="focus-timer" className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border bg-muted/30 py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={Timer} text="02_Focus" colorClass="text-cu-pink" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -180,7 +180,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Documents */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+        <section id="documents" className="flex flex-col md:flex-row max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={FileText} text="03_Docs" colorClass="text-cu-orange" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -238,7 +238,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Chat */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+        <section id="chat" className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border bg-muted/30 py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={MessageCircle} text="04_Chat" colorClass="text-cu-blue" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -297,7 +297,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Tasks */}
-        <section className="flex flex-col md:flex-row max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border py-20 md:py-28 px-6">
+        <section id="tasks" className="flex flex-col md:flex-row max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={CheckSquare} text="05_Tasks" colorClass="text-cu-green" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -352,7 +352,7 @@ export default function Featured() {
         </section>
 
         {/* Feature: Custom Workflows */}
-        <section className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-12 md:gap-20 items-center border-t border-border bg-muted/30 py-20 md:py-28 px-6">
+        <section id="workflows" className="flex flex-col md:flex-row-reverse max-w-6xl w-full gap-8 md:gap-20 items-center border-t border-border bg-muted/30 py-16 md:py-28 px-4 md:px-6">
           <div className="flex-1 flex flex-col gap-5">
             <FeatureBadge icon={Workflow} text="06_Adapt" colorClass="text-cu-purple" />
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -406,7 +406,7 @@ export default function Featured() {
         </section>
 
         {/* CTA */}
-        <section className="flex flex-col items-center max-w-4xl w-full mt-16 px-6 gap-8 py-20 bg-foreground text-background dark:bg-card dark:text-card-foreground rounded-3xl mx-6">
+        <section className="flex flex-col items-center max-w-4xl w-full mt-16 px-6 gap-8 py-16 md:py-20 bg-foreground text-background dark:bg-card dark:text-card-foreground rounded-2xl md:rounded-3xl mx-4 md:mx-6">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-center">
             Ready to Focus?
           </h2>

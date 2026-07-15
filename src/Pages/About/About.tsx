@@ -59,7 +59,7 @@ export default function About() {
       <Header />
       <main className="flex-1 flex flex-col items-center w-full">
         {/* Hero Section */}
-        <section className="flex flex-col items-center max-w-4xl w-full pt-32 pb-24 px-6 gap-8">
+        <section className="flex flex-col items-center max-w-4xl w-full pt-20 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 gap-8">
           <h1 className="text-5xl md:text-7xl font-black text-foreground tracking-tight text-center leading-tight">
             Our Mission Is To
             <br />
@@ -72,10 +72,10 @@ export default function About() {
           </p>
         </section>
 
-        <div className="w-full max-w-[96px] h-px bg-border mb-24"></div>
+        <div className="w-full max-w-[96px] h-px bg-border mb-16 md:mb-24"></div>
 
         {/* Story Section */}
-        <section className="flex flex-col items-start max-w-4xl w-full pb-32 px-6 gap-8">
+        <section id="story" className="flex flex-col items-start max-w-4xl w-full pb-16 md:pb-32 px-4 md:px-6 gap-8">
           <h3 className="text-xs font-bold text-muted-foreground tracking-[1.2px] uppercase">
             The Story
           </h3>
@@ -104,7 +104,7 @@ export default function About() {
         </section>
 
         {/* Principles Section */}
-        <section className="flex flex-col items-start max-w-4xl w-full pb-32 px-6 gap-12">
+        <section id="principles" className="flex flex-col items-start max-w-4xl w-full pb-16 md:pb-32 px-4 md:px-6 gap-12">
           <h3 className="text-xs font-bold text-muted-foreground tracking-[1.2px] uppercase">
             Our Principles
           </h3>
@@ -133,10 +133,10 @@ export default function About() {
           </div>
         </section>
 
-        <div className="w-full h-px bg-border mb-24"></div>
+        <div className="w-full h-px bg-border mb-16 md:mb-24"></div>
 
         {/* Team Section */}
-        <section className="flex flex-col items-start max-w-6xl w-full pb-24 px-6 gap-12">
+        <section id="team" className="flex flex-col items-start max-w-6xl w-full pb-16 md:pb-24 px-4 md:px-6 gap-12">
           <div className="flex flex-col md:flex-row w-full justify-between items-start md:items-end gap-6">
             <div className="flex flex-col gap-4 max-w-lg">
               <h3 className="text-4xl font-bold text-foreground tracking-tight">

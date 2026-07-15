@@ -99,7 +99,7 @@ export default function Pricing() {
       <main className="flex-1 flex flex-col items-center w-full pb-24">
         
         {/* Hero Section */}
-        <section className="flex flex-col items-center w-full max-w-7xl pt-24 pb-16 px-6 gap-6">
+        <section className="flex flex-col items-center w-full max-w-7xl pt-16 md:pt-24 pb-12 md:pb-16 px-4 md:px-6 gap-6">
           <h1 className="text-6xl md:text-7xl font-black text-foreground tracking-tight text-center uppercase">
             Transparent<br />Pricing.
           </h1>
@@ -126,10 +126,10 @@ export default function Pricing() {
         </section>
 
         {/* Pricing Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 max-w-6xl w-full px-6 gap-8 justify-center items-stretch mt-4">
+        <section className="grid grid-cols-1 md:grid-cols-3 max-w-6xl w-full px-4 md:px-6 gap-6 md:gap-8 justify-center items-stretch mt-4">
           
           {/* Free */}
-          <div className="bg-card border border-border rounded-2xl p-8 flex flex-col relative shadow-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-sm">
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold text-card-foreground">Free</h3>
               <p className="text-muted-foreground mt-2 text-sm">For individuals building their focus habit.</p>
@@ -153,7 +153,7 @@ export default function Pricing() {
           </div>
 
           {/* Pro */}
-          <div className="bg-foreground text-background dark:bg-card dark:text-card-foreground border border-border rounded-2xl p-8 flex flex-col relative shadow-xl md:-mt-4 md:mb-4 scale-105 z-10">
+          <div className="bg-foreground text-background dark:bg-card dark:text-card-foreground border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-xl md:-mt-4 md:mb-4 md:scale-105 z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background text-foreground border border-border dark:bg-foreground dark:text-background px-4 py-1.5 rounded-full text-xs font-bold shadow-sm">
               Most Popular
             </div>
@@ -182,7 +182,7 @@ export default function Pricing() {
           </div>
 
           {/* Enterprise */}
-          <div className="bg-card border border-border rounded-2xl p-8 flex flex-col relative shadow-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-sm">
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold text-card-foreground">Enterprise</h3>
               <p className="text-muted-foreground mt-2 text-sm">For large teams and organizations.</p>
@@ -205,7 +205,7 @@ export default function Pricing() {
         </section>
 
         {/* Compare Features Table */}
-        <section className="w-full max-w-6xl px-6 mt-32">
+        <section id="compare" className="w-full max-w-6xl px-4 md:px-6 mt-16 md:mt-32">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight text-foreground">Compare Features</h2>
             <p className="text-muted-foreground mt-4 text-lg">Detailed breakdown of what's included in each plan.</p>
@@ -274,7 +274,7 @@ export default function Pricing() {
         </section>
 
         {/* FAQs */}
-        <section className="w-full bg-foreground text-background dark:bg-card dark:text-card-foreground mt-32 py-24 px-6 flex justify-center text-left">
+        <section id="faq" className="w-full bg-foreground text-background dark:bg-card dark:text-card-foreground mt-16 md:mt-32 py-16 md:py-24 px-4 md:px-6 flex justify-center text-left">
           <div className="max-w-3xl w-full">
             <h2 className="text-3xl font-bold tracking-tight mb-16 text-center uppercase">Frequently Asked Questions</h2>
             

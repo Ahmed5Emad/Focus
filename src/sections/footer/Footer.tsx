@@ -1,101 +1,76 @@
+import { Link } from "react-router-dom";
 import logo from "../../assets/logo.svg";
-import { Globe, SquareTerminal } from "lucide-react";
 
-interface FooterColumnProps {
-  title: string;
-  links: string[];
-}
-
-const icons = [Globe, SquareTerminal];
-
-function FooterColumn({ title, links }: FooterColumnProps) {
-  return (
-    <div>
-      <h3 className="font-semibold mb-4">{title}</h3>
-      <ul className="space-y-3">
-        {links.map((link) => (
-          <li key={link}>
-            <a
-              href="#"
-                className="
-                    text-muted-foreground
-                    hover:text-foreground
-                    focus:outline-none focus:ring-2 focus:ring-foreground rounded
-                    transition
-                  "
-            >
-              {link}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+const footerLinks: Record<string, { name: string; to: string }[]> = {
+  Product: [
+    { name: "Features", to: "/features" },
+    { name: "Dashboard", to: "/features#dashboard" },
+    { name: "Focus Timer", to: "/features#focus-timer" },
+    { name: "Tasks", to: "/features#tasks" },
+  ],
+  Resources: [
+    { name: "Documents", to: "/features#documents" },
+    { name: "Chat", to: "/features#chat" },
+    { name: "Workflows", to: "/features#workflows" },
+  ],
+  Company: [
+    { name: "About Us", to: "/about" },
+    { name: "Our Story", to: "/about#story" },
+    { name: "Principles", to: "/about#principles" },
+    { name: "Team", to: "/about#team" },
+  ],
+  Support: [
+    { name: "Pricing", to: "/pricing" },
+    { name: "Compare Plans", to: "/pricing#compare" },
+    { name: "FAQ", to: "/pricing#faq" },
+  ],
+};
 
 function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer aria-labelledby="footer-heading">
-      <h2 id="footer-heading" className="sr-only">
-        Footer
-      </h2>
-
-      {/* Main Footer Content */}
-      <section className="bg-card">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <nav
-            className="grid grid-cols-1 md:grid-cols-5 gap-10"
-            aria-label="Footer navigation"
-          >
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-6 font-bold text-lg">
-                <img src={logo} alt="logo" className="w-10" /> Focus
-              </div>
-              <p className="text-muted-foreground max-w-sm">
-                Built for high-performance teams and focused individuals who
-                demand the best from their tools.
-              </p>
+    <footer className="border-t border-border bg-gradient-to-b from-background to-muted/30">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+          <div className="md:col-span-2">
+            <div className="flex items-center gap-3 mb-5">
+              <Link to="/" className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-foreground flex items-center justify-center shadow-sm">
+                  <img src={logo} alt="logo" className="w-5 h-5" />
+                </div>
+                <span className="font-bold text-xl tracking-tight">Focus</span>
+              </Link>
             </div>
-
-            <FooterColumn
-              title="Product"
-              links={["Features", "Security", "Desktop App", "Changelog"]}
-            />
-
-            <FooterColumn
-              title="Support"
-              links={["Help Center", "API Docs", "Status", "Community"]}
-            />
-
-            <FooterColumn
-              title="Company"
-              links={[
-                "About Us",
-                "Privacy Policy",
-                "Terms of Service",
-                "Contact",
-              ]}
-            />
-          </nav>
-
-          <div className="border-t border-border mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground">
-            <p>© {currentYear} Focus Technology Group. All rights reserved.</p>
-
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <div className="gap-6 flex flex-row items-center">
-                {icons.map((Icon, index) => (
-                  <a key={index} href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    <Icon className="w-6 h-6" />
-                    <span className="sr-only">Social Link</span>
-                  </a>
-                ))}
-              </div>
-            </div>
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
+              Built for high-performance teams and focused individuals who
+              demand the best from their tools.
+            </p>
           </div>
+
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title}>
+              <h3 className="font-semibold text-sm mb-4">{title}</h3>
+              <ul className="space-y-3">
+                {links.map(({ name, to }) => (
+                  <li key={name}>
+                    <Link
+                      to={to}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      </section>
+
+        <div className="border-t border-border mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground">
+          <p>© {currentYear} Focus Technology Group. All rights reserved.</p>
+        </div>
+      </div>
     </footer>
   );
 }

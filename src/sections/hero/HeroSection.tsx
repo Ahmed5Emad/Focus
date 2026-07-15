@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export function HeroSection() {
   const navigate = useNavigate();
   return (
-    <div className="w-full flex my-16 self-stretch flex-col items-center px-4 md:px-16 lg:px-32">
+    <div className="w-full flex my-8 md:my-16 self-stretch flex-col items-center px-4 md:px-16 lg:px-32">
       <div className="flex mb-4 flex-col w-full md:w-3/4 lg:w-1/2 items-center justify-center gap-2">
         <h1 className="text-4xl md:text-7xl lg:text-8xl -tracking-wide text-center font-black">
           One App to <br />
@@ -32,8 +32,8 @@ export function HeroSection() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col max-w-7xl w-full items-center content-start px-4 md:px-0">
-        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[400px] md:h-[650px] border border-border bg-card shadow-2xl overflow-hidden relative">
+        <div className="flex flex-col max-w-7xl w-full items-center content-start px-2 sm:px-4 md:px-0">
+        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[380px] sm:h-[400px] md:h-[650px] border border-border bg-card shadow-2xl overflow-hidden relative">
           {/* ── Sidebar ── */}
           <div className="flex flex-1 overflow-hidden">
             <div className="hidden md:flex w-56 border-r border-border bg-muted/20 flex-col shrink-0">
