@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { HashRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorBoundaryFallback } from "./components/ErrorBoundaryFallback";
 import { AppLoadingFallback } from "./components/shared/AppLoadingFallback";
@@ -58,12 +58,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <FocusProvider>
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
           <HashRouter>
+            <ScrollToTop />
             <Toaster />
             <SpeedInsights />
             <Analytics />

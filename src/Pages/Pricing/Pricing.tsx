@@ -165,7 +165,7 @@ export default function Pricing() {
               <span className="text-5xl font-light tracking-tight">${isYearly ? "8" : "10"}</span>
               <span className="text-muted-foreground ml-1">/mo</span>
             </div>
-            <ul className="flex flex-col gap-4 mb-8 flex-1 [&_li]:text-card-foreground [&_li>svg]:text-card-foreground dark:[&_li]:text-card-foreground dark:[&_li>svg]:text-card-foreground">
+            <ul className="flex flex-col gap-4 mb-8 flex-1 [&_li]:text-background dark:[&_li]:text-card-foreground [&_li>svg]:text-background dark:[&_li>svg]:text-card-foreground">
               <PricingFeature text="Unlimited projects & tasks" />
               <PricingFeature text="Kanban, Calendar & List views" />
               <PricingFeature text="Task dependencies & recurrence" />

@@ -27,6 +27,7 @@ export function HeroSection() {
             size="lg"
             variant="outline"
             className="shadow-sm px-8 h-14 font-bold text-lg rounded-xl border-2 hover:bg-muted cursor-pointer"
+            onClick={() => navigate("/features")}
             >
             View Features
           </Button>
