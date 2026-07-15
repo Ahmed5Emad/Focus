@@ -30,38 +30,7 @@ interface CommentSidebarProps {
   editorRef?: React.MutableRefObject<TiptapEditor | null>;
 }
 
-let memberCache: MemberProfile[] = [];
-let memberFetchPromise: Promise<void> | null = null;
 
-async function ensureMembers(workspaceId: string) {
-  if (memberCache.length > 0) return;
-  if (memberFetchPromise) return memberFetchPromise;
-  memberFetchPromise = (async () => {
-    try {
-      const { data: memberRows } = await supabase
-        .rpc("get_workspace_members_with_email", { p_workspace_id: workspaceId });
-      const rows = (memberRows ?? []) as Array<{ user_id: string; email: string }>;
-      const userIds = rows.map((r) => r.user_id);
-      const emailMap = new Map(rows.map((r) => [r.user_id, r.email]));
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .in("id", userIds);
-      const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
-      memberCache = userIds.map((id) => {
-        const p = profileMap.get(id);
-        return {
-          id,
-          display_name: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
-          avatar_url: p?.avatar_url ?? null,
-        };
-      });
-    } catch (e) {
-      console.error("Failed to fetch members:", e);
-    }
-  })();
-  return memberFetchPromise;
-}
 
 function renderCommentContent(content: string) {
   const parts = content.split(/(@\S+)/g);
@@ -76,7 +45,7 @@ function renderCommentContent(content: string) {
 }
 
 export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: CommentSidebarProps) {
-  const { user } = useAuth();
+  const { user, currentWorkspaceId } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [sending, setSending] = useState(false);
@@ -148,11 +117,37 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   }, [open, fetchComments]);
 
   useEffect(() => {
-    if (!user) return;
-    ensureMembers(user.user_metadata?.workspace_id ?? "").then(() => {
-      setMembers([...memberCache]);
-    });
-  }, [user]);
+    if (!currentWorkspaceId) return;
+
+    const fetchMembers = async () => {
+      try {
+        const { data: memberRows } = await supabase
+          .rpc("get_workspace_members_with_email", { p_workspace_id: currentWorkspaceId });
+        const rows = (memberRows ?? []) as Array<{ user_id: string; email: string }>;
+        const userIds = rows.map((r) => r.user_id);
+        const emailMap = new Map(rows.map((r) => [r.user_id, r.email]));
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, display_name, avatar_url")
+          .in("id", userIds);
+        const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+        setMembers(
+          userIds.map((id) => {
+            const p = profileMap.get(id);
+            return {
+              id,
+              display_name: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
+              avatar_url: p?.avatar_url ?? null,
+            };
+          })
+        );
+      } catch (e) {
+        console.error("Failed to fetch members:", e);
+      }
+    };
+
+    fetchMembers();
+  }, [currentWorkspaceId]);
 
   useEffect(() => {
     if (!open || !documentId) return;
