@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef } from "react";
 import logo from "../../assets/logo.svg";
 
@@ -15,19 +15,26 @@ function scrollToId(id: string) {
 
 function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       if (to.includes("#")) {
         const [path, hash] = to.split("#");
-        pendingHash = hash;
-        navigate(path);
+        if (path === pathname) {
+          scrollToId(hash);
+        } else {
+          pendingHash = hash;
+          navigate(path);
+        }
+      } else if (to === pathname) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         navigate(to);
       }
     },
-    [navigate, to]
+    [navigate, to, pathname]
   );
 
   return (
