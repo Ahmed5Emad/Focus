@@ -1,19 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Editor as TiptapEditor } from "@tiptap/react";
-import { MessageSquare, X, Send, Loader2 } from "lucide-react";
+import { MessageSquare, X, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { MentionInput } from "../../Chat/components/MentionInput";
+import type { MemberProfile } from "../../Chat/components/MentionDropdown";
 
 interface Profile {
   display_name: string | null;
-  avatar_url: string | null;
-}
-
-interface MemberItem {
-  id: string;
-  label: string;
   avatar_url: string | null;
 }
 
@@ -35,7 +30,7 @@ interface CommentSidebarProps {
   editorRef?: React.MutableRefObject<TiptapEditor | null>;
 }
 
-let memberCache: MemberItem[] = [];
+let memberCache: MemberProfile[] = [];
 let memberFetchPromise: Promise<void> | null = null;
 
 async function ensureMembers(workspaceId: string) {
@@ -57,7 +52,7 @@ async function ensureMembers(workspaceId: string) {
         const p = profileMap.get(id);
         return {
           id,
-          label: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
+          display_name: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
           avatar_url: p?.avatar_url ?? null,
         };
       });
@@ -90,16 +85,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const scrollRef = useRef<HTMLDivElement>(null);
   const profileCacheRef = useRef<Map<string, Profile>>(new Map());
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const inputContainerRef = useRef<HTMLDivElement>(null);
-
-  const [mentionOpen, setMentionOpen] = useState(false);
-  const [mentionSearch, setMentionSearch] = useState("");
-  const [mentionSelectedIndex, setMentionSelectedIndex] = useState(0);
-  const mentionTriggerPos = useRef<number | null>(null);
-  const mentionFiltered = memberCache.filter((m) =>
-    m.label.toLowerCase().includes(mentionSearch.toLowerCase())
-  ).slice(0, 8);
+  const sendingRef = useRef(false);
 
   const getProfile = useCallback(async (userId: string): Promise<Profile> => {
     const cached = profileCacheRef.current.get(userId);
@@ -194,75 +180,9 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [comments.length]);
 
-  const insertMention = useCallback((item: MemberItem) => {
-    if (mentionTriggerPos.current === null) return;
-    const before = newComment.slice(0, mentionTriggerPos.current);
-    const after = newComment.slice(
-      mentionTriggerPos.current + 1 + mentionSearch.length
-    );
-    setNewComment(before + "@" + item.label + " " + after);
-    setMentionOpen(false);
-    setMentionSearch("");
-    mentionTriggerPos.current = null;
-    textareaRef.current?.focus();
-  }, [newComment, mentionSearch]);
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value;
-    const cursor = e.target.selectionStart;
-    setNewComment(val);
-
-    const lastAtIndex = val.lastIndexOf("@", cursor - 1);
-    if (lastAtIndex !== -1) {
-      const textBeforeAt = val[lastAtIndex - 1];
-      if (lastAtIndex === 0 || textBeforeAt === " " || textBeforeAt === "\n") {
-        const searchText = val.slice(lastAtIndex + 1, cursor);
-        if (searchText.length <= 30 && !searchText.includes(" ") && !searchText.includes("\n")) {
-          mentionTriggerPos.current = lastAtIndex;
-          setMentionSearch(searchText);
-          setMentionSelectedIndex(0);
-          setMentionOpen(true);
-          return;
-        }
-      }
-    }
-    setMentionOpen(false);
-    setMentionSearch("");
-    mentionTriggerPos.current = null;
-  }, []);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (mentionOpen) {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setMentionSelectedIndex((i) => Math.min(i + 1, mentionFiltered.length - 1));
-        return;
-      }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setMentionSelectedIndex((i) => Math.max(i - 1, 0));
-        return;
-      }
-      if (e.key === "Enter" && mentionFiltered[mentionSelectedIndex]) {
-        e.preventDefault();
-        insertMention(mentionFiltered[mentionSelectedIndex]);
-        return;
-      }
-      if (e.key === "Escape") {
-        setMentionOpen(false);
-        setMentionSearch("");
-        mentionTriggerPos.current = null;
-        return;
-      }
-    }
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
   const handleSend = async () => {
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim() || !user || sendingRef.current) return;
+    sendingRef.current = true;
     setSending(true);
 
     let selectionFrom: number | null = null;
@@ -289,6 +209,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
       console.error("Error sending comment:", err);
     } finally {
       setSending(false);
+      sendingRef.current = false;
     }
   };
 
@@ -401,58 +322,29 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
         )}
       </div>
 
-      <div className="border-t border-border px-4 py-3 relative" ref={inputContainerRef}>
-        {mentionOpen && mentionFiltered.length > 0 && (
-          <div className="absolute bottom-full left-4 right-4 mb-1 bg-white rounded-xl border border-border shadow-lg overflow-hidden z-50">
-            {mentionFiltered.map((item, i) => (
-              <button
-                key={item.id}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  insertMention(item);
-                }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors ${
-                  i === mentionSelectedIndex
-                    ? "bg-cu-purple/10 text-cu-purple"
-                    : "text-foreground hover:bg-accent"
-                }`}
-              >
-                <Avatar className="w-5 h-5">
-                  <AvatarImage src={item.avatar_url ?? undefined} />
-                  <AvatarFallback className="text-[8px]">
-                    {item.label.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="font-medium">{item.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
+      <div className="border-t border-border px-4 py-3">
         <div className="flex items-end gap-2 bg-[#f8f7fc] border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
-          <textarea
-            ref={textareaRef}
+          <MentionInput
+            members={memberCache}
             value={newComment}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
+            onChange={setNewComment}
+            onSend={handleSend}
             placeholder={editorRef?.current?.state.selection.from !== editorRef?.current?.state.selection.to
               ? "Comment on selected text... (@ to mention)"
               : "Add a comment... (@ to mention)"
             }
-            rows={1}
-            className="flex-1 px-3 py-1.5 text-sm bg-transparent border-none resize-none outline-none text-foreground placeholder:text-muted-foreground"
           />
-          <Button
+          <button
             onClick={handleSend}
             disabled={!newComment.trim() || sending}
-            size="icon"
-            className="shrink-0 rounded-lg bg-cu-purple hover:bg-cu-purple/90 text-white h-8 w-8"
+            className="shrink-0 rounded-lg bg-cu-purple hover:bg-cu-purple/90 text-white h-8 w-8 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {sending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4" />
             ) : (
-              <Send className="w-4 h-4" />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" /></svg>
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

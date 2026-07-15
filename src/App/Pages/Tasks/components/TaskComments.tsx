@@ -1,11 +1,47 @@
-import { useState } from "react";
-import { MessageSquare, Send, Trash2, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { MessageSquare, Trash2, Loader2 } from "lucide-react";
 import { useTaskComments } from "@/hooks/useTaskComments";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MentionInput } from "../../Chat/components/MentionInput";
+import type { MemberProfile } from "../../Chat/components/MentionDropdown";
+import { supabase } from "@/lib/supabase/client";
 
 interface TaskCommentsProps {
   taskId: string;
+}
+
+let memberCache: MemberProfile[] = [];
+let memberFetchPromise: Promise<void> | null = null;
+
+async function ensureMembers(workspaceId: string) {
+  if (memberCache.length > 0) return;
+  if (memberFetchPromise) return memberFetchPromise;
+  memberFetchPromise = (async () => {
+    try {
+      const { data: memberRows } = await supabase
+        .rpc("get_workspace_members_with_email", { p_workspace_id: workspaceId });
+      const rows = (memberRows ?? []) as Array<{ user_id: string; email: string }>;
+      const userIds = rows.map((r) => r.user_id);
+      const emailMap = new Map(rows.map((r) => [r.user_id, r.email]));
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", userIds);
+      const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      memberCache = userIds.map((id) => {
+        const p = profileMap.get(id);
+        return {
+          id,
+          display_name: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
+          avatar_url: p?.avatar_url ?? null,
+        };
+      });
+    } catch (e) {
+      console.error("Failed to fetch members:", e);
+    }
+  })();
+  return memberFetchPromise;
 }
 
 export function TaskComments({ taskId }: TaskCommentsProps) {
@@ -13,20 +49,22 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
   const { comments, isLoading, addComment, deleteComment } = useTaskComments(taskId);
   const [newComment, setNewComment] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const sendingRef = useRef(false);
+
+  useEffect(() => {
+    if (user) {
+      ensureMembers(user.user_metadata?.workspace_id ?? "");
+    }
+  }, [user]);
 
   const handleSend = async () => {
-    if (!newComment.trim() || isSending) return;
+    if (!newComment.trim() || isSending || sendingRef.current) return;
+    sendingRef.current = true;
     setIsSending(true);
     const ok = await addComment(newComment);
     setIsSending(false);
+    sendingRef.current = false;
     if (ok) setNewComment("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
   };
 
   return (
@@ -78,13 +116,12 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
       )}
 
       <div className="flex items-end gap-2 pt-2 border-t border-slate-100">
-        <textarea
+        <MentionInput
+          members={memberCache}
           value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add a comment... (Enter to send, Shift+Enter for new line)"
-          rows={2}
-          className="flex-1 text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg resize-none outline-none focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed]/20 transition-all placeholder:text-slate-400"
+          onChange={setNewComment}
+          onSend={handleSend}
+          placeholder="Add a comment... (@ to mention)"
         />
         <button
           onClick={handleSend}
@@ -96,5 +133,13 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
         </button>
       </div>
     </div>
+  );
+}
+
+function Send({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
   );
 }
