@@ -11,6 +11,7 @@ export interface Notification {
   body?: string | null;
   link?: string | null;
   is_read: boolean;
+  is_seen: boolean;
   created_at: string;
 }
 
@@ -107,14 +108,55 @@ export function useNotifications() {
     }
   }, [notifications]);
 
+  const markAsSeen = useCallback(async (id: string) => {
+    try {
+      await supabase.from("notifications").update({ is_seen: true }).eq("id", id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_seen: true } : n))
+      );
+    } catch (error) {
+      console.error("Error marking notification as seen:", error);
+    }
+  }, []);
+
+  const markAllAsSeen = useCallback(async () => {
+    const unseenIds = notifications.filter((n) => !n.is_seen).map((n) => n.id);
+    if (unseenIds.length === 0) return;
+    try {
+      await supabase.from("notifications").update({ is_seen: true }).in("id", unseenIds);
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_seen: true })));
+    } catch (error) {
+      console.error("Error marking all as seen:", error);
+    }
+  }, [notifications]);
+
+  const deleteNotification = useCallback(async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  }, []);
+
   const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unseenCount = notifications.filter((n) => !n.is_seen).length;
 
   return {
     notifications,
     unreadCount,
+    unseenCount,
     isLoading,
     markAsRead,
     markAllAsRead,
+    markAsSeen,
+    markAllAsSeen,
+    deleteNotification,
     refresh: fetchNotifications,
   };
 }

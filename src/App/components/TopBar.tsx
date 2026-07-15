@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Timer, BellRing, Check, X, User, LogOut } from "lucide-react";
+import { Search, Timer, BellRing, Check, X, Trash2, User, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -39,7 +39,7 @@ function timeAgo(dateString: string): string {
 export function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, markAllAsSeen, deleteNotification } = useNotifications();
   const [signingOut, setSigningOut] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -78,7 +78,7 @@ export function TopBar() {
             <button onClick={() => navigate('/focus-timer')} className="min-h-10 min-w-10 flex items-center justify-center p-2 rounded-xl transition-colors text-muted-foreground cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open focus timer">
               <Timer className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </button>
-            <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+            <Popover open={notifOpen} onOpenChange={(open) => { setNotifOpen(open); if (open) markAllAsSeen(); }}>
               <PopoverTrigger asChild>
                 <button className="min-h-10 min-w-10 flex items-center justify-center p-2 rounded-xl transition-colors text-muted-foreground relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open notifications">
                   <BellRing className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -138,18 +138,30 @@ export function TopBar() {
                                 {timeAgo(notif.created_at)}
                               </p>
                             </div>
-                            {!notif.is_read && (
+                            <div className="flex items-center gap-0.5">
+                              {!notif.is_read && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    markAsRead(notif.id);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                  aria-label="Mark as read"
+                                >
+                                  <Check className="w-3.5 h-3.5 text-muted-foreground" />
+                                </button>
+                              )}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  markAsRead(notif.id);
+                                  deleteNotification(notif.id);
                                 }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                                aria-label="Dismiss notification"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                aria-label="Delete notification"
                               >
-                                <X className="w-3.5 h-3.5 text-muted-foreground" />
+                                <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                               </button>
-                            )}
+                            </div>
                           </div>
                         </button>
                       ))}
