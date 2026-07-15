@@ -49,12 +49,14 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
   const { comments, isLoading, addComment, deleteComment } = useTaskComments(taskId);
   const [newComment, setNewComment] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [members, setMembers] = useState<MemberProfile[]>([]);
   const sendingRef = useRef(false);
 
   useEffect(() => {
-    if (user) {
-      ensureMembers(user.user_metadata?.workspace_id ?? "");
-    }
+    if (!user) return;
+    ensureMembers(user.user_metadata?.workspace_id ?? "").then(() => {
+      setMembers([...memberCache]);
+    });
   }, [user]);
 
   const handleSend = async () => {
@@ -117,7 +119,7 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
 
       <div className="flex items-end gap-2 pt-2 border-t border-slate-100">
         <MentionInput
-          members={memberCache}
+          members={members}
           value={newComment}
           onChange={setNewComment}
           onSend={handleSend}

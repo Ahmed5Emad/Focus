@@ -82,6 +82,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [highlightedComment, setHighlightedComment] = useState<string | null>(null);
+  const [members, setMembers] = useState<MemberProfile[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const profileCacheRef = useRef<Map<string, Profile>>(new Map());
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -144,10 +145,14 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   useEffect(() => {
     if (!open) return;
     fetchComments();
-    if (user) {
-      ensureMembers(user.user_metadata?.workspace_id ?? "");
-    }
-  }, [open, fetchComments, user]);
+  }, [open, fetchComments]);
+
+  useEffect(() => {
+    if (!user) return;
+    ensureMembers(user.user_metadata?.workspace_id ?? "").then(() => {
+      setMembers([...memberCache]);
+    });
+  }, [user]);
 
   useEffect(() => {
     if (!open || !documentId) return;
@@ -325,7 +330,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
       <div className="border-t border-border px-4 py-3">
         <div className="flex items-end gap-2 bg-[#f8f7fc] border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
           <MentionInput
-            members={memberCache}
+            members={members}
             value={newComment}
             onChange={setNewComment}
             onSend={handleSend}
