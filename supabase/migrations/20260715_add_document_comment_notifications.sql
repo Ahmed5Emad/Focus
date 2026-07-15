@@ -37,16 +37,18 @@ DECLARE
   mentioned_name TEXT;
   mentioned_user_id UUID;
   doc_workspace_id UUID;
+  rec RECORD;
 BEGIN
   SELECT workspace_id INTO doc_workspace_id FROM documents WHERE id = NEW.document_id;
 
-  FOR mentioned_name IN
-    SELECT DISTINCT substring(word FROM '@"([^"]+)"') AS name
-    FROM regexp_matches(NEW.content, '@"([^"]+)"', 'g') AS word
+  FOR rec IN
+    SELECT DISTINCT trim(m[1]) AS name
+    FROM regexp_matches(NEW.content, '@"([^"]+)"', 'g') AS m
     UNION
-    SELECT DISTINCT substring(word FROM '@(\S+)') AS name
-    FROM regexp_matches(NEW.content, '@(\S+)', 'g') AS word
+    SELECT DISTINCT trim(m[1]) AS name
+    FROM regexp_matches(NEW.content, '@(\S+)', 'g') AS m
   LOOP
+    mentioned_name := rec.name;
     mentioned_name := trim(trailing ',' from mentioned_name);
     mentioned_name := trim(trailing 's' from mentioned_name);
     mentioned_name := trim(trailing '.' from mentioned_name);
