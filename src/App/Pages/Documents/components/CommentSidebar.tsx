@@ -11,6 +11,12 @@ interface Profile {
   avatar_url: string | null;
 }
 
+interface MemberItem {
+  id: string;
+  label: string;
+  avatar_url: string | null;
+}
+
 interface Comment {
   id: string;
   document_id: string;
@@ -29,6 +35,51 @@ interface CommentSidebarProps {
   editorRef?: React.MutableRefObject<TiptapEditor | null>;
 }
 
+let memberCache: MemberItem[] = [];
+let memberFetchPromise: Promise<void> | null = null;
+
+async function ensureMembers(workspaceId: string) {
+  if (memberCache.length > 0) return;
+  if (memberFetchPromise) return memberFetchPromise;
+  memberFetchPromise = (async () => {
+    try {
+      const { data: memberRows } = await supabase
+        .rpc("get_workspace_members_with_email", { p_workspace_id: workspaceId });
+      const rows = (memberRows ?? []) as Array<{ user_id: string; email: string }>;
+      const userIds = rows.map((r) => r.user_id);
+      const emailMap = new Map(rows.map((r) => [r.user_id, r.email]));
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", userIds);
+      const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      memberCache = userIds.map((id) => {
+        const p = profileMap.get(id);
+        return {
+          id,
+          label: p?.display_name ?? emailMap.get(id)?.split("@")[0] ?? "Unknown",
+          avatar_url: p?.avatar_url ?? null,
+        };
+      });
+    } catch (e) {
+      console.error("Failed to fetch members:", e);
+    }
+  })();
+  return memberFetchPromise;
+}
+
+function renderCommentContent(content: string) {
+  const parts = content.split(/(@\S+)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("@")) {
+      return (
+        <span key={i} className="text-cu-purple font-medium">{part}</span>
+      );
+    }
+    return part;
+  });
+}
+
 export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: CommentSidebarProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -39,6 +90,16 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const scrollRef = useRef<HTMLDivElement>(null);
   const profileCacheRef = useRef<Map<string, Profile>>(new Map());
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [mentionSearch, setMentionSearch] = useState("");
+  const [mentionSelectedIndex, setMentionSelectedIndex] = useState(0);
+  const mentionTriggerPos = useRef<number | null>(null);
+  const mentionFiltered = memberCache.filter((m) =>
+    m.label.toLowerCase().includes(mentionSearch.toLowerCase())
+  ).slice(0, 8);
 
   const getProfile = useCallback(async (userId: string): Promise<Profile> => {
     const cached = profileCacheRef.current.get(userId);
@@ -97,7 +158,10 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   useEffect(() => {
     if (!open) return;
     fetchComments();
-  }, [open, fetchComments]);
+    if (user) {
+      ensureMembers(user.user_metadata?.workspace_id ?? "");
+    }
+  }, [open, fetchComments, user]);
 
   useEffect(() => {
     if (!open || !documentId) return;
@@ -130,6 +194,73 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [comments.length]);
 
+  const insertMention = useCallback((item: MemberItem) => {
+    if (mentionTriggerPos.current === null) return;
+    const before = newComment.slice(0, mentionTriggerPos.current);
+    const after = newComment.slice(
+      mentionTriggerPos.current + 1 + mentionSearch.length
+    );
+    setNewComment(before + "@" + item.label + " " + after);
+    setMentionOpen(false);
+    setMentionSearch("");
+    mentionTriggerPos.current = null;
+    textareaRef.current?.focus();
+  }, [newComment, mentionSearch]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    const cursor = e.target.selectionStart;
+    setNewComment(val);
+
+    const lastAtIndex = val.lastIndexOf("@", cursor - 1);
+    if (lastAtIndex !== -1) {
+      const textBeforeAt = val[lastAtIndex - 1];
+      if (lastAtIndex === 0 || textBeforeAt === " " || textBeforeAt === "\n") {
+        const searchText = val.slice(lastAtIndex + 1, cursor);
+        if (searchText.length <= 30 && !searchText.includes(" ") && !searchText.includes("\n")) {
+          mentionTriggerPos.current = lastAtIndex;
+          setMentionSearch(searchText);
+          setMentionSelectedIndex(0);
+          setMentionOpen(true);
+          return;
+        }
+      }
+    }
+    setMentionOpen(false);
+    setMentionSearch("");
+    mentionTriggerPos.current = null;
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (mentionOpen) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setMentionSelectedIndex((i) => Math.min(i + 1, mentionFiltered.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setMentionSelectedIndex((i) => Math.max(i - 1, 0));
+        return;
+      }
+      if (e.key === "Enter" && mentionFiltered[mentionSelectedIndex]) {
+        e.preventDefault();
+        insertMention(mentionFiltered[mentionSelectedIndex]);
+        return;
+      }
+      if (e.key === "Escape") {
+        setMentionOpen(false);
+        setMentionSearch("");
+        mentionTriggerPos.current = null;
+        return;
+      }
+    }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   const handleSend = async () => {
     if (!newComment.trim() || !user) return;
     setSending(true);
@@ -158,13 +289,6 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
       console.error("Error sending comment:", err);
     } finally {
       setSending(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
     }
   };
 
@@ -268,7 +392,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
                         : ""
                     }`}
                   >
-                    {comment.content}
+                    {renderCommentContent(comment.content)}
                   </div>
                 </div>
               </div>
@@ -277,15 +401,42 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
         )}
       </div>
 
-      <div className="border-t border-border px-4 py-3">
+      <div className="border-t border-border px-4 py-3 relative" ref={inputContainerRef}>
+        {mentionOpen && mentionFiltered.length > 0 && (
+          <div className="absolute bottom-full left-4 right-4 mb-1 bg-white rounded-xl border border-border shadow-lg overflow-hidden z-50">
+            {mentionFiltered.map((item, i) => (
+              <button
+                key={item.id}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  insertMention(item);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors ${
+                  i === mentionSelectedIndex
+                    ? "bg-cu-purple/10 text-cu-purple"
+                    : "text-foreground hover:bg-accent"
+                }`}
+              >
+                <Avatar className="w-5 h-5">
+                  <AvatarImage src={item.avatar_url ?? undefined} />
+                  <AvatarFallback className="text-[8px]">
+                    {item.label.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="font-medium">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <div className="flex items-end gap-2 bg-[#f8f7fc] border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
           <textarea
+            ref={textareaRef}
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder={editorRef?.current?.state.selection.from !== editorRef?.current?.state.selection.to
-              ? "Comment on selected text..."
-              : "Add a comment..."
+              ? "Comment on selected text... (@ to mention)"
+              : "Add a comment... (@ to mention)"
             }
             rows={1}
             className="flex-1 px-3 py-1.5 text-sm bg-transparent border-none resize-none outline-none text-foreground placeholder:text-muted-foreground"
