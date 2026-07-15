@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Timer, BellRing, Check, X, Trash2, User, LogOut } from "lucide-react";
+import { Search, Timer, BellRing, Check, Trash2, User, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
