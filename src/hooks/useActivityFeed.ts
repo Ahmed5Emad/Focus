@@ -15,7 +15,7 @@ export interface ActivityLog {
 }
 
 export function useActivityFeed() {
-  const { currentWorkspaceId } = useAuth();
+  const { user, currentWorkspaceId } = useAuth();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,6 +36,15 @@ export function useActivityFeed() {
       setIsLoading(false);
     }
   }, [currentWorkspaceId]);
+
+  const clearActivities = useCallback(async () => {
+    if (!currentWorkspaceId || !user) return;
+    await supabase
+      .from("activity_logs")
+      .delete()
+      .eq("workspace_id", currentWorkspaceId);
+    setActivities([]);
+  }, [currentWorkspaceId, user]);
 
   useEffect(() => {
     if (!currentWorkspaceId) return;
@@ -61,5 +70,5 @@ export function useActivityFeed() {
     };
   }, [currentWorkspaceId, fetchActivities]);
 
-  return { activities, isLoading, fetchActivities };
+  return { activities, isLoading, fetchActivities, clearActivities };
 }

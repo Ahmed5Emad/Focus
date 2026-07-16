@@ -57,7 +57,7 @@ export function LoginForm({
   return (
     <div
       className={cn(
-        "min-h-screen flex items-center justify-center bg-gradient-to-br from-cu-purple/5 via-background to-cu-orange/5 p-4",
+        "min-h-screen flex items-center justify-center bg-linear-to-br from-cu-purple/5 via-background to-cu-orange/5 p-4",
         className,
       )}
       {...props}
@@ -71,7 +71,7 @@ export function LoginForm({
                 className="flex flex-col items-center gap-2 font-medium group"
               >
                 <div className="flex flex-col items-center justify-center group-hover:scale-105 transition-transform">
-                  <img src={logo} alt="logo" className="w-12" /> 
+                  <img src={logo} alt="logo" className="w-12" />
                 </div>
                 <h2 className="text-3xl font-black text-foreground">Focus</h2>
                 <span className="sr-only">Focus</span>

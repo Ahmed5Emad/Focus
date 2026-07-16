@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFocus } from "@/contexts/FocusContext";
 import { supabase } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useActivityFeed } from "@/hooks/useActivityFeed";
 import ActivityFeed from "./components/ActivityFeed";
 
@@ -668,7 +669,13 @@ export default function Dashboard() {
 }
 
 function RecentActivitySection() {
-  const { activities, isLoading } = useActivityFeed();
+  const { activities, isLoading, clearActivities } = useActivityFeed();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const handleClear = async () => {
+    setShowClearConfirm(false);
+    await clearActivities();
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-0 mb-3">
@@ -679,8 +686,26 @@ function RecentActivitySection() {
             Recent Activity
           </h3>
         </div>
+        {activities.length > 0 && (
+          <button
+            onClick={() => setShowClearConfirm(true)}
+            className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors"
+          >
+            Clear
+          </button>
+        )}
       </div>
       <ActivityFeed activities={activities} isLoading={isLoading} />
+
+      <ConfirmDialog
+        open={showClearConfirm}
+        onOpenChange={setShowClearConfirm}
+        onConfirm={handleClear}
+        title="Clear Recent Activity"
+        description="Are you sure you want to clear all recent activity? This cannot be undone."
+        confirmLabel="Clear"
+        destructive
+      />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
+const newLocal = "min-h-screen bg-gradient-to-br from-cu-purple/5 via-background to-cu-orange/5 flex items-center justify-center p-4"
 export function LoginSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cu-purple/5 via-background to-cu-orange/5 flex items-center justify-center p-4">
+    <div className={newLocal}>
       <div className="bg-card border border-border rounded-2xl shadow-sm w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-3">
           <Skeleton className="w-12 h-12 rounded-xl mx-auto" />

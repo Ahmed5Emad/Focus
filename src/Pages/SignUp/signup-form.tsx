@@ -15,6 +15,32 @@ import appleIcon from "@/assets/apple-icon.svg"
 import googleIcon from "@/assets/google-icon.svg"
 import { createClient } from "@/lib/supabase/client"
 
+const PASSWORD_REQUIREMENTS = [
+  { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
+  { label: "At least one uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+  { label: "At least one lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+  { label: "At least one number", test: (p: string) => /\d/.test(p) },
+] as const;
+
+function getFriendlyErrorMessage(error: { message: string }): string {
+  const msg = error.message.toLowerCase();
+
+  if (msg.includes("rate limit") || msg.includes("too many requests")) {
+    return "Too many sign-up attempts. Please wait a few minutes before trying again.";
+  }
+  if (msg.includes("password") && (msg.includes("word") || msg.includes("character") || msg.includes("letter") || msg.includes("digit") || msg.includes("symbol") || msg.includes("uppercase") || msg.includes("lowercase"))) {
+    return "Password doesn't meet security requirements. See the checklist below.";
+  }
+  if (msg.includes("email") && (msg.includes("already") || msg.includes("registered") || msg.includes("exist"))) {
+    return "An account with this email already exists. Try signing in instead.";
+  }
+  if (msg.includes("email") && msg.includes("invalid")) {
+    return "Please enter a valid email address.";
+  }
+
+  return error.message;
+}
+
 export function SignupForm({
   className,
   ...props
@@ -25,12 +51,22 @@ export function SignupForm({
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [supabase] = useState(() => createClient());
+
+  const allRequirementsMet = PASSWORD_REQUIREMENTS.every(r => r.test(password));
+  const touchedPassword = password.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
+    if (!allRequirementsMet) {
+      setError("Please meet all password requirements before continuing.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -44,7 +80,7 @@ export function SignupForm({
       });
 
       if (error) {
-        setError(error.message);
+        setError(getFriendlyErrorMessage(error));
         return;
       }
 
@@ -110,10 +146,30 @@ export function SignupForm({
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
               disabled={isLoading}
             />
           </Field>
           </Field>
+          {(isPasswordFocused || (touchedPassword && !allRequirementsMet)) && (
+            <ul className="mt-2 space-y-1">
+              {PASSWORD_REQUIREMENTS.map((req) => {
+                const met = req.test(password);
+                return (
+                  <li
+                    key={req.label}
+                    className={`flex items-center gap-2 text-xs transition-colors ${
+                      met ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="text-base leading-none">{met ? "✓" : "○"}</span>
+                    {req.label}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 dark:bg-red-950 dark:border-red-800 dark:text-red-400 rounded-xl text-sm">
               {error}
