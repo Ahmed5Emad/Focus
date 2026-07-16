@@ -229,215 +229,203 @@ export default function TaskCreation() {
         </div>
 
         <div className="overflow-y-auto px-8 pb-4 flex-1 bg-white">
-          {inputValue.length === 0 ? (
-            <>
-              <div className="mb-4 pt-4">
-                  <div className="px-1 py-2 mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Actions</span>
+          <div className="mb-4 pt-4">
+            <div className="px-1 py-2 mb-1">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Actions</span>
+            </div>
+
+            {isLoadingData ? (
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
-
-                  {isLoadingData ? (
-                    <div className="space-y-3">
-                      <Skeleton className="h-12 w-full rounded-lg" />
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-10 w-full rounded-lg" />
-                        </div>
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-10 w-full rounded-lg" />
-                        </div>
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-10 w-full rounded-lg" />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-10 w-full rounded-lg" />
-                        </div>
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-10 w-full rounded-lg" />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                  <div className="space-y-3">
-                  <button
-                    onClick={() => setIsScheduledForToday(!isScheduledForToday)}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-slate-50'}`}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <Calendar className="w-4 h-4" />
-                      </div>
-                      <span className="font-medium text-sm">Schedule for Today {isScheduledForToday && <span className="text-[#7c3aed] font-semibold">(Scheduled)</span>}</span>
-                    </div>
-                  </button>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Project</label>
-                      <Dropdown
-                        value={selectedProjectId}
-                        onValueChange={setSelectedProjectId}
-                        options={projects.map((p) => ({ value: p.id, label: p.title }))}
-                        placeholder="Select project..."
-                        searchPlaceholder="Search projects..."
-                        emptyText="No project found."
-                        noneLabel="No Project"
-                        icon={<Folder className="w-4 h-4 text-purple-500" />}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Assignee</label>
-                      <Dropdown
-                        value={selectedAssigneeId}
-                        onValueChange={setSelectedAssigneeId}
-                        options={members.map((m) => ({ value: m.id, label: m.display_name ?? m.email ?? "Unknown" }))}
-                        placeholder="Assign to..."
-                        searchPlaceholder="Search members..."
-                        emptyText="No member found."
-                        noneLabel="Unassigned"
-                        renderTrigger={(selected) => {
-                          const member = selected ? members.find(m => m.id === selected.value) : null;
-                          return (
-                            <div className="flex items-center gap-2">
-                              {member ? (
-                                <>
-                                  <Avatar className="w-5 h-5">
-                                    <AvatarImage src={member.avatar_url ?? undefined} />
-                                    <AvatarFallback className="text-[9px]">{(member.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="truncate text-slate-700">{member.display_name}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <User className="w-4 h-4 text-slate-400" />
-                                  <span className="truncate text-slate-500">Assign to...</span>
-                                </>
-                              )}
-                            </div>
-                          );
-                        }}
-                        renderOption={(option) => {
-                          const member = members.find(m => m.id === option.value);
-                          return (
-                            <div className="flex items-center gap-2">
-                              <Avatar className="w-5 h-5">
-                                <AvatarImage src={member?.avatar_url ?? undefined} />
-                                <AvatarFallback className="text-[9px]">{(member?.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
-                              </Avatar>
-                              {option.label}
-                            </div>
-                          );
-                        }}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Parent Task</label>
-                      <Dropdown
-                        value={selectedParentTaskId}
-                        onValueChange={setSelectedParentTaskId}
-                        options={parentTasks.map((t) => ({ value: t.id, label: t.title }))}
-                        placeholder="Select parent task..."
-                        searchPlaceholder="Search tasks..."
-                        emptyText="No task found."
-                        noneLabel="No Parent Task"
-                        icon={<ListChecks className="w-4 h-4 text-slate-400" />}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Priority</label>
-                      <Dropdown
-                        value={selectedPriority}
-                        onValueChange={(val) => setSelectedPriority((val ?? "none") as Priority)}
-                        options={[
-                          { value: "none", label: "None" },
-                          { value: "low", label: "Low" },
-                          { value: "medium", label: "Medium" },
-                          { value: "high", label: "High" },
-                          { value: "urgent", label: "Urgent" },
-                        ]}
-                        showSearch={false}
-                        renderTrigger={(selected) => (
-                          <div className="flex items-center gap-2">
-                            {selected && selected.value !== "none" && (
-                              <span className={cn(
-                                "w-2 h-2 rounded-full",
-                                selected.value === "urgent" && "bg-red-500",
-                                selected.value === "high" && "bg-orange-500",
-                                selected.value === "medium" && "bg-blue-500",
-                                selected.value === "low" && "bg-gray-400",
-                              )} />
-                            )}
-                            <span className={selected && selected.value !== "none" ? "text-slate-700" : "text-slate-500"}>
-                              {selected?.label ?? "No Priority"}
-                            </span>
-                          </div>
-                        )}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Due Date</label>
-                      <DatePicker
-                        value={dueDate}
-                        onChange={setDueDate}
-                        placeholder="Pick a due date"
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+            <div className="space-y-3">
+            <button
+              onClick={() => setIsScheduledForToday(!isScheduledForToday)}
+              className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-700 group transition-colors ${isScheduledForToday ? 'ring-2 ring-[#7c3aed] bg-[#f5f3ff]' : 'bg-white border border-slate-200 hover:border-[#7c3aed] hover:bg-slate-50'}`}>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <span className="font-medium text-sm">Schedule for Today {isScheduledForToday && <span className="text-[#7c3aed] font-semibold">(Scheduled)</span>}</span>
+              </div>
+            </button>
 
-                  <div className="mt-3">
-                    <button
-                      type="button"
-                      onClick={() => setSaveAsTemplate(!saveAsTemplate)}
-                      className={cn(
-                        "w-full flex items-center gap-3 p-3 rounded-lg border transition-colors",
-                        saveAsTemplate
-                          ? "border-[#7c3aed] bg-[#f5f3ff] dark:bg-[#7c3aed]/10"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-transparent hover:border-[#7c3aed]/50",
-                      )}
-                    >
-                      <div className={cn(
-                        "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors",
-                        saveAsTemplate
-                          ? "bg-[#7c3aed] border-[#7c3aed] text-white"
-                          : "border-slate-300 dark:border-slate-600",
-                      )}>
-                        {saveAsTemplate && (
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Project</label>
+                <Dropdown
+                  value={selectedProjectId}
+                  onValueChange={setSelectedProjectId}
+                  options={projects.map((p) => ({ value: p.id, label: p.title }))}
+                  placeholder="Select project..."
+                  searchPlaceholder="Search projects..."
+                  emptyText="No project found."
+                  noneLabel="No Project"
+                  icon={<Folder className="w-4 h-4 text-purple-500" />}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Assignee</label>
+                <Dropdown
+                  value={selectedAssigneeId}
+                  onValueChange={setSelectedAssigneeId}
+                  options={members.map((m) => ({ value: m.id, label: m.display_name ?? m.email ?? "Unknown" }))}
+                  placeholder="Assign to..."
+                  searchPlaceholder="Search members..."
+                  emptyText="No member found."
+                  noneLabel="Unassigned"
+                  renderTrigger={(selected) => {
+                    const member = selected ? members.find(m => m.id === selected.value) : null;
+                    return (
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Save as template</span>
+                        {member ? (
+                          <>
+                            <Avatar className="w-5 h-5">
+                              <AvatarImage src={member.avatar_url ?? undefined} />
+                              <AvatarFallback className="text-[9px]">{(member.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="truncate text-slate-700">{member.display_name}</span>
+                          </>
+                        ) : (
+                          <>
+                            <User className="w-4 h-4 text-slate-400" />
+                            <span className="truncate text-slate-500">Assign to...</span>
+                          </>
+                        )}
                       </div>
-                    </button>
-                  </div>
-                  </div>
+                    );
+                  }}
+                  renderOption={(option) => {
+                    const member = members.find(m => m.id === option.value);
+                    return (
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-5 h-5">
+                          <AvatarImage src={member?.avatar_url ?? undefined} />
+                          <AvatarFallback className="text-[9px]">{(member?.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        {option.label}
+                      </div>
+                    );
+                  }}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Parent Task</label>
+                <Dropdown
+                  value={selectedParentTaskId}
+                  onValueChange={setSelectedParentTaskId}
+                  options={parentTasks.map((t) => ({ value: t.id, label: t.title }))}
+                  placeholder="Select parent task..."
+                  searchPlaceholder="Search tasks..."
+                  emptyText="No task found."
+                  noneLabel="No Parent Task"
+                  icon={<ListChecks className="w-4 h-4 text-slate-400" />}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Priority</label>
+                <Dropdown
+                  value={selectedPriority}
+                  onValueChange={(val) => setSelectedPriority((val ?? "none") as Priority)}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                    { value: "urgent", label: "Urgent" },
+                  ]}
+                  showSearch={false}
+                  renderTrigger={(selected) => (
+                    <div className="flex items-center gap-2">
+                      {selected && selected.value !== "none" && (
+                        <span className={cn(
+                          "w-2 h-2 rounded-full",
+                          selected.value === "urgent" && "bg-red-500",
+                          selected.value === "high" && "bg-orange-500",
+                          selected.value === "medium" && "bg-blue-500",
+                          selected.value === "low" && "bg-gray-400",
+                        )} />
+                      )}
+                      <span className={selected && selected.value !== "none" ? "text-slate-700" : "text-slate-500"}>
+                        {selected?.label ?? "No Priority"}
+                      </span>
+                    </div>
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">Due Date</label>
+                <DatePicker
+                  value={dueDate}
+                  onChange={setDueDate}
+                  placeholder="Pick a due date"
+                />
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => setSaveAsTemplate(!saveAsTemplate)}
+                className={cn(
+                  "w-full flex items-center gap-3 p-3 rounded-lg border transition-colors",
+                  saveAsTemplate
+                    ? "border-[#7c3aed] bg-[#f5f3ff] dark:bg-[#7c3aed]/10"
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-transparent hover:border-[#7c3aed]/50",
+                )}
+              >
+                <div className={cn(
+                  "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors",
+                  saveAsTemplate
+                    ? "bg-[#7c3aed] border-[#7c3aed] text-white"
+                    : "border-slate-300 dark:border-slate-600",
+                )}>
+                  {saveAsTemplate && (
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
                   )}
                 </div>
-              </>
-            ) : (
-            <div className="py-8 flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                <ArrowRight className="w-6 h-6 text-slate-400" />
-              </div>
-              <p className="text-slate-600 font-medium">Press Enter to create task</p>
-              <p className="text-slate-400 text-sm mt-1">"{inputValue}"</p>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Save as template</span>
+                </div>
+              </button>
             </div>
-          )}
+            </div>
+            )}
+          </div>
         </div>
 
         <div className="px-8 py-4 bg-white border-t border-slate-100 flex items-center justify-between">

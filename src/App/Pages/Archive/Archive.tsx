@@ -34,7 +34,7 @@ interface ArchivedProject {
   title: string;
   description?: string;
   status: string;
-  archived_at: string;
+  created_at: string;
 }
 
 type ArchiveTab = "tasks" | "projects";
@@ -59,7 +59,7 @@ export default function ArchivePage() {
       const [tasksRes, projectsRes] = await Promise.all([
         supabase
           .from("tasks")
-          .select("*, projects(title), goals(title)")
+          .select("*, projects(title), goals!tasks_goal_id_fkey(title)")
           .eq("workspace_id", currentWorkspaceId)
           .eq("is_archived", true)
           .order("updated_at", { ascending: false }),
@@ -68,13 +68,15 @@ export default function ArchivePage() {
           .select("*")
           .eq("workspace_id", currentWorkspaceId)
           .eq("status", "archived")
-          .order("updated_at", { ascending: false }),
+          .order("created_at", { ascending: false }),
       ]);
 
-      if (!tasksRes.error) setTasks(tasksRes.data || []);
-      if (!projectsRes.error) setProjects(projectsRes.data || []);
-    } catch {
-      // silently fail in mock mode
+      if (tasksRes.error) console.error("Error fetching archived tasks:", tasksRes.error);
+      else setTasks(tasksRes.data || []);
+      if (projectsRes.error) console.error("Error fetching archived projects:", projectsRes.error);
+      else setProjects(projectsRes.data || []);
+    } catch (error) {
+      console.error("Error fetching archived items:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +88,7 @@ export default function ArchivePage() {
         await supabase.from("tasks").update({ is_archived: false, archived_at: null, updated_at: new Date().toISOString() }).eq("id", id);
         setTasks((prev) => prev.filter((t) => t.id !== id));
       } else {
-        await supabase.from("projects").update({ status: "active", updated_at: new Date().toISOString() }).eq("id", id);
+        await supabase.from("projects").update({ status: "active" }).eq("id", id);
         setProjects((prev) => prev.filter((p) => p.id !== id));
       }
       toast.success(`${type === "tasks" ? "Task" : "Project"} restored`);
@@ -260,7 +262,7 @@ export default function ArchivePage() {
                         </span>
                         <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
                           <Calendar className="w-3.5 h-3.5" />
-                          <span>{new Date(project.archived_at).toLocaleDateString()}</span>
+                          <span>{new Date(project.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>
