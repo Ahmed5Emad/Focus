@@ -428,7 +428,11 @@ export default function WorkspaceTab() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {canChangeRoles ? (
+                        {member.role === 'owner' ? (
+                          <span className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize">
+                            Owner
+                          </span>
+                        ) : canChangeRoles ? (
                           <Dropdown
                             value={member.role}
                             onValueChange={(val) => val && handleRoleChange(member.member_id, val)}
