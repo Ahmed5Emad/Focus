@@ -7,6 +7,7 @@ import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { useFocus } from "../contexts/FocusContext";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Timer, Play, Pause, Square, AlertCircle, X, Loader2 } from "lucide-react";
@@ -30,6 +31,18 @@ export function AppLayout() {
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
   const [workspaceName, setWorkspaceName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(() => {
+    const saved = localStorage.getItem('focus_sidebar_expanded');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const handleToggleSidebar = () => {
+    setSidebarExpanded(prev => {
+      const next = !prev;
+      localStorage.setItem('focus_sidebar_expanded', String(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -113,7 +126,7 @@ export function AppLayout() {
           >
             Skip to main content
           </a>
-          <Sidebar />
+          <Sidebar expanded={sidebarExpanded} onToggle={handleToggleSidebar} />
           
           <div className="flex flex-col flex-1 h-full overflow-hidden relative">
             <TopBar />
@@ -125,7 +138,12 @@ export function AppLayout() {
               </div>
 
               {isActive && (
-                <div className="fixed bottom-8 left-4 right-4 lg:left-[300px] lg:right-[48px] z-50">
+                <div className={cn(
+                  "fixed bottom-8 z-50",
+                  "left-4 right-4",
+                  "lg:right-[48px]",
+                  sidebarExpanded ? "lg:left-[300px]" : "lg:left-[120px]"
+                )}>
                   <div className="backdrop-blur-md bg-card/90 border border-border drop-shadow-[0px_8px_15px_rgba(0,0,0,0.08)] flex h-16 items-center justify-between px-4.25 py-px rounded-3xl w-full">
                     <div className="flex gap-4 items-center">
                       <div className="bg-[#f5f3ff] border border-[#ede9fe] flex items-center justify-center rounded-2xl w-10 h-10 shrink-0">

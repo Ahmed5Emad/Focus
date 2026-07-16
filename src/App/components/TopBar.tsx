@@ -56,7 +56,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-50 w-full flex justify-center py-4 mt-2">
-      <div className="w-full px-4 md:px-[48px]">
+          <div className="w-full px-4 pl-14 md:px-[48px]">
         <div className="bg-card/60 backdrop-blur-xl border border-border/20 rounded-2xl flex items-center justify-between px-4 md:px-6 py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
           <button
             data-search-trigger
@@ -89,7 +89,7 @@ export function TopBar() {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={12} className="w-[380px] p-0 rounded-2xl border-border/80 shadow-xl">
+              <PopoverContent align="end" sideOffset={12} className="w-[380px] max-w-[calc(100vw-2rem)] p-0 rounded-2xl border-border/80 shadow-xl">
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
                   <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
                   {unreadCount > 0 && (

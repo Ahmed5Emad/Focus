@@ -174,8 +174,8 @@ export default function Tasks() {
         </div>
       </div>
 
-        <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white p-2 flex flex-row items-center gap-2">
-        <div className="relative w-48 shrink-0">
+        <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white p-2 flex flex-row flex-wrap items-center gap-2">
+        <div className="relative w-full md:w-48 md:shrink-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
           <Input
             placeholder="Search tasks..."
@@ -185,9 +185,9 @@ export default function Tasks() {
           />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <div className="filter-tabs">
-            {statusOptions.map((opt) => (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="filter-tabs">
+              {statusOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setStatusFilter(opt.value)}
