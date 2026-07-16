@@ -109,11 +109,11 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentWorkspaceId || !user) return;
-
     const fetchData = async () => {
-      setIsLoading(true);
-
+      if (!currentWorkspaceId || !user) {
+        setIsLoading(false);
+        return;
+      }
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -246,7 +246,8 @@ export default function Dashboard() {
   const weeklyTrend = useMemo(() => {
     const thisWeekTotal = weeklySessions.reduce((sum, s) => sum + (s.actual_duration_seconds || 0), 0);
     const lastWeekTotal = previousWeeklySessions.reduce((sum, s) => sum + (s.actual_duration_seconds || 0), 0);
-    if (lastWeekTotal < 60) return thisWeekTotal > 0 ? 100 : 0;
+    if (lastWeekTotal < 600 && thisWeekTotal < 600) return null;
+    if (lastWeekTotal < 600) return thisWeekTotal > 0 ? 100 : null;
     return Math.min(Math.round(((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100), 999);
   }, [weeklySessions, previousWeeklySessions]);
 
@@ -351,10 +352,16 @@ export default function Dashboard() {
                 <div className="bg-slate-100 h-1.5 rounded-2xl overflow-hidden">
                   <div className="bg-linear-to-r from-[#8b5cf6] to-[#6366f1] h-1.5 rounded-2xl" style={{ width: `${stats?.avg_flow_score ?? 0}%` }} />
                 </div>
-                <p className="text-slate-500 text-sm">
-                  {stats?.flow_score_change != null && stats.flow_score_change >= 0 ? "+" : ""}
-                  {Math.round(stats?.flow_score_change ?? 0)}pts vs yesterday
-                </p>
+                {stats?.avg_flow_score === 0 ? (
+                  <p className="text-slate-400 text-sm">No sessions today</p>
+                ) : stats?.avg_flow_score === 100 ? (
+                  <p className="text-emerald-600 text-sm font-medium">Perfect — no distractions logged</p>
+                ) : (
+                  <p className="text-slate-500 text-sm">
+                    {stats?.flow_score_change != null && stats.flow_score_change >= 0 ? "+" : ""}
+                    {Math.round(stats?.flow_score_change ?? 0)}pts vs yesterday
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -400,9 +407,15 @@ export default function Dashboard() {
                   })}
                 </div>
                 <div className="flex items-center gap-1.5 text-sm">
-                  <TrendingUp className={`w-4 h-4 ${weeklyTrend >= 0 ? "text-emerald-500" : "text-red-500 rotate-180"}`} />
-                  <span className={`font-semibold ${weeklyTrend >= 0 ? "text-emerald-600" : "text-red-600"}`}>{weeklyTrend >= 0 ? "+" : ""}{weeklyTrend}%</span>
-                  <span className="text-slate-400">vs last week</span>
+                  {weeklyTrend !== null ? (
+                    <>
+                      <TrendingUp className={`w-4 h-4 ${weeklyTrend >= 0 ? "text-emerald-500" : "text-red-500 rotate-180"}`} />
+                      <span className={`font-semibold ${weeklyTrend >= 0 ? "text-emerald-600" : "text-red-600"}`}>{weeklyTrend >= 0 ? "+" : ""}{weeklyTrend}%</span>
+                      <span className="text-slate-400">vs last week</span>
+                    </>
+                  ) : (
+                    <span className="text-slate-400">Not enough data</span>
+                  )}
                 </div>
               </div>
             </div>

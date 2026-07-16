@@ -233,7 +233,7 @@ export default function Chat() {
 
         if (uploadError) throw uploadError;
 
-        const { data: urlData } = await supabase.storage
+        const { data: urlData } = supabase.storage
           .from("chat-attachments")
           .getPublicUrl(filePath);
 

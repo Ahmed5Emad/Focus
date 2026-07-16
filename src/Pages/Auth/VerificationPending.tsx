@@ -11,7 +11,7 @@ export default function VerificationPending() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user && user.email_confirmed_at) {
         clearInterval(interval);
-        navigate('/onboarding', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     }, 2000);
 

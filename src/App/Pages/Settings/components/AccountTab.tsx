@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import {
   Avatar,
   AvatarFallback,
@@ -13,11 +15,16 @@ import {
   Loader2,
   Check,
   User,
+  Trash2,
 } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function AccountTab() {
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [profile, setProfile] = useState<{ display_name: string; avatar_url: string } | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
@@ -47,6 +54,23 @@ export default function AccountTab() {
       setProfile({ display_name: user.user_metadata?.name ?? '', avatar_url: '' });
     } finally {
       setProfileLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const { data, error } = await supabase.rpc('delete_account');
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) throw new Error(result.error ?? 'Failed to delete account');
+      await supabase.auth.signOut();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete account');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmOpen(false);
     }
   };
 
@@ -184,7 +208,26 @@ export default function AccountTab() {
             </div>
           </div>
         </div>
+
+        <div className="bg-card rounded-xl p-6 shadow-sm border border-red-200">
+          <h3 className="text-lg font-semibold text-red-600 mb-2">Danger Zone</h3>
+          <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data.</p>
+          <Button onClick={() => setDeleteConfirmOpen(true)} variant="destructive" className="w-full">
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Account
+          </Button>
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete Account"
+        description="This will permanently delete your account and all data. This action cannot be undone."
+        confirmLabel={isDeleting ? 'Deleting...' : 'Delete Account'}
+        onConfirm={handleDeleteAccount}
+        destructive
+      />
     </div>
   );
 }

@@ -48,7 +48,10 @@ export default function ArchivePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentWorkspaceId) return;
+    if (!currentWorkspaceId) {
+      setIsLoading(false);
+      return;
+    }
     fetchArchived();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspaceId]);

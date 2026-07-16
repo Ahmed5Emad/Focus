@@ -10,7 +10,7 @@ export default function AuthCallback() {
     const handleCallback = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/onboarding', { replace: true });
+        navigate('/dashboard', { replace: true });
         return;
       }
 
@@ -25,7 +25,7 @@ export default function AuthCallback() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
-          navigate('/onboarding', { replace: true });
+          navigate('/dashboard', { replace: true });
           return;
         }
       }

@@ -34,7 +34,6 @@ const Goals = lazy(() => import("./App/Pages/Goals/Goals"));
 const Projects = lazy(() => import("./App/Pages/Projects/Projects"));
 const Tasks = lazy(() => import("./App/Pages/Tasks/Tasks"));
 const TaskCreation = lazy(() => import("./App/Pages/Tasks/TaskCreation"));
-const Management = lazy(() => import("./App/Pages/Management/Management"));
 const Settings = lazy(() => import("./App/Pages/Settings/Settings"));
 const FocusTimer = lazy(() => import("./App/Pages/FocusTimer/FocusTimer"));
 const ArchivePage = lazy(() => import("./App/Pages/Archive/Archive"));
@@ -94,7 +93,7 @@ function App() {
                   <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
                   <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
                   <Route path="/tasks/new" element={<ProtectedRoute><TaskCreation /></ProtectedRoute>} />
-                  <Route path="/management" element={<ProtectedRoute><Management /></ProtectedRoute>} />
+
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
                   <Route path="/documents/:id" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />

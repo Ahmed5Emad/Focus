@@ -144,7 +144,7 @@ export default function WorkspaceTab() {
       await refreshWorkspaces();
       setCreateSuccess('Workspace created successfully!');
       setNewWorkspaceName('');
-      if (data) setCurrentWorkspaceId(data);
+      if (data?.workspace_id) setCurrentWorkspaceId(data.workspace_id);
     } catch (error) {
       setCreateError(error instanceof Error ? error.message : 'Failed to create workspace');
     } finally {
@@ -159,12 +159,16 @@ export default function WorkspaceTab() {
     setInviteError('');
     setInviteSuccess('');
     try {
-      const { error } = await supabase.rpc('invite_user_to_workspace', {
+      const { data, error } = await supabase.rpc('invite_user_to_workspace', {
         p_email: inviteEmail.trim(),
         p_workspace_id: currentWorkspaceId,
         p_role: inviteRole,
       });
       if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) {
+        throw new Error(result.error ?? 'Failed to invite member');
+      }
       setInviteSuccess('Member invited successfully!');
       setInviteEmail('');
       await fetchMembers();
