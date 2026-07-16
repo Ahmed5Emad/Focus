@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, ArrowRight, FileText } from 'lucide-react';
+import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
