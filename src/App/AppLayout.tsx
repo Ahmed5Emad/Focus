@@ -133,7 +133,7 @@ export function AppLayout() {
             <TopBar onMenuClick={() => setMobileSheetOpen(true)} />
             
             <main id="main-content" className="flex-1 overflow-y-auto w-full relative">
-              <div className="w-full h-full px-4 md:px-[48px] pt-0 pb-6 flex flex-col">
+              <div className="w-full h-full px-4 md:px-[48px] pt-0 pb-6 flex flex-col min-h-0">
                 <PagePresence />
                 <Outlet />
               </div>

@@ -7,7 +7,7 @@ import {
   Link as LinkIcon, Highlighter, AlignLeft, AlignCenter, AlignRight,
   Undo, Redo, Download, FileText, FileType,
 } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -21,10 +21,10 @@ function ToolbarButton({ onClick, active, children, title }: ToolbarButtonProps)
     <button
       onClick={onClick}
       title={title}
-      className={`p-1 sm:p-1.5 rounded-md transition-colors ${
+      className={`p-1 sm:p-1.5 rounded-md transition-colors cursor-pointer ${
         active
-          ? "bg-cu-purple/10 text-cu-purple"
-          : "text-muted-foreground hover:bg-muted"
+          ? "bg-cu-purple text-white shadow-sm"
+          : "text-muted-foreground hover:bg-muted active:bg-muted/80"
       }`}
     >
       {children}
@@ -45,6 +45,17 @@ interface ToolbarProps {
 
 export function Toolbar({ editor, onExportMarkdown, onExportPDF, onExportHTML }: ToolbarProps) {
   const [showExport, setShowExport] = useState(false);
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const update = () => forceUpdate(n => n + 1);
+    editor.on("selectionUpdate", update);
+    editor.on("transaction", update);
+    return () => {
+      editor.off("selectionUpdate", update);
+      editor.off("transaction", update);
+    };
+  }, [editor]);
 
   const addLink = useCallback(() => {
     const url = window.prompt("Enter URL:");

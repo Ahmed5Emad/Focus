@@ -434,7 +434,7 @@ export default function Chat() {
         confirmLabel="Clear"
         destructive
       />
-      <div className="flex flex-col w-full h-full min-h-0 pt-4">
+      <div className="flex flex-col w-full flex-1 min-h-0 pt-4">
 
       <div className="flex-1 flex flex-col md:flex-row rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-border bg-card overflow-hidden min-h-0 relative">
         {/* Mobile sidebar - slides in from right within the card */}

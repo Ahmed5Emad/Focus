@@ -1,9 +1,10 @@
 import { Settings as SettingsIcon, User, Sliders, Bell, Briefcase } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList } from '@/components/ui/tabs';
 import AccountTab from './components/AccountTab';
 import PreferencesTab from './components/PreferencesTab';
 import NotificationsTab from './components/NotificationsTab';
 import WorkspaceTab from './components/WorkspaceTab';
+import SettingsTabTrigger from './components/SettingsTabTrigger';
 
 export default function Settings() {
   return (
@@ -18,22 +19,10 @@ export default function Settings() {
 
       <Tabs defaultValue="workspace" className="w-full">
         <TabsList className="mb-3 bg-muted/50 p-[3px] flex-nowrap overflow-x-auto scrollbar-none">
-          <TabsTrigger value="account" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
-            <User className="w-3 h-3 md:w-5 md:h-5" />
-            Account
-          </TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
-            <Sliders className="w-3 h-3 md:w-5 md:h-5" />
-            Preferences
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
-            <Bell className="w-3 h-3 md:w-5 md:h-5" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="workspace" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
-            <Briefcase className="w-3 h-3 md:w-5 md:h-5" />
-            Workspace
-          </TabsTrigger>
+          <SettingsTabTrigger value="account" icon={User} label="Account" />
+          <SettingsTabTrigger value="preferences" icon={Sliders} label="Preferences" />
+          <SettingsTabTrigger value="notifications" icon={Bell} label="Notifications" />
+          <SettingsTabTrigger value="workspace" icon={Briefcase} label="Workspace" />
         </TabsList>
 
         <TabsContent value="account" className="space-y-6">
