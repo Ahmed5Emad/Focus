@@ -8,10 +8,17 @@
     <script>
       (function() {
         try {
+          var isDark = false;
           var t = localStorage.getItem('focus-theme');
           if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            isDark = true;
             document.documentElement.classList.add('dark');
           }
+          var s = document.createElement('style');
+          s.textContent = isDark
+            ? 'html,body{background-color:#030712;color:#e2e8f0}'
+            : 'html,body{background-color:#ffffff;color:#030712}';
+          document.head.appendChild(s);
         } catch(e) {}
       })();
     </script>
