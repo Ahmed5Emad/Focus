@@ -95,12 +95,12 @@ export default function AccountTab() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
+      <div className="lg:col-span-2 space-y-3 md:space-y-6">
+        <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+          <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-6">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
+              <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Profile Information</h3>
@@ -125,8 +125,8 @@ export default function AccountTab() {
               <Skeleton className="h-10 w-28 rounded-lg" />
             </div>
           ) : (
-            <div className="space-y-5">
-              <div className="space-y-1">
+            <div className="space-y-3 md:space-y-5">
+              <div className="space-y-0.5 md:space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
                 <Input
                   value={user?.email ?? ''}
@@ -135,7 +135,7 @@ export default function AccountTab() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5 md:space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Display Name</Label>
                 <Input
                   value={profile?.display_name ?? ''}
@@ -145,7 +145,7 @@ export default function AccountTab() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5 md:space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Avatar URL</Label>
                 <Input
                   value={profile?.avatar_url ?? ''}
@@ -179,11 +179,11 @@ export default function AccountTab() {
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
+      <div className="space-y-3 md:space-y-6">
+        <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
           <div className="flex flex-col items-center text-center">
-            <div className="relative mb-4">
-              <Avatar className="w-24 h-24">
+            <div className="relative mb-2 md:mb-4">
+              <Avatar className="w-16 h-16 md:w-24 md:h-24">
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="text-2xl bg-cu-purple/10 text-primary">
                   {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
@@ -195,8 +195,8 @@ export default function AccountTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-          <h3 className="text-lg font-semibold mb-2">Account Info</h3>
+        <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+          <h3 className="text-sm md:text-lg font-semibold mb-1 md:mb-2">Account Info</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">User ID</span>
@@ -209,9 +209,9 @@ export default function AccountTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border border-destructive/20">
-          <h3 className="text-lg font-semibold text-destructive mb-2">Danger Zone</h3>
-          <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data.</p>
+        <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border border-destructive/20">
+          <h3 className="text-sm md:text-lg font-semibold text-destructive mb-1 md:mb-2">Danger Zone</h3>
+          <p className="text-xs md:text-sm text-muted-foreground mb-2 md:mb-4">Permanently delete your account and all associated data.</p>
           <Button onClick={() => setDeleteConfirmOpen(true)} variant="destructive" className="w-full">
             <Trash2 className="w-4 h-4 mr-2" />
             Delete Account

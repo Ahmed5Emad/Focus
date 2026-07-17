@@ -7,7 +7,7 @@ import WorkspaceTab from './components/WorkspaceTab';
 
 export default function Settings() {
   return (
-    <div className="page-container pt-6 px-4 sm:px-6">
+    <div className="page-container pt-4 px-2 sm:px-6">
       <div className="flex flex-col gap-1">
         <h1 className="page-title flex items-center gap-3 text-xl sm:text-2xl md:text-3xl">
           <SettingsIcon className="w-6 h-6 sm:w-8 sm:h-8 text-cu-purple" />

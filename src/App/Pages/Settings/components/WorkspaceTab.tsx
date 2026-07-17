@@ -248,11 +248,11 @@ export default function WorkspaceTab() {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold">General Info</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6">
+        <div className="lg:col-span-4 space-y-3 md:space-y-6">
+          <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+            <div className="flex items-center justify-between mb-2 md:mb-4">
+              <h3 className="text-base md:text-xl font-semibold">General Info</h3>
               {canManageWorkspace && (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
@@ -264,21 +264,21 @@ export default function WorkspaceTab() {
               )}
             </div>
 
-            <div className="flex flex-col items-center mb-6">
+            <div className="flex flex-col items-center mb-3 md:mb-6">
               <div className="relative group">
-                <div className="w-24 h-24 rounded-2xl bg-muted border-2 border-dashed border-border flex items-center justify-center overflow-hidden transition-all group-hover:border-primary">
-                  <Camera className="text-muted-foreground w-8 h-8 group-hover:text-primary transition-colors" />
+                <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-muted border-2 border-dashed border-border flex items-center justify-center overflow-hidden transition-all group-hover:border-primary">
+                  <Camera className="text-muted-foreground w-6 h-6 md:w-8 md:h-8 group-hover:text-primary transition-colors" />
                 </div>
-                <button className="absolute -bottom-2 -right-2 p-2 bg-primary text-primary-foreground rounded-lg shadow-lg active:scale-90 transition-transform">
-                  <Edit2 className="w-4 h-4" />
+                <button className="absolute -bottom-2 -right-2 p-1.5 md:p-2 bg-primary text-primary-foreground rounded-lg shadow-lg active:scale-90 transition-transform">
+                  <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                 </button>
               </div>
-              <p className="text-xs font-bold uppercase tracking-wider mt-4 text-muted-foreground">Workspace Icon</p>
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider mt-2 md:mt-4 text-muted-foreground">Workspace Icon</p>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace Name</Label>
+            <div className="space-y-2 md:space-y-4">
+              <div className="space-y-0.5 md:space-y-1">
+                <Label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace Name</Label>
                 <div className="flex gap-2">
                   <Input
                     className="w-full bg-muted/50"
@@ -299,8 +299,8 @@ export default function WorkspaceTab() {
                   )}
                 </div>
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace URL</Label>
+              <div className="space-y-0.5 md:space-y-1">
+                <Label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace URL</Label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 bg-muted text-muted-foreground text-sm">
                     app.pro.com/
@@ -316,9 +316,9 @@ export default function WorkspaceTab() {
             </div>
           </div>
 
-          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-            <h3 className="text-xl font-semibold mb-4">Create Workspace</h3>
-            <form onSubmit={handleCreateWorkspace} className="space-y-4">
+          <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+            <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4">Create Workspace</h3>
+            <form onSubmit={handleCreateWorkspace} className="space-y-2 md:space-y-4">
               <div className="space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">New Workspace Name</Label>
                 <Input
@@ -347,21 +347,21 @@ export default function WorkspaceTab() {
           </div>
         </div>
 
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="lg:col-span-8 space-y-3 md:space-y-6">
+          <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 md:gap-3 mb-3 md:mb-6">
               <div>
-                <h3 className="text-xl font-semibold">Invite Members</h3>
-                <p className="text-sm text-muted-foreground">Add new collaborators to your workspace.</p>
+                <h3 className="text-base md:text-xl font-semibold">Invite Members</h3>
+                <p className="text-xs md:text-sm text-muted-foreground">Add new collaborators to your workspace.</p>
               </div>
-              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
+              <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/10 text-primary rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
                 New Invites
               </span>
             </div>
 
-            <form onSubmit={handleInviteMember} className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end bg-muted/30 p-4 rounded-xl border">
-              <div className="sm:col-span-6 space-y-1">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</Label>
+            <form onSubmit={handleInviteMember} className="grid grid-cols-1 sm:grid-cols-12 gap-2 md:gap-4 items-end bg-muted/30 p-2.5 md:p-4 rounded-xl border">
+              <div className="sm:col-span-6 space-y-0.5 md:space-y-1">
+                <Label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</Label>
                 <Input
                   type="email"
                   placeholder="colleague@company.com"
@@ -371,8 +371,8 @@ export default function WorkspaceTab() {
                   className="bg-background"
                 />
               </div>
-              <div className="sm:col-span-3 space-y-1">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</Label>
+              <div className="sm:col-span-3 space-y-0.5 md:space-y-1">
+                <Label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</Label>
                 <Dropdown
                   value={inviteRole}
                   onValueChange={(val) => val && setInviteRole(val)}
@@ -398,8 +398,8 @@ export default function WorkspaceTab() {
             {inviteError && <p className="text-sm text-destructive mt-2">{inviteError}</p>}
             {inviteSuccess && <p className="text-sm text-cu-green mt-2">{inviteSuccess}</p>}
 
-            <div className="mt-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Current Members</h4>
+            <div className="mt-3 md:mt-6">
+              <h4 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2 md:mb-4">Current Members</h4>
 
               {isLoadingMembers ? (
                 <div className="space-y-2">
@@ -475,14 +475,14 @@ export default function WorkspaceTab() {
             </div>
           </div>
 
-          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                <Folder className="w-6 h-6" />
+          <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-6">
+              <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <Folder className="w-4 h-4 md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Latest Projects</h3>
-                <p className="text-sm text-muted-foreground">Recent activity and milestone tracking.</p>
+                <h3 className="text-base md:text-xl font-semibold">Latest Projects</h3>
+                <p className="text-xs md:text-sm text-muted-foreground">Recent activity and milestone tracking.</p>
               </div>
             </div>
 
@@ -524,9 +524,9 @@ export default function WorkspaceTab() {
             destructive
           />
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-6">
-            <Button variant="outline" className="w-full sm:w-auto px-6" onClick={() => { if (currentWorkspace) setWorkspaceName(currentWorkspace.name); }}>Discard Changes</Button>
-            <Button className="w-full sm:w-auto px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={handleRenameWorkspace}>Save Configuration</Button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 md:gap-3 pt-3 md:pt-6">
+            <Button variant="outline" className="w-full sm:w-auto px-4 md:px-6 text-xs md:text-sm" onClick={() => { if (currentWorkspace) setWorkspaceName(currentWorkspace.name); }}>Discard Changes</Button>
+            <Button className="w-full sm:w-auto px-4 md:px-8 text-xs md:text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={handleRenameWorkspace}>Save Configuration</Button>
           </div>
         </div>
       </div>

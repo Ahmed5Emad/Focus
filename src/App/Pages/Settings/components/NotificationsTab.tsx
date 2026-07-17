@@ -55,26 +55,26 @@ export default function NotificationsTab() {
   }, [user]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-primary" />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
+      <div className="bg-card rounded-xl p-3 sm:p-6 shadow-sm border">
+        <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-6">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
+            <Bell className="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Email & Push Notifications</h3>
-            <p className="text-sm text-muted-foreground">Control how and when you receive notifications.</p>
+            <h3 className="text-sm md:text-lg font-semibold">Email & Push Notifications</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">Control how and when you receive notifications.</p>
           </div>
         </div>
 
         {notifPrefsLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
+          <div className="space-y-3 md:space-y-4">
+            <Skeleton className="h-9 md:h-12 w-full rounded-lg" />
+            <Skeleton className="h-9 md:h-12 w-full rounded-lg" />
+            <Skeleton className="h-9 md:h-12 w-full rounded-lg" />
           </div>
         ) : notifPrefs ? (
-          <div className="space-y-5">
+          <div className="space-y-3 md:space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <p className="text-sm font-medium">Email notifications</p>
