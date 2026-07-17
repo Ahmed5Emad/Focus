@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, User, Sliders, Bell, Briefcase } from 'lucide-react';
+import { Settings as SettingsIcon, User, Toggles, Bell, Briefcase } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountTab from './components/AccountTab';
 import PreferencesTab from './components/PreferencesTab';
@@ -17,22 +17,22 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-3 bg-muted/50 p-[3px] flex-wrap">
-          <TabsTrigger value="account" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
-            <User className="w-3.5 h-3.5 md:w-5 md:h-5" />
-            Account
+        <TabsList className="mb-3 bg-muted/50 p-[3px] flex-nowrap overflow-x-auto scrollbar-none gap-0.5 md:gap-0">
+          <TabsTrigger value="account" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
+            <User className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Account</span>
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
-            <Sliders className="w-3.5 h-3.5 md:w-5 md:h-5" />
-            Preferences
+          <TabsTrigger value="preferences" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
+            <Toggles className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Preferences</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
-            <Bell className="w-3.5 h-3.5 md:w-5 md:h-5" />
-            Notifications
+          <TabsTrigger value="notifications" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
+            <Bell className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Notifications</span>
           </TabsTrigger>
-          <TabsTrigger value="workspace" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
-            <Briefcase className="w-3.5 h-3.5 md:w-5 md:h-5" />
-            Workspace
+          <TabsTrigger value="workspace" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
+            <Briefcase className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Workspace</span>
           </TabsTrigger>
         </TabsList>
 
