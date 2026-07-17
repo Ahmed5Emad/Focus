@@ -15,16 +15,17 @@
             document.documentElement.classList.add('dark');
           }
           var s = document.createElement('style');
-          s.textContent = isDark
+          s.textContent = (isDark
             ? 'html,body{background-color:#030712;color:#e2e8f0}'
-            : 'html,body{background-color:#ffffff;color:#030712}';
+            : 'html,body{background-color:#ffffff;color:#030712}')
+            + 'html,body{min-height:100dvh;margin:0}#root{min-height:100dvh;display:flex;align-items:center;justify-content:center}#loading{width:24px;height:24px;border:2px solid ' + (isDark?'#334155':'#e2e8f0') + ';border-top-color:' + (isDark?'#7b68ee':'#7b68ee') + ';border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}';
           document.head.appendChild(s);
         } catch(e) {}
       })();
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="loading"></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
