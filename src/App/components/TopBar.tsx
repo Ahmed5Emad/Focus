@@ -55,7 +55,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full flex justify-center pt-1 md:pt-4 pb-0">
+    <header className="sticky top-0 z-40 w-full flex justify-center pt-2 md:pt-4 pb-0">
           <div className="w-full px-4 md:px-[48px]">
         <div className="bg-card/60 backdrop-blur-xl border border-border/20 rounded-xl md:rounded-2xl flex items-center justify-between px-3 md:px-6 py-1.5 md:py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] gap-2">
           <button

@@ -359,7 +359,7 @@ export default function WorkspaceTab() {
               </span>
             </div>
 
-            <form onSubmit={handleInviteMember} className="flex flex-col sm:grid sm:grid-cols-12 gap-4 items-end bg-muted/30 p-4 rounded-xl border">
+            <form onSubmit={handleInviteMember} className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end bg-muted/30 p-4 rounded-xl border">
               <div className="sm:col-span-6 space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</Label>
                 <Input
