@@ -17,22 +17,22 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-3 bg-muted/50 p-[3px] flex-nowrap overflow-x-auto scrollbar-none gap-0.5 md:gap-0">
-          <TabsTrigger value="account" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
-            <User className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Account</span>
+        <TabsList className="mb-3 bg-muted/50 p-[3px] flex-nowrap overflow-x-auto scrollbar-none">
+          <TabsTrigger value="account" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
+            <User className="w-3 h-3 md:w-5 md:h-5" />
+            Account
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
-            <Sliders className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Preferences</span>
+          <TabsTrigger value="preferences" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
+            <Sliders className="w-3 h-3 md:w-5 md:h-5" />
+            Preferences
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
-            <Bell className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Notifications</span>
+          <TabsTrigger value="notifications" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
+            <Bell className="w-3 h-3 md:w-5 md:h-5" />
+            Notifications
           </TabsTrigger>
-          <TabsTrigger value="workspace" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
-            <Briefcase className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Workspace</span>
+          <TabsTrigger value="workspace" className="gap-0.5 md:gap-3 px-1.5 md:px-4 py-1 md:py-2 text-[11px] md:text-base shrink-0">
+            <Briefcase className="w-3 h-3 md:w-5 md:h-5" />
+            Workspace
           </TabsTrigger>
         </TabsList>
 
