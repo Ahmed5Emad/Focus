@@ -55,20 +55,20 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full flex justify-center pt-2 md:pt-4 pb-0">
+    <header className="sticky top-0 z-40 w-full flex justify-center pt-1 md:pt-4 pb-0">
           <div className="w-full px-4 md:px-[48px]">
-        <div className="bg-card/60 backdrop-blur-xl border border-border/20 rounded-xl md:rounded-2xl flex items-center justify-between px-3 md:px-6 py-2 md:py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] gap-2">
+        <div className="bg-card/60 backdrop-blur-xl border border-border/20 rounded-xl md:rounded-2xl flex items-center justify-between px-3 md:px-6 py-1.5 md:py-2.5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] gap-2">
           <button
             onClick={onMenuClick}
-            className="md:hidden flex items-center justify-center min-h-9 min-w-9 p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="md:hidden flex items-center justify-center min-h-8 min-w-8 p-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Toggle sidebar"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-4 h-4 md:w-5 md:h-5" />
           </button>
           <button
             data-search-trigger
             onClick={() => setPaletteOpen(true)}
-            className="flex items-center gap-2 md:gap-3 bg-card/50 transition-all duration-300 px-3 md:px-6 py-2 md:py-2.5 rounded-full border border-border/40 text-muted-foreground text-sm group cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary hover:scale-[1.01] active:scale-[0.99] flex-1 min-w-0 max-w-[600px]"
+            className="flex items-center gap-2 md:gap-3 bg-card/50 transition-all duration-300 px-3 md:px-6 py-1.5 md:py-2.5 rounded-full border border-border/40 text-muted-foreground text-sm group cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary hover:scale-[1.01] active:scale-[0.99] flex-1 min-w-0 max-w-[600px]"
           >
             <Search className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
             <span className="font-medium hidden sm:inline truncate">Search anything...</span>
@@ -80,14 +80,14 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           </button>
           <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
-          <div className="flex items-center gap-1 md:gap-[12px] shrink-0">
+          <div className="flex items-center gap-0.5 md:gap-[12px] shrink-0">
             <ThemeToggle />
-            <button onClick={() => navigate('/focus-timer')} className="min-h-9 min-w-9 md:min-h-10 md:min-w-10 flex items-center justify-center p-1.5 md:p-2 rounded-xl transition-colors text-muted-foreground cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open focus timer">
+            <button onClick={() => navigate('/focus-timer')} className="min-h-8 min-w-8 md:min-h-10 md:min-w-10 flex items-center justify-center p-1 md:p-2 rounded-xl transition-colors text-muted-foreground cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open focus timer">
               <Timer className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
             </button>
             <Popover open={notifOpen} onOpenChange={(open) => { setNotifOpen(open); if (open) markAllAsSeen(); }}>
               <PopoverTrigger asChild>
-                <button className="min-h-9 min-w-9 md:min-h-10 md:min-w-10 flex items-center justify-center p-1.5 md:p-2 rounded-xl transition-colors text-muted-foreground relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open notifications">
+                <button className="min-h-8 min-w-8 md:min-h-10 md:min-w-10 flex items-center justify-center p-1 md:p-2 rounded-xl transition-colors text-muted-foreground relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open notifications">
                   <BellRing className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[16px] md:min-w-[18px] h-[16px] md:h-[18px] flex items-center justify-center bg-rose-500 text-white text-[9px] md:text-[10px] font-bold rounded-full px-1 shadow-sm border-2 border-background">
@@ -182,8 +182,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-9 h-9 rounded-full border-2 border-border/60 overflow-hidden bg-card/50 transition-all shadow-sm flex items-center justify-center cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open user menu">
-                  <Avatar className="size-9">
+                <button className="w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-border/60 overflow-hidden bg-card/50 transition-all shadow-sm flex items-center justify-center cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Open user menu">
+                  <Avatar className="size-8 md:size-9">
                     <AvatarFallback className="bg-purple-100 text-purple-700 text-xs font-semibold">
                       {user?.email?.charAt(0).toUpperCase() ?? <User className="w-4 h-4" />}
                     </AvatarFallback>

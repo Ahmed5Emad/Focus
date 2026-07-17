@@ -1,15 +1,15 @@
 import { Toaster as SonnerToaster } from "sonner";
+import { useTheme } from "@/hooks/useTheme";
 
 export function Toaster() {
+  const { theme } = useTheme();
+
   return (
     <SonnerToaster
+      theme={theme}
       position="top-right"
       toastOptions={{
-        style: {
-          background: "#fff",
-          border: "1px solid #e2e8f0",
-          color: "#0f172a",
-        },
+        className: "!bg-card !border-border !text-foreground shadow-lg",
       }}
     />
   );

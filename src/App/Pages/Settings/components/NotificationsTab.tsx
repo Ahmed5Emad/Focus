@@ -56,9 +56,9 @@ export default function NotificationsTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-card rounded-xl p-6 shadow-sm border">
+      <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
             <Bell className="w-5 h-5 text-primary" />
           </div>
           <div>
@@ -75,7 +75,7 @@ export default function NotificationsTab() {
           </div>
         ) : notifPrefs ? (
           <div className="space-y-5">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <p className="text-sm font-medium">Email notifications</p>
                 <p className="text-xs text-muted-foreground">Receive notifications via email.</p>
@@ -85,7 +85,7 @@ export default function NotificationsTab() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <p className="text-sm font-medium">Push notifications</p>
                 <p className="text-xs text-muted-foreground">Receive push notifications in-app.</p>
@@ -95,7 +95,7 @@ export default function NotificationsTab() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <p className="text-sm font-medium">Digest frequency</p>
                 <p className="text-xs text-muted-foreground">How often to receive digest emails.</p>
@@ -109,7 +109,7 @@ export default function NotificationsTab() {
                   { value: "weekly", label: "Weekly" },
                 ]}
                 showSearch={false}
-                triggerClassName="w-40 h-9 text-sm"
+                triggerClassName="w-full sm:w-40 h-9 text-sm"
               />
             </div>
 

@@ -7,9 +7,9 @@ export default function PreferencesTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-card rounded-xl p-6 shadow-sm border">
+      <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
             <ListChecks className="w-5 h-5 text-primary" />
           </div>
           <div>
@@ -19,7 +19,7 @@ export default function PreferencesTab() {
         </div>
 
         <div className="space-y-5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Default status for new tasks</p>
               <p className="text-xs text-muted-foreground">Tasks created without explicit status will use this.</p>
@@ -29,11 +29,11 @@ export default function PreferencesTab() {
               onValueChange={(val) => val && updatePreference('defaultTaskStatus', val)}
               options={[{ value: "todo", label: "To Do" }, { value: "in_progress", label: "In Progress" }]}
               showSearch={false}
-              triggerClassName="w-40 h-9 text-sm"
+              triggerClassName="w-full sm:w-40 h-9 text-sm"
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Auto-assign to self</p>
               <p className="text-xs text-muted-foreground">New tasks are automatically assigned to you.</p>
@@ -43,7 +43,7 @@ export default function PreferencesTab() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Auto-archive completed tasks</p>
               <p className="text-xs text-muted-foreground">Hide completed tasks after 7 days.</p>
@@ -53,7 +53,7 @@ export default function PreferencesTab() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Show completed tasks</p>
               <p className="text-xs text-muted-foreground">Display completed tasks in the task list.</p>
@@ -65,9 +65,9 @@ export default function PreferencesTab() {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl p-6 shadow-sm border">
+      <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
             <Folder className="w-5 h-5 text-primary" />
           </div>
           <div>
@@ -77,7 +77,7 @@ export default function PreferencesTab() {
         </div>
 
         <div className="space-y-5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Default project view</p>
               <p className="text-xs text-muted-foreground">Choose the default layout for projects.</p>
@@ -87,11 +87,11 @@ export default function PreferencesTab() {
               onValueChange={(val) => val && updatePreference('defaultProjectView', val)}
               options={[{ value: "list", label: "List" }, { value: "board", label: "Board" }]}
               showSearch={false}
-              triggerClassName="w-40 h-9 text-sm"
+              triggerClassName="w-full sm:w-40 h-9 text-sm"
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-medium">Auto-close completed projects</p>
               <p className="text-xs text-muted-foreground">Mark projects as completed when all tasks are done.</p>

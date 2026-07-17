@@ -40,6 +40,8 @@ export interface TaskTemplate {
   task_description?: string;
   task_priority: string;
   subtask_templates: Array<{ title: string }>;
+  project_id?: string | null;
+  due_date?: string | null;
   created_at: string;
   created_by: string;
 }
@@ -586,7 +588,7 @@ export function useTasks() {
         .eq('id', taskId);
 
       if (error) throw error;
-      setTasks(tasks.filter(t => t.id !== taskId));
+      setTasks(prev => prev.filter(t => t.id !== taskId));
       return true;
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -603,18 +605,17 @@ export function useTasks() {
 
       if (error) throw error;
 
-      const restoredTask = tasks.find(t => t.id === taskId);
-      if (restoredTask) {
-        setTasks([...tasks, { ...restoredTask, is_archived: false }]);
-      } else {
-        const { data } = await supabase
-          .from('tasks')
-          .select('*, projects(title), goals!tasks_goal_id_fkey(title)')
-          .eq('id', taskId)
-          .single();
-        if (data) {
-          setTasks([...tasks, data as Task]);
-        }
+      const { data } = await supabase
+        .from('tasks')
+        .select('*, projects(title), goals!tasks_goal_id_fkey(title)')
+        .eq('id', taskId)
+        .single();
+
+      if (data) {
+        setTasks(prev => {
+          if (prev.some(t => t.id === taskId)) return prev;
+          return [...prev, data as Task];
+        });
       }
       return true;
     } catch (error) {
@@ -776,6 +777,7 @@ export function useTasks() {
           status: 'todo',
           workspace_id: currentWorkspaceId,
           template_id: templateId,
+          user_id: user?.id,
         }])
         .select()
         .single();

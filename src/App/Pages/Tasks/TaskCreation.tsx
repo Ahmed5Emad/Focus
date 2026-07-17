@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Calendar, Folder, CornerDownLeft, Sparkles, ListChecks, User, FileText } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { type Priority } from "@/hooks/useTasks";
@@ -55,6 +55,7 @@ export default function TaskCreation() {
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [supabase] = useState(() => createClient());
 
   useEffect(() => {
@@ -62,6 +63,26 @@ export default function TaskCreation() {
       setSelectedAssigneeId(user.id);
     }
   }, [preferences.autoAssignToSelf, user]);
+
+  useEffect(() => {
+    const state = location.state as Record<string, unknown> | null;
+    if (state?.templateTitle) {
+      setInputValue(state.templateTitle as string);
+      if (state.templatePriority && (state.templatePriority as string) !== "none") {
+        setSelectedPriority(state.templatePriority as Priority);
+      }
+      if (state.templateProjectId) {
+        setSelectedProjectId(state.templateProjectId as string);
+      }
+      if (state.templateDueDate) {
+        const parsed = new Date(state.templateDueDate as string);
+        if (!isNaN(parsed.getTime())) {
+          setDueDate(parsed);
+        }
+      }
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (!currentWorkspaceId) return;
@@ -148,6 +169,8 @@ export default function TaskCreation() {
             name: inputValue.trim(),
             task_title: inputValue.trim(),
             task_priority: selectedPriority,
+            project_id: selectedProjectId,
+            due_date: dueDate?.toISOString() ?? null,
             created_by: user.id,
           }]);
         if (templateError) {

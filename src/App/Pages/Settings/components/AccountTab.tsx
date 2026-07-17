@@ -97,9 +97,9 @@ export default function AccountTab() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-card rounded-xl p-6 shadow-sm border">
+        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-cu-purple/10 flex items-center justify-center">
               <User className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -166,7 +166,7 @@ export default function AccountTab() {
               <Button
                 onClick={handleSaveProfile}
                 disabled={profileSaving}
-                className="bg-primary hover:opacity-90 text-white"
+                className="bg-primary hover:opacity-90 text-white w-full sm:w-auto"
               >
                 {profileSaving ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
@@ -180,12 +180,12 @@ export default function AccountTab() {
       </div>
 
       <div className="space-y-6">
-        <div className="bg-card rounded-xl p-6 shadow-sm border">
+        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
           <div className="flex flex-col items-center text-center">
             <div className="relative mb-4">
               <Avatar className="w-24 h-24">
                 <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="text-2xl bg-[#f5f3ff] text-primary">
+                <AvatarFallback className="text-2xl bg-cu-purple/10 text-primary">
                   {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -195,12 +195,12 @@ export default function AccountTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-6 shadow-sm border">
+        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
           <h3 className="text-lg font-semibold mb-2">Account Info</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">User ID</span>
-              <span className="font-mono text-xs truncate max-w-[180px]">{user?.id}</span>
+              <span className="font-mono text-xs truncate max-w-[120px] sm:max-w-[180px]">{user?.id}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Email verified</span>
@@ -209,8 +209,8 @@ export default function AccountTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl p-6 shadow-sm border border-red-200">
-          <h3 className="text-lg font-semibold text-red-600 mb-2">Danger Zone</h3>
+        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border border-destructive/20">
+          <h3 className="text-lg font-semibold text-destructive mb-2">Danger Zone</h3>
           <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data.</p>
           <Button onClick={() => setDeleteConfirmOpen(true)} variant="destructive" className="w-full">
             <Trash2 className="w-4 h-4 mr-2" />

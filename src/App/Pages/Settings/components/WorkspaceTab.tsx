@@ -250,13 +250,13 @@ export default function WorkspaceTab() {
     <>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-card rounded-xl p-6 shadow-sm border">
+          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold">General Info</h3>
               {canManageWorkspace && (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="p-1.5 rounded-md text-red-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="p-1.5 rounded-md text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors"
                   title="Delete workspace"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function WorkspaceTab() {
             </div>
           </div>
 
-          <div className="bg-card rounded-xl p-6 shadow-sm border">
+          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
             <h3 className="text-xl font-semibold mb-4">Create Workspace</h3>
             <form onSubmit={handleCreateWorkspace} className="space-y-4">
               <div className="space-y-1">
@@ -348,19 +348,19 @@ export default function WorkspaceTab() {
         </div>
 
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-card rounded-xl p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <div>
                 <h3 className="text-xl font-semibold">Invite Members</h3>
                 <p className="text-sm text-muted-foreground">Add new collaborators to your workspace.</p>
               </div>
-              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
+              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
                 New Invites
               </span>
             </div>
 
-            <form onSubmit={handleInviteMember} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-muted/30 p-4 rounded-xl border">
-              <div className="md:col-span-6 space-y-1">
+            <form onSubmit={handleInviteMember} className="flex flex-col sm:grid sm:grid-cols-12 gap-4 items-end bg-muted/30 p-4 rounded-xl border">
+              <div className="sm:col-span-6 space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</Label>
                 <Input
                   type="email"
@@ -371,7 +371,7 @@ export default function WorkspaceTab() {
                   className="bg-background"
                 />
               </div>
-              <div className="md:col-span-3 space-y-1">
+              <div className="sm:col-span-3 space-y-1">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</Label>
                 <Dropdown
                   value={inviteRole}
@@ -384,7 +384,7 @@ export default function WorkspaceTab() {
                   triggerClassName="w-full h-10"
                 />
               </div>
-              <div className="md:col-span-3">
+              <div className="sm:col-span-3">
                 <Button type="submit" disabled={isInviting || !inviteEmail.trim() || !currentWorkspaceId} className="w-full">
                   {isInviting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -419,19 +419,19 @@ export default function WorkspaceTab() {
               ) : members.length > 0 ? (
                 <div className="space-y-2">
                   {members.map((member, idx) => (
-                    <div key={member.member_id ?? idx} className="flex items-center justify-between p-3 border bg-muted/20 rounded-lg">
+                    <div key={member.member_id ?? idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border bg-muted/20 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-bold uppercase">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-bold uppercase shrink-0">
                           {member.email.substring(0, 2)}
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-foreground">{member.email}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-medium text-foreground truncate">{member.email}</span>
                           <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
                             {member.role === 'owner' ? 'Owner' : member.role === 'sub admin' ? 'Sub Admin' : member.role.charAt(0).toUpperCase() + member.role.slice(1)} • Joined {new Date(member.joined_at).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 ml-11 sm:ml-0">
                         {member.role === 'owner' ? (
                           <span className="text-xs font-medium px-2 py-1 rounded-md border bg-background text-foreground capitalize">
                             Owner
@@ -455,7 +455,7 @@ export default function WorkspaceTab() {
                         {member.role !== 'owner' && currentUserRole && ['owner', 'admin', 'sub admin'].includes(currentUserRole) && (
                           <button
                             onClick={() => setRemoveConfirmMemberId(member.member_id)}
-                            className="p-1.5 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                            className="p-1.5 rounded-md text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-colors"
                             title="Remove member"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -475,7 +475,7 @@ export default function WorkspaceTab() {
             </div>
           </div>
 
-          <div className="bg-card rounded-xl p-6 shadow-sm border">
+          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                 <Folder className="w-6 h-6" />
@@ -498,16 +498,16 @@ export default function WorkspaceTab() {
                         <Folder className="w-4 h-4 text-primary" />
                         <span className="text-sm font-medium">{p.title}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">{p.status}</span>
-                        <button
-                          onClick={() => handleDeleteProject(p.id)}
-                          className="p-1.5 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                          title="Delete project"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs text-muted-foreground">{p.status}</span>
+                <button
+                  onClick={() => handleDeleteProject(p.id)}
+                  className="p-1.5 rounded-md text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  title="Delete project"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
                     </div>
                 ))}
               </div>
@@ -524,9 +524,9 @@ export default function WorkspaceTab() {
             destructive
           />
 
-          <div className="flex items-center justify-end gap-4 pt-6">
-            <Button variant="outline" className="px-6" onClick={() => { if (currentWorkspace) setWorkspaceName(currentWorkspace.name); }}>Discard Changes</Button>
-            <Button className="px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={handleRenameWorkspace}>Save Configuration</Button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-6">
+            <Button variant="outline" className="w-full sm:w-auto px-6" onClick={() => { if (currentWorkspace) setWorkspaceName(currentWorkspace.name); }}>Discard Changes</Button>
+            <Button className="w-full sm:w-auto px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={handleRenameWorkspace}>Save Configuration</Button>
           </div>
         </div>
       </div>
