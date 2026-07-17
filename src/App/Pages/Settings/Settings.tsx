@@ -17,21 +17,21 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-3 bg-muted/50 p-1 overflow-x-auto flex-nowrap md:flex-wrap scrollbar-thin">
-          <TabsTrigger value="account" className="gap-2">
-            <User className="w-4 h-4" />
+        <TabsList className="mb-3 bg-muted/50 p-[3px] overflow-x-auto flex-nowrap md:flex-wrap scrollbar-thin">
+          <TabsTrigger value="account" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
+            <User className="w-3.5 h-3.5 md:w-5 md:h-5" />
             Account
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-2">
-            <Sliders className="w-4 h-4" />
+          <TabsTrigger value="preferences" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
+            <Sliders className="w-3.5 h-3.5 md:w-5 md:h-5" />
             Preferences
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="w-4 h-4" />
+          <TabsTrigger value="notifications" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
+            <Bell className="w-3.5 h-3.5 md:w-5 md:h-5" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger value="workspace" className="gap-2">
-            <Briefcase className="w-4 h-4" />
+          <TabsTrigger value="workspace" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
+            <Briefcase className="w-3.5 h-3.5 md:w-5 md:h-5" />
             Workspace
           </TabsTrigger>
         </TabsList>
