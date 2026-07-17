@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, User, Toggles, Bell, Briefcase } from 'lucide-react';
+import { Settings as SettingsIcon, User, Sliders, Bell, Briefcase } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountTab from './components/AccountTab';
 import PreferencesTab from './components/PreferencesTab';
@@ -23,7 +23,7 @@ export default function Settings() {
             <span className="hidden sm:inline">Account</span>
           </TabsTrigger>
           <TabsTrigger value="preferences" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
-            <Toggles className="w-4 h-4 md:w-5 md:h-5" />
+            <Sliders className="w-4 h-4 md:w-5 md:h-5" />
             <span className="hidden sm:inline">Preferences</span>
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-1 md:gap-3 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base shrink-0">
