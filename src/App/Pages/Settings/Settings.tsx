@@ -7,17 +7,17 @@ import WorkspaceTab from './components/WorkspaceTab';
 
 export default function Settings() {
   return (
-    <div className="page-container pt-6">
+    <div className="page-container pt-6 px-4 sm:px-6">
       <div className="flex flex-col gap-1">
-        <h1 className="page-title flex items-center gap-3">
-          <SettingsIcon className="w-8 h-8 text-cu-purple" />
+        <h1 className="page-title flex items-center gap-3 text-xl sm:text-2xl md:text-3xl">
+          <SettingsIcon className="w-6 h-6 sm:w-8 sm:h-8 text-cu-purple" />
           Settings
         </h1>
         <p className="page-description">Manage your account, preferences, and workspace environments.</p>
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-3 bg-muted/50 p-1">
+        <TabsList className="mb-3 bg-muted/50 p-1 overflow-x-auto flex-nowrap md:flex-wrap scrollbar-thin">
           <TabsTrigger value="account" className="gap-2">
             <User className="w-4 h-4" />
             Account

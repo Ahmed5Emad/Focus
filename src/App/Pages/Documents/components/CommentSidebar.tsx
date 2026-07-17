@@ -242,7 +242,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
   const isOwnComment = (comment: Comment) => comment.user_id === user?.id;
 
   return (
-    <div className="w-80 bg-white rounded-2xl border border-border flex flex-col shrink-0 max-h-[calc(100vh-200px)]">
+    <div className="w-80 h-full bg-card lg:rounded-2xl border border-border flex flex-col shrink-0">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-cu-purple" />
@@ -250,7 +250,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
         </h3>
         <button
           onClick={() => onOpenChange(false)}
-          className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          className="p-1.5 sm:p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors min-h-8 min-w-8 flex items-center justify-center"
         >
           <X className="w-4 h-4" />
         </button>
@@ -303,8 +303,8 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
                   <div
                     className={`px-3 py-2 text-sm leading-relaxed rounded-2xl ${
                       isOwn
-                        ? "bg-cu-purple text-white"
-                        : "bg-white border border-slate-100 shadow-sm text-slate-900"
+                        ? "bg-cu-purple text-white rounded-br-sm"
+                        : "bg-muted text-foreground rounded-bl-sm"
                     } ${
                       highlightedComment === comment.id
                         ? isOwn
@@ -323,7 +323,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
       </div>
 
       <div className="border-t border-border px-4 py-3">
-        <div className="flex items-end gap-2 bg-[#f8f7fc] border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
+        <div className="flex items-end gap-2 bg-muted border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
           <MentionInput
             members={members}
             value={newComment}
@@ -337,7 +337,7 @@ export function CommentSidebar({ documentId, open, onOpenChange, editorRef }: Co
           <button
             onClick={handleSend}
             disabled={!newComment.trim() || sending}
-            className="shrink-0 rounded-lg bg-cu-purple hover:bg-cu-purple/90 text-white h-8 w-8 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="shrink-0 rounded-lg bg-cu-purple hover:bg-cu-purple/90 text-white h-9 w-9 sm:h-8 sm:w-8 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {sending ? (
               <Loader2 className="w-4 h-4" />

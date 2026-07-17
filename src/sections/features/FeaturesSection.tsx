@@ -47,28 +47,28 @@ const features = [
 
 function FeaturesSection() {
   return (
-    <section id="features" className="flex flex-col self-stretch px-4 md:px-16 lg:px-64 py-16 md:py-24 w-full gap-8 md:gap-16 items-center">
+    <section id="features" className="flex flex-col self-stretch px-4 md:px-16 lg:px-64 py-12 md:py-24 w-full gap-6 md:gap-16 items-center">
     
-        <div className="text-center gap-4 space-y-4">
-          <h2 className="text-3xl font-black tracking-tight text-foreground md:text-5xl">
+        <div className="text-center gap-3 md:gap-4 space-y-3 md:space-y-4">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-foreground">
             Everything You Need to Focus
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
             Not another tool to check — the central hub for your team's deep work. Tasks, docs, chat, and focus tools all in one place.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 w-full max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="flex flex-col gap-4 p-8 bg-card border border-border rounded-xl shadow-sm hover:bg-muted/50 transition-all"
+              className="flex flex-col gap-3 md:gap-4 p-5 md:p-8 bg-card border border-border rounded-xl shadow-sm hover:bg-muted/50 transition-all"
             >
-              <div className={"flex h-12 w-12 border border-border items-center shadow-[0_1px_2px_rgba(0,0,0,0.05)] justify-center rounded-lg " + feature.iconBgClass + " " + feature.iconColorClass}>
-                <feature.icon className="h-6 w-6" />
+              <div className={"flex h-10 w-10 md:h-12 md:w-12 border border-border items-center shadow-[0_1px_2px_rgba(0,0,0,0.05)] justify-center rounded-lg " + feature.iconBgClass + " " + feature.iconColorClass}>
+                <feature.icon className="h-5 w-5 md:h-6 md:w-6" />
               </div>
-              <div className="space-y-2">
-                <h3 className="font-bold text-xl leading-none tracking-tight text-foreground">
+              <div className="space-y-1.5 md:space-y-2">
+                <h3 className="font-bold text-lg md:text-xl leading-none tracking-tight text-foreground">
                   {feature.head}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">

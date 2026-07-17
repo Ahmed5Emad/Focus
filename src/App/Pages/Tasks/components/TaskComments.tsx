@@ -66,14 +66,14 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
 
   return (
     <div className="space-y-3">
-      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
         <MessageSquare className="w-3.5 h-3.5" />
         Comments ({comments.length})
       </h4>
 
       {isLoading ? (
         <div className="flex justify-center py-4">
-          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
         </div>
       ) : comments.length > 0 ? (
         <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -87,32 +87,32 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-700">
+                  <span className="text-xs font-semibold text-foreground">
                     {comment.profiles?.display_name ?? "Unknown"}
                   </span>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-muted-foreground">
                     {new Date(comment.created_at).toLocaleString()}
                   </span>
                   {comment.user_id === user?.id && (
                     <button
                       onClick={() => deleteComment(comment.id)}
-                      className="ml-auto p-1 text-slate-300 hover:text-red-500 rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      className="ml-auto p-1 text-muted-foreground hover:text-red-500 rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       aria-label="Delete comment"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
-                <p className="text-sm text-slate-600 mt-0.5 whitespace-pre-wrap">{comment.content}</p>
+                <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">{comment.content}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-slate-400 py-2">No comments yet.</p>
+        <p className="text-xs text-muted-foreground py-2">No comments yet.</p>
       )}
 
-      <div className="flex items-end gap-2 pt-2 border-t border-slate-100">
+      <div className="flex items-end gap-2 pt-2 border-t border-border">
         <MentionInput
           members={members}
           value={newComment}

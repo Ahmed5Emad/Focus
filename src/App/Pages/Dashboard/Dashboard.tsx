@@ -292,14 +292,14 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0 flex-wrap">
           <button
             onClick={() => navigate("/tasks/new")}
-            className="bg-white border border-slate-200 shadow-sm flex gap-2 items-center px-5 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="bg-white border border-slate-200 shadow-sm flex gap-1.5 md:gap-2 items-center px-3 md:px-5 py-2 md:py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Create quick task"
           >
             <Zap className="w-3 h-3.5 text-slate-600" />
-            <span className="font-semibold text-slate-700 text-xs tracking-[1px] uppercase">
+            <span className="font-semibold text-slate-700 text-[11px] md:text-xs tracking-[1px] uppercase whitespace-nowrap">
               Quick Task
             </span>
           </button>
@@ -307,11 +307,11 @@ export default function Dashboard() {
             onClick={() =>
               currentWorkspaceId && startSession(null, currentWorkspaceId)
             }
-            className="bg-linear-to-r from-[#8b5cf6] to-[#6366f1] hover:from-[#7c3aed] hover:to-[#4f46e5] text-white flex gap-2 items-center px-5 py-2.5 rounded-lg shadow-sm transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="bg-linear-to-r from-[#8b5cf6] to-[#6366f1] hover:from-[#7c3aed] hover:to-[#4f46e5] text-white flex gap-1.5 md:gap-2 items-center px-3 md:px-5 py-2 md:py-2.5 rounded-lg shadow-sm transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={sessionActive ? "Focus session active" : "Start focus session"}
           >
-            <Play className="w-3.5 h-3.5 fill-white" />
-            <span className="font-semibold text-xs tracking-[1px] uppercase">
+            <Play className="w-3 h-3.5 md:w-3.5 md:h-3.5 fill-white" />
+            <span className="font-semibold text-[11px] md:text-xs tracking-[1px] uppercase whitespace-nowrap">
               {sessionActive ? "Focusing…" : "Start Session"}
             </span>
           </button>
@@ -342,11 +342,11 @@ export default function Dashboard() {
                   <BrainCircuit className="w-5 h-5" />
                 </div>
               </div>
-              <div className="flex-1 flex items-center py-2">
-                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(123,104,238,0.35)]">
+                <div className="flex-1 flex items-center py-2">
+                <span className="font-bold text-slate-900 text-4xl sm:text-5xl md:text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(123,104,238,0.35)]">
                   {Math.round(stats?.avg_flow_score ?? 0)}
                 </span>
-                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">/100</span>
+                <span className="font-normal text-slate-400 text-base sm:text-lg leading-none ml-1 mt-2 md:mt-3">/100</span>
               </div>
               <div className="shrink-0 space-y-2">
                 <div className="bg-slate-100 h-1.5 rounded-2xl overflow-hidden">
@@ -389,7 +389,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 flex items-center py-2">
-                <span className="font-bold text-slate-900 text-3xl leading-none tracking-[-0.5px] drop-shadow-[0_4px_8px_rgba(16,185,129,0.35)]">
+                <span className="font-bold text-slate-900 text-xl sm:text-2xl md:text-3xl leading-none tracking-[-0.5px] drop-shadow-[0_4px_8px_rgba(16,185,129,0.35)]">
                   {formatDuration(stats?.today_deep_work_seconds)}
                 </span>
               </div>
@@ -444,10 +444,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 flex items-center py-2">
-                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(59,130,246,0.35)]">
+                <span className="font-bold text-slate-900 text-4xl sm:text-5xl md:text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(59,130,246,0.35)]">
                   {stats?.tasks_completed ?? 0}
                 </span>
-                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">/{stats?.tasks_total ?? 0}</span>
+                <span className="font-normal text-slate-400 text-base sm:text-lg leading-none ml-1 mt-2 md:mt-3">/{stats?.tasks_total ?? 0}</span>
               </div>
               <div className="shrink-0">
                 <Link to="/tasks" className="group flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
@@ -481,10 +481,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 flex items-center py-2">
-                <span className="font-bold text-slate-900 text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(249,115,22,0.35)]">
+                <span className="font-bold text-slate-900 text-4xl sm:text-5xl md:text-6xl leading-none tracking-[-1.5px] drop-shadow-[0_4px_8px_rgba(249,115,22,0.35)]">
                   {streak}
                 </span>
-                <span className="font-normal text-slate-400 text-lg leading-none ml-1 mt-3">{streak === 1 ? "day" : "days"}</span>
+                <span className="font-normal text-slate-400 text-base sm:text-lg leading-none ml-1 mt-2 md:mt-3">{streak === 1 ? "day" : "days"}</span>
               </div>
               <div className="shrink-0">
                 <p className="text-slate-500 text-sm">
@@ -563,7 +563,7 @@ export default function Dashboard() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                     {meta.label && (
                       <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                         {meta.label}
@@ -571,7 +571,7 @@ export default function Dashboard() {
                     )}
                     {due.label && (
                       <span
-                        className={`text-[12px] font-semibold px-2 py-0.5 rounded-md ${
+                        className={`text-[12px] font-semibold px-2 py-0.5 rounded-md whitespace-nowrap ${
                           due.urgent
                             ? "bg-red-50 text-red-600"
                             : "bg-slate-100 text-slate-600"

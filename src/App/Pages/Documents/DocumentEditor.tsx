@@ -98,7 +98,7 @@ export default function DocumentEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -107,8 +107,8 @@ export default function DocumentEditor() {
     return (
       <div className="page-container pt-6">
         <div className="flex flex-col items-center justify-center py-20">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Document not found</h2>
-          <p className="text-slate-500 mb-6">This document doesn't exist or you don't have access.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Document not found</h2>
+          <p className="text-muted-foreground mb-6">This document doesn't exist or you don't have access.</p>
           <Button onClick={() => { sessionStorage.removeItem("lastDocumentId"); navigate("/documents"); }} className="btn-primary">
             Back to Documents
           </Button>
@@ -118,18 +118,18 @@ export default function DocumentEditor() {
   }
 
   return (
-    <div className="page-container pt-6 h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col h-full w-full pt-2 sm:pt-4 pb-4 sm:pb-6">
+      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-3 shrink-0">
         <Button
           variant="ghost"
           onClick={() => { sessionStorage.removeItem("lastDocumentId"); navigate("/documents"); }}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-900"
+          className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground shrink-0 px-1 sm:px-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Documents
+          <span className="hidden sm:inline">Back to Documents</span>
         </Button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-2 ml-auto min-w-0 flex-shrink flex-nowrap overflow-x-auto scrollbar-none">
           <TaskLinkSelector
             documentId={id!}
             currentTaskId={taskId}
@@ -138,66 +138,66 @@ export default function DocumentEditor() {
           <Button
             variant="ghost"
             onClick={() => setShowComments(!showComments)}
-            className={`flex items-center gap-2 ${
+            className={`flex items-center gap-1 sm:gap-2 shrink-0 ${
               showComments
-                ? "text-primary bg-[#ede9fe]"
-                : "text-slate-500 hover:text-slate-900"
+                ? "text-primary bg-cu-purple/10"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <MessageSquare className="w-4 h-4" />
-            Comments
+            <span className="hidden sm:inline">Comments</span>
           </Button>
-          <span className="text-xs text-slate-400 italic">
+          <span className="hidden sm:inline text-xs text-muted-foreground italic whitespace-nowrap">
             Collaborators will see changes in real-time
           </span>
           {connection === "connected" ? (
             <div
-              className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium"
+              className="flex items-center gap-1 sm:gap-1.5 text-xs text-emerald-600 font-medium shrink-0"
               title="Realtime sync active"
             >
               <Wifi className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Synced</span>
+              <span className="hidden sm:inline">Synced</span>
             </div>
           ) : connection === "connecting" ? (
             <div
-              className="flex items-center gap-1.5 text-xs text-amber-600 font-medium"
+              className="flex items-center gap-1 sm:gap-1.5 text-xs text-amber-600 font-medium shrink-0"
               title="Connecting to realtime channel..."
             >
               <Wifi className="w-3.5 h-3.5 animate-pulse text-amber-500" />
-              <span>Connecting...</span>
+              <span className="hidden sm:inline">Connecting...</span>
             </div>
           ) : (
             <div
-              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium"
+              className="flex items-center gap-1 sm:gap-1.5 text-xs text-rose-600 font-medium shrink-0"
               title="Realtime connection lost. Edits will sync on reconnect."
             >
               <WifiOff className="w-3.5 h-3.5 text-rose-500" />
-              <span>Offline</span>
+              <span className="hidden sm:inline">Offline</span>
             </div>
           )}
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-muted-foreground shrink-0">
             {saveState === "saving" ? (
               <>
                 <Cloud className="w-3.5 h-3.5 animate-pulse text-primary" />
-                <span className="text-primary font-medium">Saving...</span>
+                <span className="hidden sm:inline text-primary font-medium">Saving...</span>
               </>
             ) : saveState === "unsaved" ? (
               <>
                 <CloudOff className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-amber-600 font-medium">Unsaved</span>
+                <span className="hidden sm:inline text-amber-600 font-medium">Unsaved</span>
               </>
             ) : (
               <>
                 <Cloud className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-emerald-600 font-medium">Saved</span>
+                <span className="hidden sm:inline text-emerald-600 font-medium">Saved</span>
               </>
             )}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 flex gap-3 min-h-0">
-        <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row lg:gap-4">
+        <div className="flex-1 min-h-0 min-w-0">
           <Editor
             documentId={id!}
             documentTitle={title}
@@ -206,13 +206,19 @@ export default function DocumentEditor() {
             editorRef={editorRef}
           />
         </div>
+
         {showComments && (
-          <CommentSidebar
-            documentId={id!}
-            open={showComments}
-            onOpenChange={setShowComments}
-            editorRef={editorRef}
-          />
+          <>
+            <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setShowComments(false)} />
+            <div className="fixed right-0 top-0 bottom-0 w-80 z-50 lg:relative lg:top-auto lg:bottom-auto lg:w-80 lg:z-auto lg:shrink-0 lg:h-full lg:min-h-0">
+              <CommentSidebar
+                documentId={id!}
+                open={showComments}
+                onOpenChange={setShowComments}
+                editorRef={editorRef}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

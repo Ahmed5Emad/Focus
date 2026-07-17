@@ -147,7 +147,7 @@ export default function Tasks() {
 
   return (
     <div className="page-container">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 pt-6">
         <div className="flex flex-col gap-1">
           <h1 className="page-title">Tasks</h1>
           <p className="page-description">
@@ -159,39 +159,39 @@ export default function Tasks() {
           <Button
             variant="outline"
             onClick={() => setTemplatesOpen(true)}
-            className="gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary h-9 md:h-10"
             aria-label="Open task templates"
           >
             <FileText className="w-4 h-4" />
-            <span className="font-semibold tracking-wide uppercase text-[12px]">Templates</span>
+            <span className="font-semibold tracking-wide uppercase text-[11px] md:text-[12px]">Templates</span>
           </Button>
           <Link to="/tasks/new">
-            <Button className="btn-primary">
+            <Button className="bg-linear-to-r from-[#7c3aed] to-[#4f46e5] hover:opacity-90 text-white shadow-lg shadow-purple-500/20 h-9 md:h-11 px-4 md:px-6 rounded-xl flex items-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              <span className="font-semibold tracking-wide uppercase text-[12px]">New Task</span>
+              <span className="font-semibold tracking-wide uppercase text-[11px] md:text-[12px]">New Task</span>
             </Button>
           </Link>
         </div>
       </div>
 
-        <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white p-2 flex flex-row flex-wrap items-center gap-2">
-        <div className="relative w-full md:w-48 md:shrink-0">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-          <Input
-            placeholder="Search tasks..."
-            className="pl-8 bg-white border-slate-100 focus:bg-white transition-all h-9 rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-border bg-card p-2">
+          <div className="relative w-full mb-2">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search tasks..."
+              className="pl-8 bg-muted/50 border-border focus:bg-card transition-all h-9 rounded-lg text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <div className="filter-tabs">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
+            <div className="filter-tabs shrink-0">
               {statusOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setStatusFilter(opt.value)}
-                className={`filter-tab text-sm px-2.5 py-1 ${
+                className={`filter-tab whitespace-nowrap px-2 sm:px-4 py-0.5 sm:py-2 text-[11px] sm:text-[14px] ${
                   statusFilter === opt.value
                     ? "filter-tab-active"
                     : "filter-tab-inactive"
@@ -210,8 +210,8 @@ export default function Tasks() {
             searchPlaceholder="Search projects..."
             emptyText="No project found."
             noneLabel="All Projects"
-            icon={<Folder className="w-3.5 h-3.5 text-primary" />}
-            triggerClassName="filter-tab filter-tab-inactive w-32 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+            icon={<Folder className="w-3 h-3 text-primary" />}
+            triggerClassName="shrink-0 flex items-center gap-1 text-[11px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors h-auto min-h-0"
           />
 
           <Dropdown
@@ -222,8 +222,8 @@ export default function Tasks() {
             searchPlaceholder="Search goals..."
             emptyText="No goal found."
             noneLabel="All Goals"
-            icon={<Target className="w-3.5 h-3.5 text-primary" />}
-            triggerClassName="filter-tab filter-tab-inactive w-32 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+            icon={<Target className="w-3 h-3 text-primary" />}
+            triggerClassName="shrink-0 flex items-center gap-1 text-[11px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors h-auto min-h-0"
           />
 
           <Dropdown
@@ -234,8 +234,8 @@ export default function Tasks() {
             searchPlaceholder="Search members..."
             emptyText="No member found."
             noneLabel="All Members"
-            icon={<User className="w-3.5 h-3.5 text-primary" />}
-            triggerClassName="filter-tab filter-tab-inactive w-32 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+            icon={<User className="w-3 h-3 text-primary" />}
+            triggerClassName="shrink-0 flex items-center gap-1 text-[11px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors h-auto min-h-0"
             renderOption={(option) => {
               const m = members.find(mem => mem.id === option.value);
               return (
@@ -250,35 +250,35 @@ export default function Tasks() {
             }}
           />
 
-          <div className="h-5 w-px bg-slate-200 mx-1" />
+          <div className="h-4 w-px bg-border mx-0.5 shrink-0" />
 
-          <div className="filter-tabs">
+          <div className="filter-tabs shrink-0">
             <button
               onClick={() => setViewMode("list")}
-              className={`filter-tab text-sm px-2 py-1 ${
+              className={`filter-tab px-1.5 sm:px-4 py-0.5 sm:py-2 ${
                 viewMode === "list" ? "filter-tab-active" : "filter-tab-inactive"
               } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
               aria-label="List view"
             >
-              <ListChecks className="w-4 h-4" />
+              <ListChecks className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("calendar")}
-              className={`filter-tab text-sm px-2 py-1 ${
+              className={`filter-tab px-1.5 sm:px-4 py-0.5 sm:py-2 ${
                 viewMode === "calendar" ? "filter-tab-active" : "filter-tab-inactive"
               } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
               aria-label="Calendar view"
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("kanban")}
-              className={`filter-tab text-sm px-2 py-1 ${
+              className={`filter-tab px-1.5 sm:px-4 py-0.5 sm:py-2 ${
                 viewMode === "kanban" ? "filter-tab-active" : "filter-tab-inactive"
               } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
               aria-label="Board view"
             >
-              <Columns3 className="w-4 h-4" />
+              <Columns3 className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
             </button>
           </div>
 
@@ -287,7 +287,7 @@ export default function Tasks() {
             onValueChange={(val) => setSortBy((val ?? "newest") as "newest" | "oldest" | "title")}
             options={SORT_OPTIONS}
             showSearch={false}
-            triggerClassName="filter-tab filter-tab-inactive w-28 h-auto border-0 bg-transparent hover:bg-transparent rounded-none px-0 py-0 text-sm"
+            triggerClassName="shrink-0 flex items-center gap-1 text-[11px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors h-auto min-h-0"
           />
         </div>
       </div>
@@ -298,9 +298,9 @@ export default function Tasks() {
         <KanbanBoard tasks={filteredTasks} onStatusChange={toggleTaskStatus} workflowStatuses={workflowStatuses} />
       ) : (
         <>
-          <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden">
+          <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-border bg-card overflow-hidden">
             {isLoading ? (
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-border">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-4 p-5">
                     <Skeleton className="w-6 h-6 rounded-lg shrink-0" />
@@ -329,11 +329,11 @@ export default function Tasks() {
                 );
               })()
             ) : (
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-border">
                 {visibleTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors relative"
+                    className="group flex items-center gap-3 md:gap-4 p-3 md:p-5 hover:bg-muted/40 transition-colors relative"
                   >
                     {task.status === "done" && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />
@@ -346,8 +346,8 @@ export default function Tasks() {
                         task.status === "done"
                           ? "bg-emerald-500 border-emerald-500 text-white"
                           : workflowStatuses.length > 0
-                            ? "border-slate-300 hover:border-primary bg-white"
-                            : "border-slate-300 hover:border-primary bg-white",
+                            ? "border-border hover:border-primary bg-card"
+                            : "border-border hover:border-primary bg-card",
                       )}
                       style={
                         workflowStatuses.length > 0 && task.status !== "done"
@@ -366,8 +366,8 @@ export default function Tasks() {
                       )}
                     </button>
 
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-0.5 md:gap-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
                         {task.priority && task.priority !== "none" && (
                           <span
                             className={cn(
@@ -381,10 +381,10 @@ export default function Tasks() {
                         )}
                         <h4
                           className={cn(
-                            "font-['Spline_Sans',sans-serif] text-[16px] leading-[1.3] font-semibold truncate",
+                            "font-['Spline_Sans',sans-serif] text-[14px] md:text-[16px] leading-[1.3] font-semibold truncate",
                             task.status === "done"
-                              ? "text-slate-600 line-through"
-                              : "text-slate-900",
+                              ? "text-muted-foreground line-through"
+                              : "text-foreground",
                           )}
                         >
                           {task.title}
@@ -395,7 +395,7 @@ export default function Tasks() {
                           const ws = workflowStatuses.find(s => s.name === task.status);
                           return (
                             <span
-                              className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                              className="px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider shrink-0"
                               style={ws ? { backgroundColor: ws.color + '20', color: ws.color } : { backgroundColor: '#eff6ff', color: '#2563eb' }}
                             >
                               {ws ? ws.name : "In Progress"}
@@ -403,48 +403,48 @@ export default function Tasks() {
                           );
                         })()}
                         {task.total_time_seconds ? (
-                          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
-                            <Timer className="w-3 h-3" />
+                          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] md:text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 shrink-0">
+                            <Timer className="w-2.5 h-2.5 md:w-3 md:h-3" />
                             {formatTrackedTime(task.total_time_seconds)}
                           </span>
                         ) : null}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <div className="flex flex-wrap items-center gap-x-3 md:gap-x-4 gap-y-0.5">
                         {task.assignee && (
-                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
+                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground">
                             <span className="relative inline-block">
-                              <Avatar className="w-4 h-4">
+                              <Avatar className="w-3.5 h-3.5 md:w-4 md:h-4">
                                 <AvatarImage src={task.assignee.avatar_url ?? undefined} />
                                 <AvatarFallback className="text-[7px]">{(task.assignee.display_name ?? "U").charAt(0).toUpperCase()}</AvatarFallback>
                               </Avatar>
                               {onlineUsers.has(task.assignee_id!) && (
-                                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 ring-1 ring-white" />
+                                <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 ring-1 ring-background" />
                               )}
                             </span>
-                            <span>{task.assignee.display_name}</span>
+                            <span className="truncate max-w-[80px] md:max-w-none">{task.assignee.display_name}</span>
                           </div>
                         )}
                         {task.projects?.title && (
-                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
-                            <Folder className="w-3.5 h-3.5 text-primary" />
-                            <span>{task.projects.title}</span>
+                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground">
+                            <Folder className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
+                            <span className="truncate max-w-[100px]">{task.projects.title}</span>
                           </div>
                         )}
                         {task.goals?.title && (
-                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
-                            <Target className="w-3.5 h-3.5 text-primary" />
-                            <span>{task.goals.title}</span>
+                          <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground">
+                            <Target className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
+                            <span className="truncate max-w-[100px]">{task.goals.title}</span>
                           </div>
                         )}
                         {task.due_date && (
                           <div className={cn(
-                            "flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal",
+                            "flex items-center gap-1.5 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal",
                             task.status !== "done" && new Date(task.due_date) < new Date(new Date().toDateString())
                               ? "text-red-500"
-                              : "text-slate-600",
+                              : "text-muted-foreground",
                           )}>
-                            <Calendar className="w-3.5 h-3.5" />
+                            <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
                             <span>
                               {new Date(task.due_date).toDateString() === new Date().toDateString()
                                 ? "Today"
@@ -452,42 +452,42 @@ export default function Tasks() {
                             </span>
                           </div>
                         )}
-                    <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
-                      <Calendar className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground">
+                      <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
                       <span>
                         {new Date(task.created_at).toLocaleDateString()}
                       </span>
                     </div>
                     {task.subtask_count ? (
-                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-400">
-                        <GitBranch className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground/70">
+                        <GitBranch className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         <span>{task.subtask_count}</span>
                       </div>
                     ) : null}
                     {task.dependency_count ? (
-                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-400">
-                        <Link2 className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground/70">
+                        <Link2 className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         <span>{task.dependency_count}</span>
                       </div>
                     ) : null}
                     {task.recurrence_rule && (
-                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[14px] leading-normal text-slate-400">
-                        <Repeat className="w-3.5 h-3.5" />
-                        <span className="capitalize text-[11px]">{task.recurrence_rule}</span>
+                      <div className="flex items-center gap-1 font-['Inter',sans-serif] text-[12px] md:text-[14px] leading-normal text-muted-foreground/70">
+                        <Repeat className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                        <span className="capitalize text-[10px] md:text-[11px]">{task.recurrence_rule}</span>
                       </div>
                     )}
                     {taskCustomValues[task.id]?.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 md:mt-1">
                         {taskCustomValues[task.id].map((cv) => {
                           const field = customFields.find(f => f.id === cv.field_id);
                           if (!field || !cv.value) return null;
                           return (
                             <span
                               key={cv.id}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5f3ff] text-primary text-[10px] font-bold uppercase tracking-wider"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cu-purple/10 text-primary text-[9px] md:text-[10px] font-bold uppercase tracking-wider"
                               title={`${field.name}: ${cv.value}`}
                             >
-                              {field.name}: {cv.value.length > 20 ? cv.value.slice(0, 20) + '...' : cv.value}
+                              {field.name}: {cv.value.length > 15 ? cv.value.slice(0, 15) + '...' : cv.value}
                             </span>
                           );
                         })}
@@ -496,13 +496,13 @@ export default function Tasks() {
                   </div>
                 </div>
 
-                    <div className="flex items-center gap-2 transition-opacity">
+                    <div className="flex items-center gap-1 md:gap-2 shrink-0">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-lg text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                             aria-label="Task actions"
                           >
                             <MoreHorizontal className="w-4 h-4" />
@@ -513,14 +513,14 @@ export default function Tasks() {
                           className="w-44 rounded-xl"
                         >
                           <DropdownMenuItem
-                            className="text-slate-600 cursor-pointer"
+                            className="text-muted-foreground cursor-pointer"
                             onClick={() => handleEdit(task)}
                           >
                             <Pencil className="w-4 h-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-slate-600 cursor-pointer"
+                        className="text-muted-foreground cursor-pointer"
                         onClick={() => {
                           setDependenciesTaskId(task.id);
                           setDependenciesOpen(true);
@@ -530,7 +530,7 @@ export default function Tasks() {
                         Dependencies
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-slate-600 cursor-pointer"
+                        className="text-muted-foreground cursor-pointer"
                         onClick={() => {
                           setRecurrenceTaskId(task.id);
                           setRecurrenceTaskRule(task.recurrence_rule ?? null);
@@ -541,7 +541,7 @@ export default function Tasks() {
                         Set Recurrence
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-slate-600 cursor-pointer"
+                        className="text-muted-foreground cursor-pointer"
                         onClick={() => toggleTaskStatus(task.id, task.status)}
                       >
                         {workflowStatuses.length > 0
@@ -553,7 +553,7 @@ export default function Tasks() {
                               : "Mark as In Progress"}
                       </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="text-slate-600 cursor-pointer"
+                            className="text-muted-foreground cursor-pointer"
                             onClick={async () => {
                               const success = await updateTask(task.id, { is_archived: true, archived_at: new Date().toISOString(), updated_at: new Date().toISOString() });
                               if (success) {
@@ -612,7 +612,7 @@ export default function Tasks() {
 
           {!isLoading && filteredTasks.length > 0 && (
             <div className="mt-3 flex items-center justify-between px-2">
-              <p className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600 font-medium">
+              <p className="font-['Inter',sans-serif] text-[14px] leading-normal text-muted-foreground font-medium">
                 {visibleCount < filteredTasks.length
                   ? `Showing ${visibleCount} of ${filteredTasks.length}`
                   : `Showing ${filteredTasks.length}`}{" "}
@@ -630,13 +630,13 @@ export default function Tasks() {
                     <>
                       <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: terminalColor }} />
-                        <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
+                        <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-muted-foreground">
                           {tasks.filter((t) => t.status === terminalStatus).length} Completed
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full bg-primary" />
-                        <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-slate-600">
+                        <span className="font-['Inter',sans-serif] text-[14px] leading-normal text-muted-foreground">
                           {tasks.filter((t) => t.status !== terminalStatus).length} Remaining
                         </span>
                       </div>

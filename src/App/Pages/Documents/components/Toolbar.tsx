@@ -21,10 +21,10 @@ function ToolbarButton({ onClick, active, children, title }: ToolbarButtonProps)
     <button
       onClick={onClick}
       title={title}
-      className={`p-1.5 rounded-md transition-colors ${
+      className={`p-1 sm:p-1.5 rounded-md transition-colors ${
         active
-          ? "bg-[#ede9fe] text-[#6d28d9]"
-          : "text-slate-600 hover:bg-slate-100"
+          ? "bg-cu-purple/10 text-cu-purple"
+          : "text-muted-foreground hover:bg-muted"
       }`}
     >
       {children}
@@ -33,7 +33,7 @@ function ToolbarButton({ onClick, active, children, title }: ToolbarButtonProps)
 }
 
 function Divider() {
-  return <div className="w-px h-5 bg-slate-200" />;
+  return <div className="w-px h-4 sm:h-5 bg-border" />;
 }
 
 interface ToolbarProps {
@@ -65,8 +65,8 @@ export function Toolbar({ editor, onExportMarkdown, onExportPDF, onExportHTML }:
   }, [editor]);
 
   return (
-    <div className="bg-white border border-slate-100 rounded-t-2xl shadow-sm px-4 py-2 sticky top-0 z-10">
-      <div className="flex items-center gap-1 flex-wrap">
+    <div className="bg-card border border-border rounded-t-2xl shadow-sm px-2 sm:px-4 py-1.5 sm:py-2">
+      <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap">
         <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold (Ctrl+B)">
           <Bold className="w-4 h-4" />
         </ToolbarButton>
@@ -154,24 +154,24 @@ export function Toolbar({ editor, onExportMarkdown, onExportPDF, onExportHTML }:
           {showExport && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowExport(false)} />
-              <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 py-1 min-w-[160px]">
+              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg z-20 py-1 min-w-[160px]">
                 <button
                   onClick={() => { onExportMarkdown(); setShowExport(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <FileText className="w-4 h-4" />
                   Export as Markdown
                 </button>
                 <button
                   onClick={() => { onExportPDF(); setShowExport(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <FileType className="w-4 h-4" />
                   Export as PDF
                 </button>
                 <button
                   onClick={() => { onExportHTML(); setShowExport(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <FileText className="w-4 h-4" />
                   Export as HTML

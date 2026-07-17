@@ -63,7 +63,7 @@ export function Dropdown({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex items-center justify-between px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors h-11",
+            "flex items-center justify-between px-3 py-2 text-sm bg-card border border-border rounded-xl hover:bg-muted/50 transition-colors h-11",
             triggerClassName,
           )}
         >
@@ -75,7 +75,7 @@ export function Dropdown({
               <span
                 className={cn(
                   "whitespace-nowrap",
-                  selected ? "text-slate-700" : "text-slate-500",
+                  selected ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 {selected ? selected.label : placeholder}

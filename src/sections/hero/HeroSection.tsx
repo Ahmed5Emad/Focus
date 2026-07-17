@@ -5,28 +5,28 @@ import { useNavigate } from "react-router-dom";
 export function HeroSection() {
   const navigate = useNavigate();
   return (
-    <div className="w-full flex my-8 md:my-16 self-stretch flex-col items-center px-4 md:px-16 lg:px-32">
+    <div className="w-full flex my-6 md:my-16 self-stretch flex-col items-center px-4 md:px-16 lg:px-32">
       <div className="flex mb-4 flex-col w-full md:w-3/4 lg:w-1/2 items-center justify-center gap-2">
-        <h1 className="text-4xl md:text-7xl lg:text-8xl -tracking-wide text-center font-black">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl -tracking-wide text-center font-black leading-tight">
           One App to <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cu-purple via-cu-pink to-cu-orange pb-2">Replace Them All.</span>
         </h1>
-        <p className="text-center mt-8 text-muted-foreground text-lg md:text-xl max-w-2xl">
+        <p className="text-center mt-4 md:mt-8 text-muted-foreground text-base md:text-lg lg:text-xl max-w-2xl">
           Tasks, Docs, Chat, Goals, Focus Timer & more. <br />
           A vibrant workspace for high-performing teams who value speed and clarity.
         </p>
-        <div className="flex flex-col md:flex-row mt-10 mb-12 gap-4">
+        <div className="flex flex-col sm:flex-row mt-6 md:mt-10 mb-8 md:mb-12 gap-3 md:gap-4 w-full sm:w-auto">
           <Button
             size="lg"
-            className="shadow-xl bg-cu-purple hover:bg-cu-purple/90 text-white px-8 h-14 font-bold text-lg rounded-xl cursor-pointer"
+            className="shadow-xl bg-cu-purple hover:bg-cu-purple/90 text-white px-6 md:px-8 h-12 md:h-14 font-bold text-base md:text-lg rounded-xl cursor-pointer w-full sm:w-auto"
             onClick={() => navigate("/signup")}
           >
-            Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
+            Get Started Free <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="shadow-sm px-8 h-14 font-bold text-lg rounded-xl border-2 hover:bg-muted cursor-pointer"
+            className="shadow-sm px-6 md:px-8 h-12 md:h-14 font-bold text-base md:text-lg rounded-xl border-2 hover:bg-muted cursor-pointer w-full sm:w-auto"
             onClick={() => navigate("/features")}
             >
             View Features
@@ -34,7 +34,7 @@ export function HeroSection() {
         </div>
       </div>
         <div className="flex flex-col max-w-7xl w-full items-center content-start px-2 sm:px-4 md:px-0">
-        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[380px] sm:h-[400px] md:h-[650px] border border-border bg-card shadow-2xl overflow-hidden relative">
+        <div className="flex flex-col self-stretch content-start w-full rounded-2xl h-[320px] sm:h-[380px] md:h-[650px] border border-border bg-card shadow-2xl overflow-hidden relative">
           {/* ── Sidebar ── */}
           <div className="flex flex-1 overflow-hidden">
             <div className="hidden md:flex w-56 border-r border-border bg-muted/20 flex-col shrink-0">

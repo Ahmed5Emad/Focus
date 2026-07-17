@@ -12,7 +12,6 @@ import {
   Layout,
   MessageCircle,
   FileText,
-  Menu,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -22,10 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-
 const navItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Tasks", icon: CheckSquare, path: "/tasks" },
@@ -182,7 +178,7 @@ function BottomLink({ item, expanded }: { item: typeof bottomNavItems[number]; e
   );
 }
 
-export function Sidebar({ expanded, onToggle }: SidebarProps) {
+export function Sidebar({ expanded, onToggle, mobileSheetOpen, setMobileSheetOpen }: SidebarProps & { mobileSheetOpen?: boolean; setMobileSheetOpen?: (open: boolean) => void }) {
   return (
     <>
       <aside className={`hidden md:flex bg-card border-border border-r border-solid flex-col h-screen items-start pt-[32px] relative shrink-0 sticky top-0 transition-all duration-300 ${expanded ? 'w-[256px]' : 'w-[72px]'}`}>
@@ -201,17 +197,7 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
         </button>
       </aside>
 
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Toggle sidebar"
-            className="fixed top-4 left-4 z-50 md:hidden flex items-center justify-center bg-card/80 backdrop-blur border border-border/20 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <Menu className="w-5 h-5 text-muted-foreground" />
-          </Button>
-        </SheetTrigger>
+      <Sheet open={mobileSheetOpen} onOpenChange={(open) => setMobileSheetOpen?.(open)}>
         <SheetContent side="left" className="w-[256px] p-0">
           <div className="flex flex-col pt-[32px] h-full">
             <SidebarContent />

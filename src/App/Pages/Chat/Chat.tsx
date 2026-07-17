@@ -10,6 +10,7 @@ import {
   Paperclip,
   X,
   Loader2,
+  Menu,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +37,7 @@ import { useGlobalPresence } from "@/hooks/useGlobalPresence";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+
 
 interface MemberProfile {
   id: string;
@@ -65,6 +67,7 @@ export default function Chat() {
   const [inputValue, setInputValue] = useState("");
   const [uploading, setUploading] = useState(false);
   const [pendingFile, setPendingFile] = useState<{ file: File; preview?: string } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -327,6 +330,98 @@ export default function Chat() {
       ? `${active.typingUsers[0].displayName} and ${active.typingUsers.length - 1} others are typing...`
       : null;
 
+  const renderSidebarContent = () => (
+    <>
+      <div className="p-3">
+        <div className="px-2 py-1.5 mb-1">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Channels
+          </span>
+        </div>
+        <button
+          onClick={() => {
+            setMode("channel");
+            setSelectedUserId(null);
+            setInputValue("");
+            setSidebarOpen(false);
+          }}
+          className={cn(
+            "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            mode === "channel"
+              ? "bg-cu-purple/10 text-cu-purple font-semibold"
+              : "text-muted-foreground hover:bg-muted"
+          )}
+          aria-label="Switch to general channel"
+        >
+          <Hash className="w-4 h-4 shrink-0" />
+          <span className="truncate">general</span>
+        </button>
+      </div>
+
+      <div className="border-t border-border flex-1 overflow-y-auto p-3">
+        <div className="px-2 py-1.5 mb-1">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Direct Messages
+          </span>
+        </div>
+
+        {membersLoading ? (
+          <div className="space-y-2 px-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-2 py-1.5">
+                <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            ))}
+          </div>
+        ) : members.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-4 px-2">
+            No members found
+          </p>
+        ) : (
+          <div className="space-y-0.5">
+            {members.filter((m) => m.id !== user?.id).map((member) => (
+              <button
+                key={member.id}
+                onClick={() => {
+                  setMode("dm");
+                  setSelectedUserId(member.id);
+                  setInputValue("");
+                  setSidebarOpen(false);
+                }}
+                className={cn(
+                  "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  mode === "dm" && selectedUserId === member.id
+                    ? "bg-cu-purple/10 text-cu-purple font-semibold"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+                aria-label={`Direct message ${member.display_name ?? "user"}`}
+              >
+                <span className="relative inline-block shrink-0">
+                  <Avatar className="w-5 h-5">
+                    <AvatarImage
+                      src={member.avatar_url ?? undefined}
+                      alt={member.display_name ?? "User"}
+                    />
+                    <AvatarFallback className="text-[9px]">
+                      {(member.display_name ?? "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {onlineUsers.has(member.id) && (
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-background" />
+                  )}
+                </span>
+                <span className="truncate">
+                  {member.display_name ?? "Unknown"}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <>
       {/* Used instead of the Bad looking console dialog */}
@@ -341,102 +436,37 @@ export default function Chat() {
       />
       <div className="flex flex-col w-full h-full min-h-0 pt-4">
 
-      <div className="flex-1 flex flex-col md:flex-row rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden min-h-0">
-        {/* Sidebar */}
-        <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col bg-[#fafafa] max-h-48 md:max-h-none overflow-y-auto">
-          <div className="p-3">
-            <div className="px-2 py-1.5 mb-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Channels
-              </span>
+      <div className="flex-1 flex flex-col md:flex-row rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-border bg-card overflow-hidden min-h-0 relative">
+        {/* Mobile sidebar - slides in from right within the card */}
+        {sidebarOpen && (
+          <div className="md:hidden absolute inset-y-0 right-0 z-20 w-64 bg-white dark:bg-[#0f172a] border-l border-border shadow-xl flex flex-col">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0 bg-white dark:bg-[#0f172a]">
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Chats</span>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Close chat sidebar"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => {
-                setMode("channel");
-                setSelectedUserId(null);
-                setInputValue("");
-              }}
-              className={cn(
-                "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                mode === "channel"
-                  ? "bg-[#ede9fe] text-[#6d28d9] font-semibold"
-                  : "text-slate-600 hover:bg-slate-100"
-              )}
-              aria-label="Switch to general channel"
-            >
-              <Hash className="w-4 h-4 shrink-0" />
-              <span className="truncate">general</span>
-            </button>
-          </div>
-
-          <div className="border-t border-slate-100 flex-1 overflow-y-auto p-3">
-            <div className="px-2 py-1.5 mb-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Direct Messages
-              </span>
+            <div className="overflow-y-auto flex-1 bg-white dark:bg-[#0f172a]">
+              {renderSidebarContent()}
             </div>
-
-            {membersLoading ? (
-              <div className="space-y-2 px-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-2 py-1.5">
-                    <Skeleton className="w-5 h-5 rounded-full shrink-0" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                ))}
-              </div>
-            ) : members.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-4 px-2">
-                No members found
-              </p>
-            ) : (
-              <div className="space-y-0.5">
-                {members.filter((m) => m.id !== user?.id).map((member) => (
-                  <button
-                    key={member.id}
-                    onClick={() => {
-                      setMode("dm");
-                      setSelectedUserId(member.id);
-                      setInputValue("");
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                      mode === "dm" && selectedUserId === member.id
-                        ? "bg-[#ede9fe] text-[#6d28d9] font-semibold"
-                        : "text-slate-600 hover:bg-slate-100"
-                    )}
-                    aria-label={`Direct message ${member.display_name ?? "user"}`}
-                  >
-                    <span className="relative inline-block shrink-0">
-                      <Avatar className="w-5 h-5">
-                        <AvatarImage
-                          src={member.avatar_url ?? undefined}
-                          alt={member.display_name ?? "User"}
-                        />
-                        <AvatarFallback className="text-[9px]">
-                          {(member.display_name ?? "U").charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      {onlineUsers.has(member.id) && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-white" />
-                      )}
-                    </span>
-                    <span className="truncate">
-                      {member.display_name ?? "Unknown"}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
+        )}
+
+        {/* Desktop sidebar */}
+        <div className="hidden md:flex md:w-56 shrink-0 border-r border-border flex-col bg-muted/30 overflow-y-auto">
+          {renderSidebarContent()}
         </div>
 
         {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header bar */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100">
+          <div className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-3 border-b border-border">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 {mode === "channel" ? (
                   <Hash className="w-4 h-4 text-cu-purple" />
                 ) : (
@@ -444,13 +474,13 @@ export default function Chat() {
                 )}
                 {headerTitle}
                 {isAdmin && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
                     <Shield className="w-3 h-3" />
                     Admin
                   </span>
                 )}
               </h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {headerDescription}
               </p>
               {typingText && (
@@ -460,35 +490,46 @@ export default function Chat() {
               )}
             </div>
 
-            {(mode === "dm" || isAdmin) && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 rounded-md text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    aria-label="Chat options"
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 rounded-lg">
-                  <DropdownMenuItem
-                    className="cursor-pointer text-sm text-red-600 focus:text-red-600"
-                    onClick={handleClear}
-                  >
-                    <Trash2 className="w-3.5 h-3.5 mr-2" />
-                    Clear conversation
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden h-7 w-7 rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle chat sidebar"
+              >
+                {sidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </Button>
+              {(mode === "dm" || isAdmin) && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-label="Chat options"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 rounded-lg">
+                    <DropdownMenuItem
+                      className="cursor-pointer text-sm text-red-600 focus:text-red-600"
+                      onClick={handleClear}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-2" />
+                      Clear conversation
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
 
           {/* Messages area */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
             {active.isLoading ? (
-              <div className="space-y-4 py-4 px-6">
+              <div className="space-y-4 py-3 sm:py-4 px-3 sm:px-6">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className={`flex items-start gap-3 ${i % 2 === 0 ? '' : 'flex-row-reverse'}`}>
                     <Skeleton className="w-8 h-8 rounded-full shrink-0" />
@@ -508,10 +549,10 @@ export default function Chat() {
                 action={{ label: "Send a message", onClick: () => inputRef.current?.focus() }}
               />
             ) : (
-              <div className="py-4">
+              <div className="py-2 sm:py-4">
                 {mode === "channel" && isLoadingMore && (
-                  <div className="flex justify-center py-2">
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="flex justify-center py-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Loader2 className="w-3 h-3 animate-spin" />
                       Loading older messages...
                     </div>
@@ -538,35 +579,35 @@ export default function Chat() {
           </div>
 
           {/* Input area */}
-          <div className="border-t border-slate-100 px-4 py-3">
+          <div className="border-t border-border px-3 sm:px-4 py-2 sm:py-3">
             {pendingFile && (
-              <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-muted rounded-lg border border-border">
                 {pendingFile.preview ? (
-                  <img src={pendingFile.preview} alt="" className="w-10 h-10 object-cover rounded" />
+                  <img src={pendingFile.preview} alt="" className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded" />
                 ) : (
-                  <Paperclip className="w-5 h-5 text-slate-400" />
+                  <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                 )}
-                <span className="text-sm text-slate-600 flex-1 truncate">{pendingFile.file.name}</span>
+                <span className="text-xs sm:text-sm text-foreground/70 flex-1 truncate">{pendingFile.file.name}</span>
                 <button
                   onClick={() => {
                     setPendingFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = "";
                   }}
-                  className="p-1 hover:bg-slate-200 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="p-1.5 hover:bg-muted rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   aria-label="Remove file attachment"
                 >
-                  <X className="w-4 h-4 text-slate-400" />
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
             )}
-            <div className="flex items-end gap-2 bg-[#f8f7fc] border border-slate-200 rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
+            <div className="flex items-end gap-1.5 sm:gap-2 bg-muted border border-border rounded-xl focus-within:border-cu-purple focus-within:ring-2 focus-within:ring-cu-purple/20 transition-all p-1.5">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="p-2 text-slate-400 hover:text-cu-purple rounded-lg transition-colors shrink-0 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="p-2 sm:p-2.5 text-muted-foreground hover:text-cu-purple rounded-lg transition-colors shrink-0 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label="Attach file"
               >
-                <Paperclip className="w-4 h-4" />
+                <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <input
                 ref={fileInputRef}
@@ -591,13 +632,13 @@ export default function Chat() {
               <button
                 onClick={handleSend}
                 disabled={(!inputValue.trim() && !pendingFile) || uploading}
-                className="p-2 bg-cu-purple text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="p-2 sm:p-2.5 bg-cu-purple text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label="Send message"
               >
                 {uploading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </button>
             </div>

@@ -80,10 +80,10 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
       <PopoverTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors",
+            "flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors min-h-8",
             currentTaskId
-              ? "text-primary bg-[#ede9fe] hover:bg-slate-100"
-              : "text-slate-400 hover:text-slate-500 hover:bg-slate-100"
+              ? "text-primary bg-cu-purple/10 hover:bg-muted"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           {currentTask?.status === "done" ? (
@@ -107,7 +107,7 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
               <CommandGroup>
                 <CommandItem
                   onSelect={unlinkTask}
-                  className="text-red-500 data-[selected=true]:text-red-500 data-[selected=true]:bg-red-50"
+                  className="text-destructive data-[selected=true]:text-destructive data-[selected=true]:bg-destructive/10"
                 >
                   <X className="w-4 h-4" />
                   Remove task link
@@ -120,18 +120,18 @@ export function TaskLinkSelector({ documentId, currentTaskId, onTaskChange }: Pr
                   key={task.id}
                   onSelect={() => linkTask(task.id)}
                   className={cn(
-                    task.id === currentTaskId && "bg-[#ede9fe]"
+                    task.id === currentTaskId && "bg-cu-purple/10"
                   )}
                 >
                   {task.status === "done" ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   ) : (
-                    <Circle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <Circle className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                   )}
                   <div className="flex flex-col min-w-0">
                     <span className="truncate">{task.title}</span>
                     {task.projects?.title && (
-                      <span className="text-[10px] text-slate-400 truncate">
+                      <span className="text-[10px] text-muted-foreground truncate">
                         {task.projects.title}
                       </span>
                     )}

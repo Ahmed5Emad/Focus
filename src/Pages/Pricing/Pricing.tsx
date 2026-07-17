@@ -78,7 +78,7 @@ const FeatureValue = ({ value, mobile = false }: { value: string | boolean; mobi
 
 const FAQItem = ({ question, answer }: { question: string; answer: string }) => (
     <details className="group border-b border-border dark:border-slate-700 pb-6 [&_summary::-webkit-details-marker]:hidden">
-      <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-lg font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-purple focus-visible:ring-offset-2 focus-visible:ring-offset-card rounded-sm">
+      <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-base md:text-lg font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-purple focus-visible:ring-offset-2 focus-visible:ring-offset-card rounded-sm">
         {question}
         <ChevronDown className="w-5 h-5 transition duration-300 group-open:-rotate-180" />
       </summary>
@@ -100,10 +100,10 @@ export default function Pricing() {
         
         {/* Hero Section */}
         <section className="flex flex-col items-center w-full max-w-7xl pt-16 md:pt-24 pb-12 md:pb-16 px-4 md:px-6 gap-6">
-          <h1 className="text-6xl md:text-7xl font-black text-foreground tracking-tight text-center uppercase">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground tracking-tight text-center uppercase">
             Transparent<br />Pricing.
           </h1>
-          <p className="text-xl text-muted-foreground text-center max-w-2xl leading-relaxed font-light">
+          <p className="text-base md:text-xl text-muted-foreground text-center max-w-2xl leading-relaxed font-light">
             Focus on your work, not hidden costs. Simple, transparent pricing for individuals and teams who value productivity.
           </p>
 
@@ -129,7 +129,7 @@ export default function Pricing() {
         <section className="grid grid-cols-1 md:grid-cols-3 max-w-6xl w-full px-4 md:px-6 gap-6 md:gap-8 justify-center items-stretch mt-4">
           
           {/* Free */}
-          <div className="bg-card border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col relative shadow-sm">
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold text-card-foreground">Free</h3>
               <p className="text-muted-foreground mt-2 text-sm">For individuals building their focus habit.</p>
@@ -153,7 +153,7 @@ export default function Pricing() {
           </div>
 
           {/* Pro */}
-          <div className="bg-foreground text-background dark:bg-card dark:text-card-foreground border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-xl md:-mt-4 md:mb-4 md:scale-105 z-10">
+          <div className="bg-foreground text-background dark:bg-card dark:text-card-foreground border border-border rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col relative shadow-xl md:-mt-4 md:mb-4 md:scale-105 z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background text-foreground border border-border dark:bg-foreground dark:text-background px-4 py-1.5 rounded-full text-xs font-bold shadow-sm">
               Most Popular
             </div>
@@ -182,7 +182,7 @@ export default function Pricing() {
           </div>
 
           {/* Enterprise */}
-          <div className="bg-card border border-border rounded-2xl p-6 md:p-8 flex flex-col relative shadow-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col relative shadow-sm">
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold text-card-foreground">Enterprise</h3>
               <p className="text-muted-foreground mt-2 text-sm">For large teams and organizations.</p>
@@ -211,7 +211,7 @@ export default function Pricing() {
             <p className="text-muted-foreground mt-4 text-lg">Detailed breakdown of what's included in each plan.</p>
           </div>
 
-          <div className="hidden md:block bg-card border border-border rounded-2xl overflow-x-auto shadow-sm">
+          <div className="block bg-card border border-border rounded-2xl overflow-x-auto shadow-sm">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-card border-b border-border">
@@ -241,42 +241,13 @@ export default function Pricing() {
             </table>
           </div>
 
-          <div className="md:hidden space-y-8">
-            {comparisonFeatures.map((category) => (
-              <div key={category.category} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-                <div className="bg-muted/50 px-6 py-3 border-b border-border">
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{category.category}</h3>
-                </div>
-                <div className="divide-y divide-border">
-                  {category.features.map((feature) => (
-                    <div key={feature.name} className="p-6">
-                      <p className="font-bold text-card-foreground mb-4">{feature.name}</p>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Personal</span>
-                          <div className="text-sm"><FeatureValue value={feature.personal} mobile /></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Pro</span>
-                          <div className="text-sm"><FeatureValue value={feature.pro} mobile /></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Enterprise</span>
-                          <div className="text-sm"><FeatureValue value={feature.enterprise} mobile /></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+
         </section>
 
         {/* FAQs */}
         <section id="faq" className="w-full bg-foreground text-background dark:bg-card dark:text-card-foreground mt-16 md:mt-32 py-16 md:py-24 px-4 md:px-6 flex justify-center text-left">
           <div className="max-w-3xl w-full">
-            <h2 className="text-3xl font-bold tracking-tight mb-16 text-center uppercase">Frequently Asked Questions</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-16 text-center uppercase">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <FAQItem 

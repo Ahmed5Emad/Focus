@@ -127,20 +127,21 @@ export default function Documents() {
         confirmLabel="Delete"
         destructive
       />
-      <div className="page-container pt-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-3">
+      <div className="page-container pt-4 sm:pt-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-3">
         <div>
-          <h1 className="page-title mb-2">Documents</h1>
-          <p className="page-description">
+          <h1 className="page-title text-xl sm:text-2xl mb-1 sm:mb-2">Documents</h1>
+          <p className="page-description text-sm sm:text-base">
             Create and collaborate on documents organized by project.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="btn-primary">
+              <Button className="btn-primary text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 h-auto">
                 <Plus className="w-4 h-4" />
-                New Document
+                <span className="hidden sm:inline">New Document</span>
+                <span className="sm:hidden">New</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-xl">
@@ -160,7 +161,7 @@ export default function Documents() {
       </div>
 
       {deleteError && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-sm">
           {deleteError}
         </div>
       )}
@@ -168,8 +169,8 @@ export default function Documents() {
       {isLoading ? (
         <div className="grid gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="content-card p-4 flex items-center gap-4">
-              <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
+            <div key={i} className="content-card p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+              <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl shrink-0" />
               <div className="flex-1 min-w-0">
                 <Skeleton className="h-4 w-48" />
                 <div className="flex items-center gap-3 mt-2">
@@ -216,9 +217,10 @@ export default function Documents() {
               title="No documents in this project"
               description="Create a document in this project to get started."
             >
-              <Button className="btn-primary" onClick={() => handleCreate(selectedProject)}>
+              <Button className="btn-primary text-sm sm:text-base" onClick={() => handleCreate(selectedProject)}>
                 <Plus className="w-4 h-4" />
-                Create Document
+                <span className="hidden sm:inline">Create Document</span>
+                <span className="sm:hidden">Create</span>
               </Button>
             </EmptyState>
           )}
@@ -227,14 +229,14 @@ export default function Documents() {
             const projectName = projectMap.get(projectId) ?? "Unknown Project";
             return (
               <section key={projectId}>
-                <div className="flex items-center gap-2 mb-3">
-                  <FolderOpen className="w-5 h-5 text-primary" />
-                  <h3 className="font-['Spline_Sans',sans-serif] text-lg font-semibold text-slate-900">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                  <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <h3 className="font-['Spline_Sans',sans-serif] text-base sm:text-lg font-semibold text-foreground">
                     {projectName}
                   </h3>
                   <button
                     onClick={() => handleCreate(projectId)}
-                    className="ml-1 p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="ml-1 p-1.5 sm:p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-8 min-w-8 flex items-center justify-center"
                     title="Add document to this project"
                     aria-label={`Add document to ${projectName}`}
                   >
@@ -245,11 +247,11 @@ export default function Documents() {
                   {docs.map((doc) => (
                     <div
                       key={doc.id}
-                      className="content-card p-4 flex items-center gap-4 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+                      className="content-card p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
                       onClick={() => navigate(`/documents/${doc.id}`)}
                     >
-                      <div className="w-10 h-10 bg-[#f5f3ff] rounded-xl flex items-center justify-center shrink-0">
-                        <FileText className="w-5 h-5 text-primary" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-cu-purple/10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -262,26 +264,26 @@ export default function Documents() {
                               if (e.key === "Enter") handleRename(doc.id);
                               if (e.key === "Escape") setEditingId(null);
                             }}
-                            className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2 py-1 w-full outline-none focus:border-primary"
+                            className="text-sm font-semibold text-foreground bg-muted border border-border rounded px-2 py-1 w-full outline-none focus:border-primary"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <h3 className="text-sm font-semibold text-slate-900 truncate">
+                          <h3 className="text-sm font-semibold text-foreground truncate">
                             {doc.title}
                           </h3>
                         )}
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                          <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted-foreground">
                             <Clock className="w-3 h-3" />
                             {formatDate(doc.updated_at)}
                           </span>
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                          <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted-foreground">
                             <User className="w-3 h-3" />
                             {doc.created_by === user?.id ? "You" : "Collaborator"}
                           </span>
                           {doc.task_id && doc.tasks?.title && (
-                            <span className="flex items-center gap-1 text-[11px] text-primary truncate max-w-[150px]">
+                            <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-primary truncate max-w-[100px] sm:max-w-[150px]">
                               <FileText className="w-3 h-3 shrink-0" />
                               <span className="truncate">{doc.tasks.title}</span>
                             </span>
@@ -294,7 +296,7 @@ export default function Documents() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                             aria-label="Document actions"
                           >
                             <MoreHorizontal className="w-4 h-4" />

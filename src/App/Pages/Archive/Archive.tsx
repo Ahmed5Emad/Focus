@@ -130,9 +130,9 @@ export default function ArchivePage() {
       : filteredProjects.length === 0;
 
   return (
-    <div className="page-container pt-3">
+    <div className="page-container pt-3 px-4 sm:px-6">
       <div className="flex flex-col gap-0.5">
-        <h1 className="page-title">Archive</h1>
+        <h1 className="page-title text-xl sm:text-2xl md:text-3xl">Archive</h1>
         <p className="page-description">
           View and manage your archived tasks and projects.
         </p>
@@ -165,12 +165,12 @@ export default function ArchivePage() {
         </div>
       </div>
 
-      <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden">
+      <div className="rounded-xl shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-white overflow-hidden px-1 sm:px-0">
         {isLoading ? (
           <div className="divide-y divide-slate-200">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 p-5">
-                <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+              <div key={i} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 md:p-5">
+                <Skeleton className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shrink-0" />
                 <div className="flex-1 min-w-0 space-y-2">
                   <Skeleton className="h-4 w-1/2" />
                   <Skeleton className="h-3 w-1/4" />
@@ -192,44 +192,44 @@ export default function ArchivePage() {
           <div className="divide-y divide-slate-200">
             {activeTab === "tasks"
               ? filteredTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                      <ListChecks className="w-5 h-5 text-slate-500" />
+                    <div
+                      key={task.id}
+                      className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 md:p-5 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                        <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                     </div>
 
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-slate-900 truncate">
+                      <h4 className="font-['Spline_Sans',sans-serif] text-sm sm:text-base md:text-[16px] font-semibold text-slate-900 truncate">
                         {task.title}
                       </h4>
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                         {task.projects?.title && (
-                          <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm md:text-[14px] text-slate-600">
                             <Folder className="w-3.5 h-3.5 text-primary" />
                             <span>{task.projects.title}</span>
                           </div>
                         )}
                         {task.goals?.title && (
-                          <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm md:text-[14px] text-slate-600">
                             <Target className="w-3.5 h-3.5 text-primary" />
                             <span>{task.goals.title}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm md:text-[14px] text-slate-600">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>{new Date(task.archived_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleRestore("tasks", task.id)}
-                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-cu-green"
+                        className="h-8 w-8 min-h-9 min-w-9 sm:min-h-8 sm:min-w-8 rounded-lg text-slate-600 hover:text-cu-green"
                         title="Restore"
                       >
                         <RotateCcw className="w-4 h-4" />
@@ -238,7 +238,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDelete("tasks", task.id)}
-                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-red-600"
+                        className="h-8 w-8 min-h-9 min-w-9 sm:min-h-8 sm:min-w-8 rounded-lg text-slate-600 hover:text-red-600"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -249,33 +249,33 @@ export default function ArchivePage() {
               : filteredProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="group flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors"
+                    className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 md:p-5 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                      <Folder className="w-5 h-5 text-slate-500" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                      <Folder className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                     </div>
 
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <h4 className="font-['Spline_Sans',sans-serif] text-[16px] font-semibold text-slate-900 truncate">
+                      <h4 className="font-['Spline_Sans',sans-serif] text-sm sm:text-base md:text-[16px] font-semibold text-slate-900 truncate">
                         {project.title}
                       </h4>
                       <div className="flex items-center gap-x-4 gap-y-1">
-                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs sm:text-sm md:text-[14px] font-bold uppercase tracking-wider">
                           {project.status}
                         </span>
-                        <div className="flex items-center gap-1.5 text-[14px] text-slate-600">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm md:text-[14px] text-slate-600">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>{new Date(project.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleRestore("projects", project.id)}
-                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-cu-green"
+                        className="h-8 w-8 min-h-9 min-w-9 sm:min-h-8 sm:min-w-8 rounded-lg text-slate-600 hover:text-cu-green"
                         title="Restore"
                       >
                         <RotateCcw className="w-4 h-4" />
@@ -284,7 +284,7 @@ export default function ArchivePage() {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDelete("projects", project.id)}
-                        className="h-8 w-8 rounded-lg text-slate-600 hover:text-red-600"
+                        className="h-8 w-8 min-h-9 min-w-9 sm:min-h-8 sm:min-w-8 rounded-lg text-slate-600 hover:text-red-600"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function ArchivePage() {
 
       {!isLoading && !isEmpty && (
         <div className="mt-3 flex items-center justify-between px-2">
-          <p className="font-['Inter',sans-serif] text-[14px] text-slate-600 font-medium">
+          <p className="font-['Inter',sans-serif] text-xs sm:text-sm md:text-[14px] text-slate-600 font-medium">
             Showing{" "}
             {activeTab === "tasks"
               ? filteredTasks.length

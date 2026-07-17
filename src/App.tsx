@@ -93,7 +93,6 @@ function App() {
                   <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
                   <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
                   <Route path="/tasks/new" element={<ProtectedRoute><TaskCreation /></ProtectedRoute>} />
-
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
                   <Route path="/documents/:id" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />

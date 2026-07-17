@@ -138,7 +138,7 @@ export default function Projects() {
         {isLoading ? (
           <div className="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 border border-slate-100 flex flex-col justify-between">
+              <div key={i} className="bg-white rounded-xl p-4 sm:p-6 border border-slate-100 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Skeleton className="h-7 w-40" />
@@ -170,17 +170,17 @@ export default function Projects() {
               />
             ))}
 
-            <div className="col-span-1 md:col-span-6 rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group min-h-[200px]">
+            <div className="col-span-1 md:col-span-6 rounded-xl p-4 sm:p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group min-h-[160px] sm:min-h-[200px]">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-primary via-transparent to-transparent"></div>
-              <Layout className="w-12 h-12 text-primary mb-4" />
-              <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-slate-900 mb-2">
+              <Layout className="w-8 h-8 sm:w-12 sm:h-12 text-primary mb-3 sm:mb-4" />
+              <h3 className="font-['Spline_Sans',sans-serif] text-[18px] sm:text-[24px] leading-[1.3] font-semibold text-slate-900 mb-1 sm:mb-2">
                 Start a new project
               </h3>
-              <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-slate-600 mb-6">
+              <p className="font-['Inter',sans-serif] text-[14px] sm:text-[16px] leading-normal text-slate-600 mb-4 sm:mb-6">
                 Ready to take on a new challenge? Create a project to get started.
               </p>
               <CreateProjectModal onCreate={handleCreateProject}>
-                <button className="btn-primary z-10">
+                <button className="btn-primary z-10 w-full sm:w-auto">
                   <Plus className="w-4 h-4" />
                   Create Project
                 </button>

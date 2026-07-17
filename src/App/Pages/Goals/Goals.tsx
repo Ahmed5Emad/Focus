@@ -164,7 +164,7 @@ export default function Goals() {
         {isLoading ? (
           <>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between">
+              <div key={i} className="bg-white rounded-xl p-4 sm:p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1 min-w-0">
@@ -184,8 +184,8 @@ export default function Goals() {
                 </div>
               </div>
             ))}
-            <div className="rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center">
-              <Skeleton className="h-12 w-12 rounded-full mb-4" />
+            <div className="rounded-xl p-4 sm:p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center">
+              <Skeleton className="h-8 w-8 sm:h-12 sm:w-12 rounded-full mb-3 sm:mb-4" />
               <Skeleton className="h-7 w-56 mb-2" />
               <Skeleton className="h-5 w-44 mb-6" />
               <Skeleton className="h-10 w-28 rounded-lg" />
@@ -206,17 +206,17 @@ export default function Goals() {
               />
             ))}
 
-            <div className="rounded-xl p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group">
+            <div className="rounded-xl p-4 sm:p-6 shadow-[0px_4px_12px_rgba(139,92,246,0.04)] border border-slate-100 bg-linear-to-br from-[#e9ddff] to-[#dce9ff] flex flex-col justify-center items-center text-center hover:-translate-y-0.5 transition-transform duration-300 relative overflow-hidden group">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-[#6b38d4] via-transparent to-transparent"></div>
-              <Trophy className="w-12 h-12 text-[#6b38d4] mb-4" />
-              <h3 className="font-['Spline_Sans',sans-serif] text-[24px] leading-[1.3] font-semibold text-slate-900 mb-2">
+              <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-[#6b38d4] mb-3 sm:mb-4" />
+              <h3 className="font-['Spline_Sans',sans-serif] text-[18px] sm:text-[24px] leading-[1.3] font-semibold text-slate-900 mb-1 sm:mb-2">
                 Ready for a new challenge?
               </h3>
-              <p className="font-['Inter',sans-serif] text-[16px] leading-normal text-slate-600 mb-6">
+              <p className="font-['Inter',sans-serif] text-[14px] sm:text-[16px] leading-normal text-slate-600 mb-4 sm:mb-6">
                 Define a new objective and start tracking your progress today.
               </p>
               <CreateGoalModal onCreate={handleCreateGoal} tasks={tasks}>
-                <button className="btn-primary z-10">
+                <button className="btn-primary z-10 w-full sm:w-auto">
                   Create Goal
                 </button>
               </CreateGoalModal>

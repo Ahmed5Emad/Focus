@@ -339,7 +339,7 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
     ].filter((e): e is NonNullable<typeof e> => e !== null),
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none min-h-[500px] px-8 py-6",
+        class: "prose prose-sm max-w-none focus:outline-none min-h-[400px] sm:min-h-[500px] px-4 sm:px-6 py-4 sm:py-6",
       },
     },
   });
@@ -452,7 +452,7 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
             h1, h2, h3 { font-family: 'Spline Sans', sans-serif; }
             table { border-collapse: collapse; width: 100%; }
             td, th { border: 1px solid #e2e8f0; padding: 8px; }
-            pre { background: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }
+            pre { background: #f1f5f9; padding: 16px; border-radius: 8px; overflow-x: auto; }
             code { background: #f1f5f9; padding: 2px 4px; border-radius: 4px; font-size: 0.9em; }
             ul[data-type="taskList"] { list-style: none; padding-left: 0; }
             ul[data-type="taskList"] li { display: flex; align-items: center; gap: 8px; }
@@ -488,7 +488,7 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
   if (!editor) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#ede9fe] border-t-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -501,13 +501,13 @@ export function Editor({ documentId, documentTitle, onTitleChange, onConnectionC
         onExportPDF={exportAsPDF}
         onExportHTML={exportAsHTML}
       />
-      <div className="flex-1 overflow-y-auto bg-white border border-slate-100 rounded-b-2xl shadow-sm">
-        <div className="px-8 pt-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden bg-card border border-border rounded-b-2xl shadow-sm">
+        <div className="px-4 sm:px-6 pt-3 sm:pt-4">
           <input
             value={documentTitle}
             onChange={(e) => onTitleChange(e.target.value)}
             placeholder="Untitled Document"
-            className="w-full text-[32px] font-['Spline_Sans',sans-serif] font-bold text-slate-900 tracking-[-0.8px] border-none outline-none bg-transparent placeholder:text-slate-300"
+            className="w-full text-[22px] sm:text-[28px] md:text-[32px] font-['Spline_Sans',sans-serif] font-bold text-foreground tracking-[-0.8px] border-none outline-none bg-transparent placeholder:text-muted-foreground/40"
           />
         </div>
         <EditorContent editor={editor} />

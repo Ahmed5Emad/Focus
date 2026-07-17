@@ -29,6 +29,7 @@ export function AppLayout() {
   const { isActive, isPaused, activeSession, secondsElapsed, pauseSession, resumeSession, stopSession, logDistraction } = useFocus();
   const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const [workspaceName, setWorkspaceName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(() => {
@@ -126,10 +127,10 @@ export function AppLayout() {
           >
             Skip to main content
           </a>
-          <Sidebar expanded={sidebarExpanded} onToggle={handleToggleSidebar} />
+          <Sidebar expanded={sidebarExpanded} onToggle={handleToggleSidebar} mobileSheetOpen={mobileSheetOpen} setMobileSheetOpen={setMobileSheetOpen} />
           
           <div className="flex flex-col flex-1 h-full overflow-hidden relative">
-            <TopBar />
+            <TopBar onMenuClick={() => setMobileSheetOpen(true)} />
             
             <main id="main-content" className="flex-1 overflow-y-auto w-full relative">
               <div className="w-full h-full px-4 md:px-[48px] pt-0 pb-6 flex flex-col">
@@ -139,29 +140,29 @@ export function AppLayout() {
 
               {isActive && (
                 <div className={cn(
-                  "fixed bottom-8 z-50",
+                  "fixed bottom-4 md:bottom-8 z-50",
                   "left-4 right-4",
                   "lg:right-[48px]",
                   sidebarExpanded ? "lg:left-[300px]" : "lg:left-[120px]"
                 )}>
-                  <div className="backdrop-blur-md bg-card/90 border border-border drop-shadow-[0px_8px_15px_rgba(0,0,0,0.08)] flex h-16 items-center justify-between px-4.25 py-px rounded-3xl w-full">
-                    <div className="flex gap-4 items-center">
-                      <div className="bg-[#f5f3ff] border border-[#ede9fe] flex items-center justify-center rounded-2xl w-10 h-10 shrink-0">
+                  <div className="backdrop-blur-md bg-card/90 border border-border drop-shadow-[0px_8px_15px_rgba(0,0,0,0.08)] flex flex-wrap items-center justify-between px-3 py-3 md:px-4.25 md:py-px md:h-16 rounded-2xl md:rounded-3xl w-full gap-2">
+                    <div className="flex gap-2 md:gap-4 items-center min-w-0 flex-1 md:flex-auto">
+                      <div className="bg-[#f5f3ff] border border-[#ede9fe] hidden sm:flex items-center justify-center rounded-2xl w-10 h-10 shrink-0">
                         <Timer className="w-4.5 h-4.5 text-cu-purple" />
                       </div>
-                      <div className="flex flex-col items-start">
+                      <div className="flex flex-col items-start min-w-0">
                         <span className="font-['Spline_Sans',sans-serif] font-bold text-cu-purple text-[10px] leading-4 tracking-[1px] uppercase">ACTIVE FOCUS</span>
-                        <span className="font-['Spline_Sans',sans-serif] font-semibold text-foreground text-[14px] leading-5">
+                        <span className="font-['Spline_Sans',sans-serif] font-semibold text-foreground text-[12px] md:text-[14px] leading-5 truncate max-w-[120px] sm:max-w-[200px]">
                           {activeSession?.task_id ? 'Focusing on task' : 'No Task Selected'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-6 items-center">
-                      <span className="font-['Spline_Sans',sans-serif] font-bold text-foreground text-[18px] leading-6">{formatTime(secondsElapsed)}</span>
-                      <div className="flex gap-2 items-center">
-                        <button onClick={() => setIsDistractionModalOpen(true)} className="bg-[#fff7ed] hover:bg-[#ffedd5] transition-colors border-none flex items-center justify-center rounded-xl px-3 h-8 cursor-pointer gap-1.5 mr-2" title="Log Distraction (Cmd/Ctrl + D)">
+                    <div className="flex gap-2 md:gap-6 items-center ml-auto shrink-0">
+                      <span className="font-['Spline_Sans',sans-serif] font-bold text-foreground text-[14px] md:text-[18px] leading-6">{formatTime(secondsElapsed)}</span>
+                      <div className="flex gap-1.5 md:gap-2 items-center">
+                        <button onClick={() => setIsDistractionModalOpen(true)} className="bg-[#fff7ed] hover:bg-[#ffedd5] transition-colors border-none flex items-center justify-center rounded-xl px-2 md:px-3 h-8 cursor-pointer gap-1" title="Log Distraction (Cmd/Ctrl + D)">
                           <AlertCircle className="w-3.5 h-3.5 text-cu-orange" />
-                          <span className="text-xs font-semibold text-cu-orange">Log</span>
+                          <span className="text-xs font-semibold text-cu-orange hidden md:inline">Log</span>
                         </button>
                         <button onClick={() => isPaused ? resumeSession() : pauseSession()} className="bg-muted hover:bg-muted/80 transition-colors border-none flex items-center justify-center rounded-xl w-8 h-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" title={isPaused ? "Resume" : "Pause"} aria-label={isPaused ? "Resume focus session" : "Pause focus session"}>
                           {isPaused ? <Play className="w-3.5 h-3.5 text-muted-foreground" /> : <Pause className="w-3.5 h-3.5 text-muted-foreground fill-muted-foreground" />}

@@ -94,8 +94,8 @@ export default function Support() {
   return (
     <div className="page-container pt-3">
       <div className="flex flex-col gap-0.5 mb-3">
-        <h1 className="page-title">Support</h1>
-        <p className="page-description">
+        <h1 className="page-title text-xl sm:text-2xl">Support</h1>
+        <p className="page-description text-sm sm:text-base">
           Find answers to common questions or reach out to our team.
         </p>
       </div>
@@ -104,17 +104,17 @@ export default function Support() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <Input
           placeholder="Search FAQs..."
-          className="pl-10 bg-white border-slate-100 h-10 rounded-xl"
+          className="pl-10 bg-white border-slate-100 h-9 sm:h-10 rounded-xl text-sm sm:text-base"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100">
-              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-slate-700 text-[12px] tracking-[1.2px] uppercase">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+              <h3 className="font-['Spline_Sans',sans-serif] font-semibold text-slate-700 text-[11px] sm:text-[12px] tracking-[1.2px] uppercase">
                 Frequently Asked Questions
               </h3>
             </div>
@@ -133,9 +133,9 @@ export default function Support() {
                       onClick={() =>
                         setOpenIndex(openIndex === index ? null : index)
                       }
-                      className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 text-left hover:bg-slate-50 transition-colors cursor-pointer"
                     >
-                      <span className="font-['Spline_Sans',sans-serif] text-[15px] font-semibold text-slate-900 pr-4">
+                      <span className="font-['Spline_Sans',sans-serif] text-[13px] sm:text-[15px] font-semibold text-slate-900 pr-3 sm:pr-4">
                         {faq.question}
                       </span>
                       <ChevronDown
@@ -151,8 +151,8 @@ export default function Support() {
                         openIndex === index ? "max-h-96" : "max-h-0",
                       )}
                     >
-                      <div className="px-6 pb-4">
-                        <p className="font-['Inter',sans-serif] text-[14px] leading-relaxed text-slate-500">
+                      <div className="px-4 sm:px-6 pb-3 sm:pb-4">
+                        <p className="font-['Inter',sans-serif] text-[13px] sm:text-[14px] leading-relaxed text-slate-500">
                           {faq.answer}
                         </p>
                       </div>
@@ -165,14 +165,14 @@ export default function Support() {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-6">
+          <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[#f5f3ff] flex items-center justify-center shrink-0">
                 <HelpCircle className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Need more help?</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-base sm:text-lg font-semibold">Need more help?</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   We're here for you.
                 </p>
               </div>
@@ -213,11 +213,11 @@ export default function Support() {
             </div>
           </div>
 
-          <div className="bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] border border-[#e0d6ff] rounded-xl p-6">
-            <h3 className="font-['Spline_Sans',sans-serif] text-[18px] font-semibold text-slate-900 mb-2">
+          <div className="bg-linear-to-br from-[#f5f3ff] to-[#ede9fe] border border-[#e0d6ff] rounded-xl p-4 sm:p-6">
+            <h3 className="font-['Spline_Sans',sans-serif] text-[16px] sm:text-[18px] font-semibold text-slate-900 mb-2">
               Join our community
             </h3>
-            <p className="text-sm text-slate-600 mb-4">
+            <p className="text-xs sm:text-sm text-slate-600 mb-4">
               Connect with other power users, share tips, and get early access
               to new features.
             </p>

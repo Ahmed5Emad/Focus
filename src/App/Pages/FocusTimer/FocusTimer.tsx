@@ -202,13 +202,13 @@ export default function FocusTimer() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container px-4 sm:px-6">
       <div className="flex flex-col gap-2 pt-6">
-        <h1 className="page-title">Focus Timer</h1>
+        <h1 className="page-title text-xl sm:text-2xl md:text-3xl">Focus Timer</h1>
         <p className="page-description">Manage your deep work sessions and track distractions.</p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 md:p-8 shadow-sm flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cu-purple to-cu-pink opacity-20"></div>
         
         {isActive ? (
@@ -218,18 +218,18 @@ export default function FocusTimer() {
               ACTIVE SESSION
             </div>
             
-            <h2 className="text-2xl font-semibold text-slate-900 mb-2 text-center">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 mb-2 text-center">
               {activeSession?.task_id ? 'Focusing on task' : 'Unassigned Task'}
             </h2>
             
-            <div className="text-[80px] font-bold text-slate-900 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
+            <div className="text-3xl sm:text-5xl md:text-[80px] font-bold text-slate-900 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-8 sm:mb-12">
               {formatTime(secondsElapsed)}
             </div>
             
             <div className="flex gap-4">
               <button 
                 onClick={() => isPaused ? resumeSession() : pauseSession()}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 min-h-11 rounded-xl transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label={isPaused ? "Resume focus session" : "Pause focus session"}
               >
                 {isPaused ? (
@@ -241,7 +241,7 @@ export default function FocusTimer() {
               </button>
               <button 
                 onClick={() => stopSession()}
-                className="bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold py-3 px-6 min-h-11 rounded-xl transition-colors flex items-center gap-2 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label="Stop focus session"
               >
                 <Square className="w-5 h-5" />
@@ -255,7 +255,7 @@ export default function FocusTimer() {
               READY TO FOCUS
             </div>
             
-            <div className="text-[80px] font-bold text-slate-400 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-12">
+            <div className="text-3xl sm:text-5xl md:text-[80px] font-bold text-slate-400 font-['Spline_Sans',sans-serif] tracking-tight leading-none mb-8 sm:mb-12">
               00:00
             </div>
             
@@ -278,10 +278,10 @@ export default function FocusTimer() {
                   if (!currentWorkspaceId) return;
                   await startSession(startTaskId, currentWorkspaceId);
                 }}
-                className="btn-primary w-full"
+                className="btn-primary w-full min-h-11"
               >
                 <Play className="w-4 h-4" />
-                <span className="font-semibold tracking-wide uppercase text-[12px]">
+                <span className="font-semibold tracking-wide uppercase text-[10px] sm:text-[12px]">
                   {startTaskId ? "Start Focus Session" : "Start Free Focus"}
                 </span>
               </Button>
@@ -311,7 +311,7 @@ export default function FocusTimer() {
 
         <CollapsibleContent className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col h-[400px]">
+            <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm flex flex-col h-[300px] sm:h-[400px]">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-cu-orange" />
@@ -340,7 +340,7 @@ export default function FocusTimer() {
                   </div>
                 ) : (
                   currentLogs.map(log => (
-                    <div key={log.id} className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-start gap-3">
+                    <div key={log.id} className="bg-slate-50 border border-slate-100 rounded-xl p-2 sm:p-3 flex items-start gap-2 sm:gap-3">
                       <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${log.severity === 'major' ? 'bg-red-500' : 'bg-amber-400'}`} />
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -362,14 +362,14 @@ export default function FocusTimer() {
                 <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => logDistraction('internal', 'minor')}
-                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2.5 sm:py-2 min-h-10 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     aria-label="Log internal distraction"
                   >
                     + Internal
                   </button>
                   <button 
                     onClick={() => logDistraction('external', 'minor')}
-                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2.5 sm:py-2 min-h-10 rounded-lg transition-colors border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     aria-label="Log external distraction"
                   >
                     + External
@@ -378,7 +378,7 @@ export default function FocusTimer() {
               )}
             </div>
 
-            <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm overflow-hidden">
+            <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm overflow-hidden">
               <h3 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-cu-blue" />
                 Recent Sessions
@@ -407,17 +407,17 @@ export default function FocusTimer() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="pb-3 font-semibold text-slate-500 text-sm">Task</th>
-                        <th className="pb-3 font-semibold text-slate-500 text-sm">Date</th>
-                        <th className="pb-3 font-semibold text-slate-500 text-sm">Duration</th>
-                        <th className="pb-3 font-semibold text-slate-500 text-sm">Flow Score</th>
-                        <th className="pb-3 font-semibold text-slate-500 text-sm">Status</th>
+                        <th className="pb-2 sm:pb-3 font-semibold text-slate-500 text-[11px] sm:text-sm">Task</th>
+                        <th className="pb-2 sm:pb-3 font-semibold text-slate-500 text-[11px] sm:text-sm">Date</th>
+                        <th className="pb-2 sm:pb-3 font-semibold text-slate-500 text-[11px] sm:text-sm">Duration</th>
+                        <th className="pb-2 sm:pb-3 font-semibold text-slate-500 text-[11px] sm:text-sm">Flow Score</th>
+                        <th className="pb-2 sm:pb-3 font-semibold text-slate-500 text-[11px] sm:text-sm">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {history.map(session => (
                         <tr key={session.id} className="border-b border-slate-100 last:border-0 group">
-                          <td className="py-4 text-sm font-medium text-slate-900">
+                          <td className="py-2 sm:py-3 md:py-4 text-xs sm:text-sm font-medium text-slate-900">
                             <div className="flex items-center gap-2">
                               <Dropdown
                                 value={session.task_id}
@@ -432,25 +432,25 @@ export default function FocusTimer() {
                               />
                             </div>
                           </td>
-                          <td className="py-4 text-sm text-slate-500">
+                          <td className="py-2 sm:py-3 md:py-4 text-xs sm:text-sm text-slate-500">
                             {new Date(session.start_time).toLocaleDateString()}
                           </td>
-                          <td className="py-4 text-sm text-slate-900 font-medium">
+                          <td className="py-2 sm:py-3 md:py-4 text-xs sm:text-sm text-slate-900 font-medium">
                             {formatTime(session.actual_duration_seconds)}
                           </td>
-                          <td className="py-4">
+                          <td className="py-2 sm:py-3 md:py-4">
                             {session.flow_score !== null ? (
                               <div className="flex items-center gap-1.5">
-                                <Activity className="w-4 h-4 text-cu-green" />
-                                <span className="text-sm font-bold text-slate-900">{session.flow_score}</span>
+                                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cu-green" />
+                                <span className="text-xs sm:text-sm font-bold text-slate-900">{session.flow_score}</span>
                               </div>
                             ) : (
                               <span className="text-sm text-slate-400">-</span>
                             )}
                           </td>
-                          <td className="py-4">
+                          <td className="py-2 sm:py-3 md:py-4">
                             <div className="flex items-center gap-2">
-                              <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${
+                              <span className={`text-[10px] sm:text-xs font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full capitalize ${
                                 session.status === 'completed' ? 'bg-[#f0fdf4] text-cu-green' :
                                 session.status === 'active' ? 'bg-[#f5f3ff] text-cu-purple' :
                                 'bg-slate-100 text-slate-500'
@@ -462,7 +462,7 @@ export default function FocusTimer() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                    className="h-8 w-8 min-h-9 min-w-9 sm:min-h-8 sm:min-w-8 rounded-lg text-slate-400 hover:text-slate-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                     aria-label="Session actions"
                                   >
                                     <MoreHorizontal className="w-4 h-4" />
