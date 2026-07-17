@@ -17,7 +17,7 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="workspace" className="w-full">
-        <TabsList className="mb-3 bg-muted/50 p-[3px] overflow-x-auto flex-nowrap md:flex-wrap scrollbar-thin">
+        <TabsList className="mb-3 bg-muted/50 p-[3px] flex-wrap">
           <TabsTrigger value="account" className="gap-1 md:gap-3 px-1.5 md:px-4 text-xs md:text-base">
             <User className="w-3.5 h-3.5 md:w-5 md:h-5" />
             Account
